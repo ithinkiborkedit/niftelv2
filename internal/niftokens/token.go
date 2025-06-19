@@ -1,4 +1,4 @@
-package ntokens
+package niftokens
 
 type TokenType int
 
@@ -35,6 +35,8 @@ const (
 	TokenOr
 	TokenColon
 	TokenDot
+	TokenPercent
+	TokenAmper
 
 	//Keywords
 	TokenTrue
@@ -66,6 +68,7 @@ var tokenTypeToString = map[TokenType]string{
 	TokenComma:     ",",
 	TokenStar:      "*",
 	TokenFWDSlash:  "/",
+	TokenPercent:   "%",
 	TokenPlus:      "+",
 	TokenPlusEq:    "+=",
 	TokenMinus:     "-",
@@ -82,6 +85,7 @@ var tokenTypeToString = map[TokenType]string{
 	TokenLess:      "<",
 	TokenGreaterEq: ">=",
 	TokenLessEq:    "<=",
+	TokenAmper:     "&",
 	TokenAnd:       "&&",
 	TokenOr:        "||",
 	TokenColon:     ":",
@@ -111,7 +115,7 @@ func (tt TokenType) String() string {
 	return "UNKNOWN"
 }
 
-type Token struct {
+type NifToken struct {
 	Type    TokenType
 	Lexeme  string
 	Literal interface{}
