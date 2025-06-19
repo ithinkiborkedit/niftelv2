@@ -1,6 +1,6 @@
 package lexer
 
-import ntoken "go/github.com/ithinkiborkedit/niftelv2/internal/ntokens"
+import "go/token"
 
 type Lexer struct {
 	input   string
@@ -9,5 +9,5 @@ type Lexer struct {
 	line    int
 	column  int
 	width   int
-	tokens  []ntoken.Token
+	tokens  []token.Token
 }
