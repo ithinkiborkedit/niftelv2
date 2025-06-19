@@ -1,3 +1,3 @@
-module github.com/ithinkiborkedit/niftelv2.git
+module github.com/ithinkiborkedit/niftelv2
 
 go 1.24.2

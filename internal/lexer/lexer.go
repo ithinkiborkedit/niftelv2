@@ -1,6 +1,6 @@
 package lexer
 
-import "go/token"
+import "github.com/ithinkiborkedit/niftelv2/internal/token"
 
 type Lexer struct {
 	input   string
