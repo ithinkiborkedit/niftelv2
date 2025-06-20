@@ -256,7 +256,13 @@ func (l *Lexer) scanToken() {
 	case '*':
 		l.addToken(token.TokenStar)
 	case '/':
-		l.addToken(token.TokenFWDSlash)
+		if l.match('/') {
+			l.skipLineComment()
+		} else if l.match('*') {
+			l.skipBlockComment()
+		} else {
+			l.addToken(token.TokenFWDSlash)
+		}
 	case '%':
 		l.addToken(token.TokenPercent)
 	case '=':
@@ -302,7 +308,7 @@ func (l *Lexer) scanToken() {
 		l.line++
 		l.column = 0
 	case ' ', '\r', '\t':
-		l.addToken(token.TokenLParen)
+
 	default:
 		if unicode.IsDigit(ch) {
 			l.number()

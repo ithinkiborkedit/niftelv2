@@ -46,19 +46,8 @@
     lexer_test.go:105: 044: STRING               "\"fail\""
     lexer_test.go:105: 045: )                    ")"
     lexer_test.go:105: 046: }                    "}"
-    lexer_test.go:105: 047: /                    "/"
-    lexer_test.go:105: 048: /                    "/"
-    lexer_test.go:105: 049: IDENTIFIER           "single"
-    lexer_test.go:105: 050: IDENTIFIER           "line"
-    lexer_test.go:105: 051: IDENTIFIER           "comment"
-    lexer_test.go:105: 052: /                    "/"
-    lexer_test.go:105: 053: *                    "*"
-    lexer_test.go:105: 054: IDENTIFIER           "block"
-    lexer_test.go:105: 055: IDENTIFIER           "comment"
-    lexer_test.go:105: 056: *                    "*"
-    lexer_test.go:105: 057: /                    "/"
-    lexer_test.go:105: 058: EOF                  ""
-    lexer_test.go:108: token count mismatch: got 74, want 58
+    lexer_test.go:105: 047: EOF                  ""
+    lexer_test.go:108: token count mismatch: got 61, want 58
 FAIL
-FAIL	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	0.195s
+FAIL	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	0.283s
 FAIL
