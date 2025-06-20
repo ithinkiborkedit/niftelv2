@@ -47,7 +47,7 @@
     lexer_test.go:105: 045: )                    ")"
     lexer_test.go:105: 046: }                    "}"
     lexer_test.go:105: 047: EOF                  ""
-    lexer_test.go:108: token count mismatch: got 61, want 58
+    lexer_test.go:108: token count mismatch: got 48, want 58
 FAIL
-FAIL	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	0.232s
+FAIL	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	0.193s
 FAIL
