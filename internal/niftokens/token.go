@@ -5,12 +5,16 @@ type TokenType int
 const (
 	TokenIllegal TokenType = iota
 	TokenEOF
-	TokenIdent
+	TokenIdentifier
 	TokenNumber
 	TokenString
-	TokenEqual
+	TokenBool
+	TokenNull
+
+	TokenAssign
 	TokenBang
 	TokenComma
+	TokenSemicolon
 	TokenStar
 	TokenFWDSlash
 	TokenPlus
@@ -21,6 +25,7 @@ const (
 	TokenRParen
 	TokenLBrace
 	TokenRBrace
+	TokenPipe
 	TokenLBracket
 	TokenRBracket
 	TokenRepo
@@ -37,6 +42,8 @@ const (
 	TokenDot
 	TokenPercent
 	TokenAmper
+	TokenNewLine
+	TokenArrow
 
 	//Keywords
 	TokenTrue
@@ -55,57 +62,65 @@ const (
 	TokenReturn
 	TokenWhile
 	TokenPrint
+	TokenBreak
+	TokenContinue
 )
 
 var tokenTypeToString = map[TokenType]string{
-	TokenIllegal:   "ILLEGAL",
-	TokenEOF:       "EOF",
-	TokenIdent:     "IDENTIFIER",
-	TokenNumber:    "NUMBER",
-	TokenString:    "STRING",
-	TokenEqual:     "=",
-	TokenBang:      "!",
-	TokenComma:     ",",
-	TokenStar:      "*",
-	TokenFWDSlash:  "/",
-	TokenPercent:   "%",
-	TokenPlus:      "+",
-	TokenPlusEq:    "+=",
-	TokenMinus:     "-",
-	TokenMinEq:     "-=",
-	TokenLParen:    "(",
-	TokenRParen:    ")",
-	TokenLBrace:    "{",
-	TokenRBrace:    "}",
-	TokenLBracket:  "[",
-	TokenRBracket:  "]",
-	TokenEqality:   "==",
-	TokenBangEqal:  "!=",
-	TokenGreater:   ">",
-	TokenLess:      "<",
-	TokenGreaterEq: ">=",
-	TokenLessEq:    "<=",
-	TokenAmper:     "&",
-	TokenAnd:       "&&",
-	TokenOr:        "||",
-	TokenColon:     ":",
-	TokenDot:       ".",
-	TokenTrue:      "true",
-	TokenT:         "type",
-	TokenStruct:    "struct",
-	TokenImport:    "import",
-	TokenAs:        "as",
-	TokenNil:       "nil",
-	TokenFalse:     "false",
-	TokenIf:        "if",
-	TokenElse:      "else",
-	TokenFor:       "for",
-	TokenIn:        "in",
-	TokenVar:       "var",
-	TokenFunc:      "func",
-	TokenReturn:    "return",
-	TokenWhile:     "while",
-	TokenPrint:     "print",
+	TokenIllegal:    "ILLEGAL",
+	TokenEOF:        "EOF",
+	TokenIdentifier: "IDENTIFIER",
+	TokenNumber:     "NUMBER",
+	TokenString:     "STRING",
+	TokenAssign:     "=",
+	TokenBang:       "!",
+	TokenComma:      ",",
+	TokenStar:       "*",
+	TokenFWDSlash:   "/",
+	TokenPercent:    "%",
+	TokenPlus:       "+",
+	TokenPlusEq:     "+=",
+	TokenMinus:      "-",
+	TokenArrow:      "->",
+	TokenMinEq:      "-=",
+	TokenLParen:     "(",
+	TokenRParen:     ")",
+	TokenLBrace:     "{",
+	TokenRBrace:     "}",
+	TokenLBracket:   "[",
+	TokenRBracket:   "]",
+	TokenEqality:    "==",
+	TokenBangEqal:   "!=",
+	TokenGreater:    ">",
+	TokenLess:       "<",
+	TokenGreaterEq:  ">=",
+	TokenLessEq:     "<=",
+	TokenAmper:      "&",
+	TokenAnd:        "&&",
+	TokenPipe:       "|",
+	TokenOr:         "||",
+	TokenColon:      ":",
+	TokenSemicolon:  ";",
+	TokenDot:        ".",
+	TokenTrue:       "true",
+	TokenT:          "type",
+	TokenStruct:     "struct",
+	TokenImport:     "import",
+	TokenAs:         "as",
+	TokenNil:        "nil",
+	TokenFalse:      "false",
+	TokenIf:         "if",
+	TokenElse:       "else",
+	TokenFor:        "for",
+	TokenIn:         "in",
+	TokenVar:        "var",
+	TokenFunc:       "func",
+	TokenReturn:     "return",
+	TokenWhile:      "while",
+	TokenPrint:      "print",
+	TokenBreak:      "break",
+	TokenContinue:   "continue",
+	TokenNewLine:    "\n",
 }
 
 func (tt TokenType) String() string {
@@ -116,9 +131,8 @@ func (tt TokenType) String() string {
 }
 
 type NifToken struct {
-	Type    TokenType
-	Lexeme  string
-	Literal interface{}
-	Line    int
-	Column  int
+	Type   TokenType
+	Lexeme string
+	Line   int
+	Column int
 }
