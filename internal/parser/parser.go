@@ -248,7 +248,7 @@ func (p *Parser) UnaryExpr() (ast.Expr, error) {
 }
 
 func (p *Parser) varDeclaration() (ast.Stmt, error) {
-	p.consume(token.TokenVar, "Expect 'var' keyword")
+	// p.consume(token.TokenVar, "Expect 'var' keyword")
 	name := p.consume(token.TokenIdentifier, "expect variable name after var")
 
 	typ := p.consume(token.TokenIdentifier, "expect type after variable name")
@@ -726,7 +726,7 @@ func (p *Parser) statement() (ast.Stmt, error) {
 	if p.match(token.TokenVar) {
 		return p.varDeclaration()
 	}
-	if p.match(token.TokenIdentifier) {
+	if p.check(token.TokenIdentifier) {
 		return p.shortVarDeclaration()
 	}
 	if p.check(token.TokenIdentifier) && p.checkNext(token.TokenAssign) {

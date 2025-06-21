@@ -1,3 +1,2 @@
---- FAIL: TestParser_Basic (0.00s)
-panic: [Parse error] Expect 'var' keyword. Got 'result' at line 4 [recovered]
-        panic: [Parse error] Expect 'var' keyword. Got 'result' at line 4
+panic: [Parse error] expect type after variable name. Got ':' at line 4 [recovered]
+        panic: [Parse error] expect type after variable name. Got ':' at line 4
