@@ -250,7 +250,7 @@ func (p *Parser) UnaryExpr() (ast.Expr, error) {
 func (p *Parser) varDeclaration() (ast.Stmt, error) {
 	// p.consume(token.TokenVar, "Expect 'var' keyword")
 	name := p.consume(token.TokenIdentifier, "expect variable name after var")
-
+	p.consume(token.TokenColon, "expected ':' after variable name")
 	typ := p.consume(token.TokenIdentifier, "expect type after variable name")
 
 	p.consume(token.TokenAssign, "expect '=' after variable type")

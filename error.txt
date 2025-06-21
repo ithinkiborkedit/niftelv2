@@ -1,2 +1,4 @@
-panic: [Parse error] expect type after variable name. Got ':' at line 4 [recovered]
-        panic: [Parse error] expect type after variable name. Got ':' at line 4
+panic: [Parse error] expect end of variable declaration  got '
+        ' instead at line 5 [recovered]
+        panic: [Parse error] expect end of variable declaration  got '
+        ' instead at line 5
