@@ -21,7 +21,7 @@ func TestValueTypeRegistry(t *testing.T) {
 			"bar": {Name: "string", Kind: TypeKindBuiltin},
 		},
 		Methods:       make(map[string]*FuncInfo),
-		GenericParams: nil,
+		GenericParams: []string{"T"},
 	}
 
 	RegisterType(myStruct.Name, myStruct)
