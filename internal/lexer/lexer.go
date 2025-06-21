@@ -308,10 +308,7 @@ func (l *Lexer) scanToken() {
 	case '"', '\'':
 		l.string(ch)
 	case '\n':
-		if len(l.tokens) == 0 || l.tokens[len(l.tokens)-1].Type != token.TokenNewLine {
-			l.addToken(token.TokenNewLine)
-		}
-		// l.addToken(token.TokenNewLine)
+		l.addToken(token.TokenNewLine)
 		l.line++
 		l.column = 0
 	case ' ', '\r', '\t':
