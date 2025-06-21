@@ -8,11 +8,14 @@ import (
 )
 
 func TestParser_Basic(t *testing.T) {
-	source := `	func add(a: int, b: int) -> int {
+	source := `	
+	func add(a: int, b: int) -> int {
 	   return a + b
 	}
 	var result: int = add(5,3)
 
+
+	
 	if result > 5 {
 	  print("success")
 

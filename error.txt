@@ -1,2 +1,69 @@
-panic: [Parse error] expect end of variable declaration  got 'if' instead at line 6 [recovered]
-        panic: [Parse error] expect end of variable declaration  got 'if' instead at line 6
+=== RUN   TestParser_Basic
+    parser_test.go:33:                              0: 
+                "\n"
+    parser_test.go:33:                              1: func     "func"
+    parser_test.go:33:                              2: IDENTIFIER       "add"
+    parser_test.go:33:                              3: (        "("
+    parser_test.go:33:                              4: IDENTIFIER       "a"
+    parser_test.go:33:                              5: :        ":"
+    parser_test.go:33:                              6: IDENTIFIER       "int"
+    parser_test.go:33:                              7: ,        ","
+    parser_test.go:33:                              8: IDENTIFIER       "b"
+    parser_test.go:33:                              9: :        ":"
+    parser_test.go:33:                             10: IDENTIFIER       "int"
+    parser_test.go:33:                             11: )        ")"
+    parser_test.go:33:                             12: ->       "->"
+    parser_test.go:33:                             13: IDENTIFIER       "int"
+    parser_test.go:33:                             14: {        "{"
+    parser_test.go:33:                             15: 
+                "\n"
+    parser_test.go:33:                             16: return   "return"
+    parser_test.go:33:                             17: IDENTIFIER       "a"
+    parser_test.go:33:                             18: +        "+"
+    parser_test.go:33:                             19: IDENTIFIER       "b"
+    parser_test.go:33:                             20: 
+                "\n"
+    parser_test.go:33:                             21: }        "}"
+    parser_test.go:33:                             22: 
+                "\n"
+    parser_test.go:33:                             23: var      "var"
+    parser_test.go:33:                             24: IDENTIFIER       "result"
+    parser_test.go:33:                             25: :        ":"
+    parser_test.go:33:                             26: IDENTIFIER       "int"
+    parser_test.go:33:                             27: =        "="
+    parser_test.go:33:                             28: IDENTIFIER       "add"
+    parser_test.go:33:                             29: (        "("
+    parser_test.go:33:                             30: NUMBER   "5"
+    parser_test.go:33:                             31: ,        ","
+    parser_test.go:33:                             32: NUMBER   "3"
+    parser_test.go:33:                             33: )        ")"
+    parser_test.go:33:                             34: 
+                "\n"
+    parser_test.go:33:                             35: if       "if"
+    parser_test.go:33:                             36: IDENTIFIER       "result"
+    parser_test.go:33:                             37: >        ">"
+    parser_test.go:33:                             38: NUMBER   "5"
+    parser_test.go:33:                             39: {        "{"
+    parser_test.go:33:                             40: 
+                "\n"
+    parser_test.go:33:                             41: IDENTIFIER       "print"
+    parser_test.go:33:                             42: (        "("
+    parser_test.go:33:                             43: STRING   "\"success\""
+    parser_test.go:33:                             44: )        ")"
+    parser_test.go:33:                             45: 
+                "\n"
+    parser_test.go:33:                             46: }        "}"
+    parser_test.go:33:                             47: else     "else"
+    parser_test.go:33:                             48: {        "{"
+    parser_test.go:33:                             49: 
+                "\n"
+    parser_test.go:33:                             50: IDENTIFIER       "print"
+    parser_test.go:33:                             51: (        "("
+    parser_test.go:33:                             52: STRING   "\"fail\""
+    parser_test.go:33:                             53: )        ")"
+    parser_test.go:33:                             54: 
+                "\n"
+    parser_test.go:33:                             55: }        "}"
+    parser_test.go:33:                             56: 
+                "\n"
+    parser_test.go:33:                             57: EOF      ""
