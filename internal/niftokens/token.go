@@ -44,6 +44,7 @@ const (
 	TokenAmper
 	TokenNewLine
 	TokenArrow
+	TokenColonEqual
 
 	//Keywords
 	TokenTrue
@@ -90,6 +91,7 @@ var tokenTypeToString = map[TokenType]string{
 	TokenLBracket:   "[",
 	TokenRBracket:   "]",
 	TokenEqality:    "==",
+	TokenColonEqual: ":=",
 	TokenBangEqal:   "!=",
 	TokenGreater:    ">",
 	TokenLess:       "<",

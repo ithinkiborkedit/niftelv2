@@ -244,12 +244,15 @@ func (l *Lexer) scanToken() {
 	case ';':
 		l.addToken(token.TokenSemicolon)
 	case ':':
+		if l.match('=') {
+			l.addToken(token.TokenColonEqual)
+		}
 		l.addToken(token.TokenColon)
 	case '+':
 		l.addToken(token.TokenPlus)
 	case '-':
 		if l.match('>') {
-			l.addToken(token.TokenBangEqal)
+			l.addToken(token.TokenArrow)
 		} else {
 			l.addToken(token.TokenBang)
 		}
@@ -269,7 +272,7 @@ func (l *Lexer) scanToken() {
 		if l.match('=') {
 			l.addToken(token.TokenEqality)
 		} else {
-			l.addToken(token.TokenBang)
+			l.addToken(token.TokenAssign)
 		}
 	case '!':
 		if l.match('=') {
