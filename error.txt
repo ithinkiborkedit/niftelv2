@@ -1,3 +1,3 @@
 --- FAIL: TestValueTypeRegistry (0.00s)
-panic: runtime error: invalid memory address or nil pointer dereference [recovered]
-        panic: runtime error: invalid memory address or nil pointer dereference
+panic: runtime error: index out of range [0] with length 0 [recovered]
+        panic: runtime error: index out of range [0] with length 0

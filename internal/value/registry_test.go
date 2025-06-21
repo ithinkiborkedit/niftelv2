@@ -14,7 +14,7 @@ func TestValueTypeRegistry(t *testing.T) {
 	}
 
 	myStruct := &TypeInfo{
-		Name: "Mystruct",
+		Name: "MyStruct",
 		Kind: TypeKindStruct,
 		Fields: map[string]*TypeInfo{
 			"foo": {Name: "int", Kind: TypeKindBuiltin},
