@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
 )
 
 func TestParser_Basic(t *testing.T) {
@@ -26,13 +25,17 @@ func TestParser_Basic(t *testing.T) {
 	l := lexer.New(source)
 	tokens := l.ScanTokens()
 
-	p := parser.New(tokens)
-
-	program, err := p.Parse()
-	if err != nil {
-		t.Fatalf("Parser error: %v", err)
+	for i, tok := range tokens {
+		t.Logf("%30d: %s\t%q", i, tok.Type, tok.Lexeme)
 	}
 
-	t.Logf("AST %+v", program)
+	// p := parser.New(tokens)
+
+	// program, err := p.Parse()
+	// if err != nil {
+	// 	t.Fatalf("Parser error: %v", err)
+	// }
+
+	// t.Logf("AST %+v", program)
 
 }

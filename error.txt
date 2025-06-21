@@ -1,28 +1,75 @@
 === RUN   TestParser_Basic
---- FAIL: TestParser_Basic (0.00s)
-panic: [Parse error] expected ':' after parameter name. Got 'int' at line 1 [recovered]
-	panic: [Parse error] expected ':' after parameter name. Got 'int' at line 1
-
-goroutine 34 [running]:
-testing.tRunner.func1.2({0x10507cb80, 0x1400011a250})
-	/opt/homebrew/Cellar/go/1.24.2/libexec/src/testing/testing.go:1734 +0x1ac
-testing.tRunner.func1()
-	/opt/homebrew/Cellar/go/1.24.2/libexec/src/testing/testing.go:1737 +0x334
-panic({0x10507cb80?, 0x1400011a250?})
-	/opt/homebrew/Cellar/go/1.24.2/libexec/src/runtime/panic.go:792 +0x124
-github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).consume(0x14000109c78?, 0x105020cc4?, {0x105034d2c?, 0x104f0efac?})
-	/Users/xk64gw/private/niftelv2/internal/parser/parser.go:70 +0x280
-github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).funcDeclaration(0x14000177ee0)
-	/Users/xk64gw/private/niftelv2/internal/parser/parser.go:600 +0x350
-github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).statement(0xc?)
-	/Users/xk64gw/private/niftelv2/internal/parser/parser.go:742 +0x8dc
-github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).Parse(0x14000177ee0)
-	/Users/xk64gw/private/niftelv2/internal/parser/parser.go:25 +0x98
-github.com/ithinkiborkedit/niftelv2.git/internal/parser_test.TestParser_Basic(0x14000128380)
-	/Users/xk64gw/private/niftelv2/internal/parser/parser_test.go:31 +0x88
-testing.tRunner(0x14000128380, 0x1050acd08)
-	/opt/homebrew/Cellar/go/1.24.2/libexec/src/testing/testing.go:1792 +0xe4
-created by testing.(*T).Run in goroutine 1
-	/opt/homebrew/Cellar/go/1.24.2/libexec/src/testing/testing.go:1851 +0x374
-FAIL	github.com/ithinkiborkedit/niftelv2.git/internal/parser	0.198s
-FAIL
+    parser_test.go:29:                              0: func     "func"
+    parser_test.go:29:                              1: IDENTIFIER       "add"
+    parser_test.go:29:                              2: (        "("
+    parser_test.go:29:                              3: IDENTIFIER       "a"
+    parser_test.go:29:                              4: :        ":"
+    parser_test.go:29:                              5: IDENTIFIER       "int"
+    parser_test.go:29:                              6: ,        ","
+    parser_test.go:29:                              7: IDENTIFIER       "b"
+    parser_test.go:29:                              8: :        ":"
+    parser_test.go:29:                              9: IDENTIFIER       "int"
+    parser_test.go:29:                             10: )        ")"
+    parser_test.go:29:                             11: ->       "->"
+    parser_test.go:29:                             12: IDENTIFIER       "int"
+    parser_test.go:29:                             13: {        "{"
+    parser_test.go:29:                             14: 
+                "\n"
+    parser_test.go:29:                             15: return   "return"
+    parser_test.go:29:                             16: IDENTIFIER       "a"
+    parser_test.go:29:                             17: +        "+"
+    parser_test.go:29:                             18: IDENTIFIER       "b"
+    parser_test.go:29:                             19: 
+                "\n"
+    parser_test.go:29:                             20: }        "}"
+    parser_test.go:29:                             21: 
+                "\n"
+    parser_test.go:29:                             22: var      "var"
+    parser_test.go:29:                             23: IDENTIFIER       "result"
+    parser_test.go:29:                             24: :        ":"
+    parser_test.go:29:                             25: IDENTIFIER       "int"
+    parser_test.go:29:                             26: =        "="
+    parser_test.go:29:                             27: IDENTIFIER       "add"
+    parser_test.go:29:                             28: (        "("
+    parser_test.go:29:                             29: NUMBER   "5"
+    parser_test.go:29:                             30: ,        ","
+    parser_test.go:29:                             31: NUMBER   "3"
+    parser_test.go:29:                             32: )        ")"
+    parser_test.go:29:                             33: 
+                "\n"
+    parser_test.go:29:                             34: 
+                "\n"
+    parser_test.go:29:                             35: if       "if"
+    parser_test.go:29:                             36: IDENTIFIER       "result"
+    parser_test.go:29:                             37: >        ">"
+    parser_test.go:29:                             38: NUMBER   "5"
+    parser_test.go:29:                             39: {        "{"
+    parser_test.go:29:                             40: 
+                "\n"
+    parser_test.go:29:                             41: IDENTIFIER       "print"
+    parser_test.go:29:                             42: (        "("
+    parser_test.go:29:                             43: STRING   "\"success\""
+    parser_test.go:29:                             44: )        ")"
+    parser_test.go:29:                             45: 
+                "\n"
+    parser_test.go:29:                             46: 
+                "\n"
+    parser_test.go:29:                             47: }        "}"
+    parser_test.go:29:                             48: else     "else"
+    parser_test.go:29:                             49: {        "{"
+    parser_test.go:29:                             50: 
+                "\n"
+    parser_test.go:29:                             51: IDENTIFIER       "print"
+    parser_test.go:29:                             52: (        "("
+    parser_test.go:29:                             53: STRING   "\"fail\""
+    parser_test.go:29:                             54: )        ")"
+    parser_test.go:29:                             55: 
+                "\n"
+    parser_test.go:29:                             56: }        "}"
+    parser_test.go:29:                             57: 
+                "\n"
+    parser_test.go:29:                             58: 
+                "\n"
+    parser_test.go:29:                             59: EOF      ""
+--- PASS: TestParser_Basic (0.00s)
+PASS

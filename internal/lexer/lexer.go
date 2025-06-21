@@ -246,8 +246,9 @@ func (l *Lexer) scanToken() {
 	case ':':
 		if l.match('=') {
 			l.addToken(token.TokenColonEqual)
+		} else {
+			l.addToken(token.TokenColon)
 		}
-		l.addToken(token.TokenColon)
 	case '+':
 		l.addToken(token.TokenPlus)
 	case '-':
