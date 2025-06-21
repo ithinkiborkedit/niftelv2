@@ -86,9 +86,14 @@ func (*DictExpr) exprNode()         {}
 func (e *DictExpr) Pos() (int, int) { return e.LBrace.Line, e.LBrace.Column }
 
 type FuncExpr struct {
-	Params []token.NifToken
+	Params []Param
 	Body   *BlockStmt
 	Func   token.NifToken
+}
+
+type Param struct {
+	Name token.NifToken
+	Type token.NifToken
 }
 
 func (*FuncExpr) exprNode()         {}
@@ -176,7 +181,7 @@ func (s *BlockStmt) Pos() (int, int) { return s.LBrace.Line, s.LBrace.Column }
 
 type FuncStmt struct {
 	Name   token.NifToken
-	Params []token.NifToken
+	Params []Param
 	Body   *BlockStmt
 	Func   token.NifToken
 }

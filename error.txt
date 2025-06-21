@@ -1,28 +1,28 @@
 === RUN   TestParser_Basic
 --- FAIL: TestParser_Basic (0.00s)
-panic: [Parse error] expect ')' after parameters. Got ':' at line 1 [recovered]
-	panic: [Parse error] expect ')' after parameters. Got ':' at line 1
+panic: [Parse error] expected ':' after parameter name. Got 'int' at line 1 [recovered]
+	panic: [Parse error] expected ':' after parameter name. Got 'int' at line 1
 
 goroutine 34 [running]:
-testing.tRunner.func1.2({0x10277cb40, 0x14000118250})
+testing.tRunner.func1.2({0x10507cb80, 0x1400011a250})
 	/opt/homebrew/Cellar/go/1.24.2/libexec/src/testing/testing.go:1734 +0x1ac
 testing.tRunner.func1()
 	/opt/homebrew/Cellar/go/1.24.2/libexec/src/testing/testing.go:1737 +0x334
-panic({0x10277cb40?, 0x14000118250?})
+panic({0x10507cb80?, 0x1400011a250?})
 	/opt/homebrew/Cellar/go/1.24.2/libexec/src/runtime/panic.go:792 +0x124
-github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).consume(0x0?, 0x102720bd4?, {0x102732dc3?, 0x3?})
+github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).consume(0x14000109c78?, 0x105020cc4?, {0x105034d2c?, 0x104f0efac?})
 	/Users/xk64gw/private/niftelv2/internal/parser/parser.go:70 +0x280
-github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).funcDeclaration(0x14000175ee0)
-	/Users/xk64gw/private/niftelv2/internal/parser/parser.go:604 +0x1a0
+github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).funcDeclaration(0x14000177ee0)
+	/Users/xk64gw/private/niftelv2/internal/parser/parser.go:600 +0x350
 github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).statement(0xc?)
-	/Users/xk64gw/private/niftelv2/internal/parser/parser.go:733 +0x8dc
-github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).Parse(0x14000175ee0)
+	/Users/xk64gw/private/niftelv2/internal/parser/parser.go:742 +0x8dc
+github.com/ithinkiborkedit/niftelv2.git/internal/parser.(*Parser).Parse(0x14000177ee0)
 	/Users/xk64gw/private/niftelv2/internal/parser/parser.go:25 +0x98
 github.com/ithinkiborkedit/niftelv2.git/internal/parser_test.TestParser_Basic(0x14000128380)
 	/Users/xk64gw/private/niftelv2/internal/parser/parser_test.go:31 +0x88
-testing.tRunner(0x14000128380, 0x1027acc28)
+testing.tRunner(0x14000128380, 0x1050acd08)
 	/opt/homebrew/Cellar/go/1.24.2/libexec/src/testing/testing.go:1792 +0xe4
 created by testing.(*T).Run in goroutine 1
 	/opt/homebrew/Cellar/go/1.24.2/libexec/src/testing/testing.go:1851 +0x374
-FAIL	github.com/ithinkiborkedit/niftelv2.git/internal/parser	0.279s
+FAIL	github.com/ithinkiborkedit/niftelv2.git/internal/parser	0.198s
 FAIL

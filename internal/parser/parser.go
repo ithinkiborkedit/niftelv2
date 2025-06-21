@@ -592,10 +592,15 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 	name := p.consume(token.TokenIdentifier, "expected function name after 'func'")
 	p.consume(token.TokenLParen, "expect '(' after function name")
 
-	var params []token.NifToken
+	var params []ast.Param
 	if !p.check(token.TokenRParen) {
 		for {
-			params = append(params, p.consume(token.TokenIdentifier, "expected parameter name"))
+			paramName := p.consume(token.TokenIdentifier, "expected parameter name")
+			p.consume(token.TokenColon, "expected colon after parameter name")
+			paramType := p.consume(token.TokenColon, "expected ':' after parameter name")
+
+			params = append(params, ast.Param{Name: paramName, Type: paramType})
+
 			if !p.match(token.TokenComma) {
 				break
 			}
@@ -624,11 +629,15 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 
 	p.consume(token.TokenLParen, "expect '(' after func in function literal")
 
-	var params []token.NifToken
+	var params []ast.Param
 
 	if !p.check(token.TokenRParen) {
 		for {
-			params = append(params, p.consume(token.TokenIdentifier, "expected parameter name"))
+			paramName := p.consume(token.TokenIdentifier, "expected parameter name")
+			p.consume(token.TokenColon, "expected ':' after parameter name")
+			paramType := p.consume(token.TokenIdentifier, "expected parameter type")
+
+			params = append(params, ast.Param{Name: paramName, Type: paramType})
 			if !p.match(token.TokenComma) {
 				break
 			}
