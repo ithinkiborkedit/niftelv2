@@ -92,7 +92,7 @@ func (p *Parser) consumeStatementEnd(message string) {
 		return
 	}
 
-	panic(fmt.Sprintf("[Parse error] %s got '%s' instead", message, p.peek().Lexeme, p.peek().Line))
+	panic(fmt.Sprintf("[Parse error] %s  got '%s' instead at line %d", message, p.peek().Lexeme, p.peek().Line))
 }
 
 func (p *Parser) expression() (ast.Expr, error) {
