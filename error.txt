@@ -1,4 +1,2 @@
-panic: [Parse error] expect end of variable declaration  got '
-        ' instead at line 5 [recovered]
-        panic: [Parse error] expect end of variable declaration  got '
-        ' instead at line 5
+panic: [Parse error] expect end of variable declaration  got 'if' instead at line 6 [recovered]
+        panic: [Parse error] expect end of variable declaration  got 'if' instead at line 6

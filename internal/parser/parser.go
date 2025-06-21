@@ -85,7 +85,7 @@ func (p *Parser) skipnewLines() {
 }
 
 func (p *Parser) consumeStatementEnd(message string) {
-	if p.check(token.TokenNewLine) {
+	for p.check(token.TokenNewLine) {
 		p.advance()
 	}
 	if p.check(token.TokenRBrace) || p.isAtEnd() {
