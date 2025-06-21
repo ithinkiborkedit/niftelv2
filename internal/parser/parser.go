@@ -721,7 +721,7 @@ func (p *Parser) statement() (ast.Stmt, error) {
 	if p.match(token.TokenVar) {
 		return p.varDeclaration()
 	}
-	if p.check(token.TokenIdentifier) {
+	if p.check(token.TokenIdentifier) && p.checkNext(token.TokenColonEqual) {
 		return p.shortVarDeclaration()
 	}
 	if p.check(token.TokenIdentifier) && p.checkNext(token.TokenAssign) {

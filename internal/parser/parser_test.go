@@ -22,7 +22,8 @@ func TestParser_Basic(t *testing.T) {
 	}
 	// single line comment
 	/* block
-	   comment */ `
+	   comment */
+	`
 
 	l := lexer.New(source)
 	tokens := l.ScanTokens()
