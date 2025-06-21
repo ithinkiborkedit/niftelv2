@@ -8,14 +8,14 @@ import (
 type ValueType int
 
 const (
-	TypeNull ValueType = iota
-	TypeInt
-	TypeFloat
-	TypeString
-	TypeBool
-	TypeList
-	TypeDict
-	TypeStruct
+	ValueNull ValueType = iota
+	ValueInt
+	ValueFloat
+	ValueString
+	ValueBool
+	ValueList
+	ValueDict
+	ValueStruct
 )
 
 type Value struct {
@@ -26,27 +26,21 @@ type Value struct {
 
 func (v Value) String() string {
 	switch v.Type {
-	case TypeNull:
+	case ValueNull:
 		return "null"
-	case TypeInt, TypeFloat, TypeBool, TypeString:
+	case ValueInt, ValueFloat, ValueBool, ValueString:
 		return fmt.Sprintf("%v", v.Data)
-	case TypeList:
+	case ValueList:
 		return fmt.Sprintf("%v", v.Data)
-	case TypeDict:
+	case ValueDict:
 		return fmt.Sprintf("%v", v.Data)
-	case TypeStruct:
-		return fmt.Sprintf("%v", v.Data)
+	case ValueStruct:
+		return fmt.Sprintf("Struct{%v}", v.Data)
 	default:
 		return fmt.Sprintf("<unknown value: %v>", reflect.TypeOf(v.Data))
 	}
 }
 
-type TypeInfo struct {
-	Name     string
-	Fields   map[string]*TypeInfo
-	ElemType *TypeInfo
-}
-
 func Null() Value {
-	return Value{Type: TypeNull, Data: nil}
+	return Value{Type: ValueNull, Data: nil}
 }
