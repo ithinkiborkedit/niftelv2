@@ -40,7 +40,7 @@ func TestValueTypeRegistry(t *testing.T) {
 		t.Fatalf("struct %v generic params mismatch", typ.Name)
 	}
 
-	if !HasType("int") || HasType("MyStruct") || HasType("NonExistents") {
+	if !HasType("int") || !HasType("MyStruct") || HasType("NonExistents") {
 		t.Fatal("HasType check failed")
 	}
 
