@@ -597,7 +597,7 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 		for {
 			paramName := p.consume(token.TokenIdentifier, "expected parameter name")
 			p.consume(token.TokenColon, "expected colon after parameter name")
-			paramType := p.consume(token.TokenColon, "expected ':' after parameter name")
+			paramType := p.consume(token.TokenIdentifier, "expected ':' after parameter name")
 
 			params = append(params, ast.Param{Name: paramName, Type: paramType})
 
