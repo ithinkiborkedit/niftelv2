@@ -183,6 +183,7 @@ type FuncStmt struct {
 	Name   token.NifToken
 	Params []Param
 	Body   *BlockStmt
+	Return token.NifToken
 	Func   token.NifToken
 }
 

@@ -608,6 +608,11 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 	}
 	p.consume(token.TokenRParen, "expect ')' after parameters")
 
+	var returnType token.NifToken
+	if p.match(token.TokenArrow) {
+		returnType = p.consume(token.TokenArrow, "expect return type after '->'")
+	}
+
 	p.consume(token.TokenLBrace, "expect '{' before function body")
 	body, err := p.blockStatement()
 	if err != nil {
@@ -619,6 +624,7 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 		Name:   name,
 		Params: params,
 		Body:   body,
+		Return: returnType,
 	}, nil
 }
 

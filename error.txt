@@ -1,3 +1,3 @@
 --- FAIL: TestParser_Basic (0.00s)
-panic: [Parse error] expect '{' before function body. Got '->' at line 1 [recovered]
-        panic: [Parse error] expect '{' before function body. Got '->' at line 1
+panic: [Parse error] expect return type after '->'. Got 'int' at line 1 [recovered]
+        panic: [Parse error] expect return type after '->'. Got 'int' at line 1
