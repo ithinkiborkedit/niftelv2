@@ -92,6 +92,8 @@ func (p *Parser) consumeStatementEnd(message string) {
 		return
 	}
 
+	fmt.Printf("TOkens: prev=%v cuurent=%v next=%v\n", p.previous(), p.peek(), p.tokens[p.current+1])
+
 	panic(fmt.Sprintf("[Parse error] %s  got '%s' instead at line %d", message, p.peek().Lexeme, p.peek().Line))
 }
 

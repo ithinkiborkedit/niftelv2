@@ -15,7 +15,7 @@ func TestParser_Basic(t *testing.T) {
 	var result: int = add(5,3)
 
 
-	
+
 	if result > 5 {
 	  print("success")
 
@@ -29,9 +29,9 @@ func TestParser_Basic(t *testing.T) {
 	l := lexer.New(source)
 	tokens := l.ScanTokens()
 
-	for i, tok := range tokens {
-		t.Logf("%30d: %s\t%q", i, tok.Type, tok.Lexeme)
-	}
+	// for i, tok := range tokens {
+	// 	t.Logf("%30d: %s\t%q", i, tok.Type, tok.Lexeme)
+	// }
 
 	p := parser.New(tokens)
 
