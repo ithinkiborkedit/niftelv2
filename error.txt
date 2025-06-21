@@ -1,3 +1,5 @@
 --- FAIL: TestValueTypeRegistry (0.00s)
-panic: runtime error: index out of range [0] with length 0 [recovered]
-        panic: runtime error: index out of range [0] with length 0
+    registry_test.go:40: struct MyStruct generic params mismatch
+FAIL
+FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/value  0.200s
+FAIL

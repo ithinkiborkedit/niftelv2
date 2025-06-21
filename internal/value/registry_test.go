@@ -36,9 +36,10 @@ func TestValueTypeRegistry(t *testing.T) {
 	if len(typ.Fields) != 2 {
 		t.Fatalf("struct %v fields count mismatch", typ.Name)
 	}
-	if typ.GenericParams[0] != "T" {
+	if len(typ.GenericParams) == 0 || typ.GenericParams[0] != "T" {
 		t.Fatalf("struct %v generic params mismatch", typ.Name)
 	}
+
 	if !HasType("int") || HasType("MyStruct") || HasType("NonExistents") {
 		t.Fatal("HasType check failed")
 	}
