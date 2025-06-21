@@ -20,8 +20,8 @@ func New(tokens []token.NifToken) *Parser {
 
 func (p *Parser) Parse() ([]ast.Stmt, error) {
 	var statements []ast.Stmt
+	p.skipnewLines()
 	for !p.isAtEnd() {
-		p.skipnewLines()
 		stmt, err := p.statement()
 		if err != nil {
 			return nil, err
@@ -29,6 +29,7 @@ func (p *Parser) Parse() ([]ast.Stmt, error) {
 		if stmt != nil {
 			statements = append(statements, stmt)
 		}
+		p.skipnewLines()
 	}
 	return statements, nil
 }
@@ -518,6 +519,7 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 		if stmt != nil {
 			statements = append(statements, stmt)
 		}
+		p.skipnewLines()
 	}
 
 	p.consume(token.TokenRBrace, "expected '}' after block")

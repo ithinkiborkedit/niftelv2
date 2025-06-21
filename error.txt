@@ -73,8 +73,7 @@
     parser_test.go:32:                             59: 
         	"\n"
     parser_test.go:32:                             60: EOF	""
-    parser_test.go:39: Parser error: unexpected token '' as line 16
---- FAIL: TestParser_Basic (0.00s)
-FAIL
-FAIL	github.com/ithinkiborkedit/niftelv2.git/internal/parser	0.277s
-FAIL
+    parser_test.go:42: AST [0x140001063c0 0x1400010e1e0 0x1400010e240]
+--- PASS: TestParser_Basic (0.00s)
+PASS
+ok  	github.com/ithinkiborkedit/niftelv2.git/internal/parser	(cached)
