@@ -610,7 +610,7 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 
 	var returnType token.NifToken
 	if p.match(token.TokenArrow) {
-		returnType = p.consume(token.TokenArrow, "expect return type after '->'")
+		returnType = p.consume(token.TokenIdentifier, "expect return type after '->'")
 	}
 
 	p.consume(token.TokenLBrace, "expect '{' before function body")
