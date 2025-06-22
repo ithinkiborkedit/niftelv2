@@ -1,16 +1,10 @@
---- FAIL: TestValueTypeRegistry (0.00s)
-    registry_test.go:40: struct MyStruct generic params mismatch
-FAIL
-FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/value  0.200s
-FAIL=== RUN   TestEnvironemtn_DefineAndGet
+=== RUN   TestEnvironemtn_DefineAndGet
 --- PASS: TestEnvironemtn_DefineAndGet (0.00s)
 === RUN   TestEnvironment_EnclosingScopes
 --- PASS: TestEnvironment_EnclosingScopes (0.00s)
 === RUN   TestEnvironment_AssignEnclosing
-    environment_test.go:57: unexpected error: undefined variable 'x'
---- FAIL: TestEnvironment_AssignEnclosing (0.00s)
+--- PASS: TestEnvironment_AssignEnclosing (0.00s)
 === RUN   TestEnvironment_UndefinedVariable
 --- PASS: TestEnvironment_UndefinedVariable (0.00s)
-FAIL
-FAIL	github.com/ithinkiborkedit/niftelv2.git/internal/environment	0.223s
-FAIL
+PASS
+ok  	github.com/ithinkiborkedit/niftelv2.git/internal/environment	(cached)
