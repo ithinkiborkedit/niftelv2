@@ -292,8 +292,104 @@ func (i *Interpreter) VisitBlockStmt(stmt *nifast.BlockStmt) error {
 	return nil
 }
 
-// TODO: Implement VisitForStmt, VisitFuncStmt, VisitReturnStmt, VisitBreakStmt, VisitContinueStmt
+// VisitForStmt executes a for loop.
+func (i *Interpreter) VisitForStmt(stmt *nifast.ForStmt) error {
+	previousEnv := i.env
+	i.env = environment.NewEnvironment(previousEnv)
+	defer func() { i.env = previousEnv }()
+
+	// Init statement
+	if stmt.Init != nil {
+		if err := i.Execute(stmt.Init); err != nil {
+			return err
+		}
 	}
+
+	for {
+		// Condition expression
+		if stmt.CondExpr != nil {
+			condVal, err := i.Evaluate(stmt.CondExpr)
+			if err != nil {
+				return err
+			}
+			if condVal.Type != value.ValueBool {
+				return fmt.Errorf("for loop condition must evaluate to bool")
+			}
+			if !condVal.Data.(bool) {
+				break
+			}
+		}
+
+		// Execute body
+		err := i.Execute(stmt.BodyStmt)
+		if err != nil {
+			// Implement break/continue handling here if you add flags or custom errors
+			return err
+		}
+
+		// Update statement
+		if stmt.Update != nil {
+			if err := i.Execute(stmt.Update); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
+// VisitFuncStmt defines a function in the environment.
+func (i *Interpreter) VisitFuncStmt(stmt *nifast.FuncStmt) error {
+	// Wrap the function expression in a callable Value
+	fnValue := value.Value{
+		Type: value.ValueStruct, // or define a specific function value type
+		Data: stmt,              // Keep the AST node to execute on call
+		Meta: nil,
+	}
+	i.env.Define(stmt.Name.Lexeme, fnValue)
+	return nil
+}
 
+// VisitReturnStmt returns a value from a function.
+// Here, we use panic as control flow to unwind the call stack for returns.
+func (i *Interpreter) VisitReturnStmt(stmt *nifast.ReturnStmt) error {
+	var retVal value.Value
+	var err error
+	if stmt.Value != nil {
+		retVal, err = i.Evaluate(stmt.Value)
+		if err != nil {
+			return err
+		}
+	} else {
+		retVal = value.Null()
+	}
+	// panic with a special ReturnValue to unwind execution
+	panic(ReturnValue{Value: retVal})
+}
+
+// VisitBreakStmt handles break statement in loops.
+func (i *Interpreter) VisitBreakStmt(stmt *nifast.BreakStmt) error {
+	panic(BreakSignal{})
+}
+
+// VisitContinueStmt handles continue statement in loops.
+func (i *Interpreter) VisitContinueStmt(stmt *nifast.ContinueStmt) error {
+	panic(ContinueSignal{})
+}
+
+// ReturnValue is used internally to signal return from function.
+type ReturnValue struct {
+	Value value.Value
+}
+
+func (r ReturnValue) Error() string { return "function return" }
+
+// BreakSignal signals a break in loops.
+type BreakSignal struct{}
+
+func (b BreakSignal) Error() string { return "break" }
+
+// ContinueSignal signals a continue in loops.
+type ContinueSignal struct{}
+
+func (c ContinueSignal) Error() string { return "continue" }
