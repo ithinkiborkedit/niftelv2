@@ -48,7 +48,7 @@ func TestEnvironment_EnclosingScopes(t *testing.T) {
 
 func TestEnvironment_AssignEnclosing(t *testing.T) {
 	global := NewEnvironment(nil)
-	global.Define("a", value.Value{Type: value.ValueInt, Data: 1})
+	global.Define("x", value.Value{Type: value.ValueInt, Data: 1})
 
 	local := NewEnvironment(global)
 
