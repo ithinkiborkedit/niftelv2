@@ -135,6 +135,7 @@ func (tt TokenType) String() string {
 type NifToken struct {
 	Type   TokenType
 	Lexeme string
+	Data   interface{}
 	Line   int
 	Column int
 }

@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"fmt"
+	"strconv"
 	"unicode"
 	"unicode/utf8"
 
@@ -170,9 +171,16 @@ func (l *Lexer) number() {
 	}
 
 	lexeme := l.source[l.start:l.current]
+	val, err := strconv.ParseFloat(lexeme, 64)
+	if err != nil {
+		l.errorf("invalid number literal: %s", lexeme)
+		val = 0.0
+	}
+
 	l.tokens = append(l.tokens, token.NifToken{
 		Type:   token.TokenNumber,
 		Lexeme: lexeme,
+		Data:   val,
 		Line:   l.line,
 		Column: l.column,
 	})

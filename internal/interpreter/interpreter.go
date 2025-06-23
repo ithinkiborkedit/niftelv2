@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
@@ -52,33 +51,33 @@ func (i *Interpreter) Evaluate(expr ast.Expr) (value.Value, error) {
 }
 
 // Execute dispatches to the correct Stmt handler.
-func (i *Interpreter) Execute(stmt nifast.Stmt) error {
+func (i *Interpreter) Execute(stmt ast.Stmt) error {
 	switch s := stmt.(type) {
-	case *nifast.VarStmt:
+	case *ast.VarStmt:
 		return i.VisitVarStmt(s)
-	case *nifast.ShortVarStmt:
+	case *ast.ShortVarStmt:
 		return i.VisitShortVarStmt(s)
-	case *nifast.AssignStmt:
+	case *ast.AssignStmt:
 		return i.VisitAssignStmt(s)
-	case *nifast.PrintStmt:
+	case *ast.PrintStmt:
 		return i.VisitPrintStmt(s)
-	case *nifast.ExprStmt:
+	case *ast.ExprStmt:
 		return i.VisitExprStmt(s)
-	case *nifast.IfStmt:
+	case *ast.IfStmt:
 		return i.VisitIfStmt(s)
-	case *nifast.WhileStmt:
+	case *ast.WhileStmt:
 		return i.VisitWhileStmt(s)
-	case *nifast.ForStmt:
+	case *ast.ForStmt:
 		return i.VisitForStmt(s)
-	case *nifast.FuncStmt:
+	case *ast.FuncStmt:
 		return i.VisitFuncStmt(s)
-	case *nifast.ReturnStmt:
+	case *ast.ReturnStmt:
 		return i.VisitReturnStmt(s)
-	case *nifast.BreakStmt:
+	case *ast.BreakStmt:
 		return i.VisitBreakStmt(s)
-	case *nifast.ContinueStmt:
+	case *ast.ContinueStmt:
 		return i.VisitContinueStmt(s)
-	case *nifast.BlockStmt:
+	case *ast.BlockStmt:
 		return i.VisitBlockStmt(s)
 	default:
 		return fmt.Errorf("unknown statement type %T", stmt)
@@ -100,9 +99,10 @@ func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) (value.Value, erro
 	case token.TokenString:
 		return value.Value{Type: value.ValueString, Data: tok.Lexeme}, nil
 	case token.TokenBool:
-		if tok.Lexeme == "true" {
+		switch tok.Lexeme {
+		case "true":
 			return value.Value{Type: value.ValueBool, Data: true}, nil
-		} else if tok.Lexeme == "false" {
+		case "false":
 			return value.Value{Type: value.ValueBool, Data: false}, nil
 		}
 		return value.Null(), errors.New("invalid bool literal token")
@@ -113,7 +113,7 @@ func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) (value.Value, erro
 	}
 }
 
-func (i *Interpreter) VisitVariableExpr(expr *nifast.VariableExpr) (value.Value, error) {
+func (i *Interpreter) VisitVariableExpr(expr *ast.VariableExpr) (value.Value, error) {
 	val, err := i.env.Get(expr.Name.Lexeme)
 	if err != nil {
 		return value.Null(), fmt.Errorf("undefined variable %s", expr.Name.Lexeme)
@@ -121,7 +121,7 @@ func (i *Interpreter) VisitVariableExpr(expr *nifast.VariableExpr) (value.Value,
 	return val, nil
 }
 
-func (i *Interpreter) VisitBinaryExpr(expr *nifast.BinaryExpr) (value.Value, error) {
+func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) (value.Value, error) {
 	left, err := i.Evaluate(expr.Left)
 	if err != nil {
 		return value.Null(), err
@@ -183,7 +183,7 @@ func (i *Interpreter) VisitBinaryExpr(expr *nifast.BinaryExpr) (value.Value, err
 	}
 }
 
-func (i *Interpreter) VisitUnaryExpr(expr *nifast.UnaryExpr) (value.Value, error) {
+func (i *Interpreter) VisitUnaryExpr(expr *ast.UnaryExpr) (value.Value, error) {
 	right, err := i.Evaluate(expr.Right)
 	if err != nil {
 		return value.Null(), err
@@ -208,7 +208,7 @@ func (i *Interpreter) VisitUnaryExpr(expr *nifast.UnaryExpr) (value.Value, error
 
 // --- Statement Visitors ---
 
-func (i *Interpreter) VisitVarStmt(stmt *nifast.VarStmt) error {
+func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) error {
 	val, err := i.Evaluate(stmt.Init)
 	if err != nil {
 		return err
@@ -217,7 +217,7 @@ func (i *Interpreter) VisitVarStmt(stmt *nifast.VarStmt) error {
 	return nil
 }
 
-func (i *Interpreter) VisitShortVarStmt(stmt *nifast.ShortVarStmt) error {
+func (i *Interpreter) VisitShortVarStmt(stmt *ast.ShortVarStmt) error {
 	val, err := i.Evaluate(stmt.Init)
 	if err != nil {
 		return err
@@ -226,7 +226,7 @@ func (i *Interpreter) VisitShortVarStmt(stmt *nifast.ShortVarStmt) error {
 	return nil
 }
 
-func (i *Interpreter) VisitAssignStmt(stmt *nifast.AssignStmt) error {
+func (i *Interpreter) VisitAssignStmt(stmt *ast.AssignStmt) error {
 	val, err := i.Evaluate(stmt.Value)
 	if err != nil {
 		return err
@@ -234,7 +234,7 @@ func (i *Interpreter) VisitAssignStmt(stmt *nifast.AssignStmt) error {
 	return i.env.Assign(stmt.Name.Lexeme, val)
 }
 
-func (i *Interpreter) VisitPrintStmt(stmt *nifast.PrintStmt) error {
+func (i *Interpreter) VisitPrintStmt(stmt *ast.PrintStmt) error {
 	val, err := i.Evaluate(stmt.Expr)
 	if err != nil {
 		return err
@@ -243,12 +243,12 @@ func (i *Interpreter) VisitPrintStmt(stmt *nifast.PrintStmt) error {
 	return nil
 }
 
-func (i *Interpreter) VisitExprStmt(stmt *nifast.ExprStmt) error {
+func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) error {
 	_, err := i.Evaluate(stmt.Expr)
 	return err
 }
 
-func (i *Interpreter) VisitIfStmt(stmt *nifast.IfStmt) error {
+func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) error {
 	cond, err := i.Evaluate(stmt.Conditon)
 	if err != nil {
 		return err
@@ -264,7 +264,7 @@ func (i *Interpreter) VisitIfStmt(stmt *nifast.IfStmt) error {
 	return nil
 }
 
-func (i *Interpreter) VisitWhileStmt(stmt *nifast.WhileStmt) error {
+func (i *Interpreter) VisitWhileStmt(stmt *ast.WhileStmt) error {
 	for {
 		cond, err := i.Evaluate(stmt.Conditon)
 		if err != nil {
@@ -283,7 +283,7 @@ func (i *Interpreter) VisitWhileStmt(stmt *nifast.WhileStmt) error {
 	return nil
 }
 
-func (i *Interpreter) VisitBlockStmt(stmt *nifast.BlockStmt) error {
+func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) error {
 	previousEnv := i.env
 	i.env = environment.NewEnvironment(previousEnv)
 	defer func() { i.env = previousEnv }()
@@ -297,7 +297,7 @@ func (i *Interpreter) VisitBlockStmt(stmt *nifast.BlockStmt) error {
 }
 
 // VisitForStmt executes a for loop.
-func (i *Interpreter) VisitForStmt(stmt *nifast.ForStmt) error {
+func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) error {
 	previousEnv := i.env
 	i.env = environment.NewEnvironment(previousEnv)
 	defer func() { i.env = previousEnv }()
@@ -342,7 +342,7 @@ func (i *Interpreter) VisitForStmt(stmt *nifast.ForStmt) error {
 	return nil
 }
 
-func (i *Interpreter) VisitCallExpr(expr *nifast.CallExpr) (value.Value, error) {
+func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) (value.Value, error) {
 	// Evaluate the callee expression (should be a function)
 	calleeVal, err := i.Evaluate(expr.Callee)
 	if err != nil {
@@ -360,10 +360,10 @@ func (i *Interpreter) VisitCallExpr(expr *nifast.CallExpr) (value.Value, error) 
 
 	// Check if callee is a function value (assumed to have type ValueStruct or special FuncInfo)
 	// You may need a function wrapper or closure struct; adjust as per your implementation
-	funcMeta := calleeVal.Meta
-	if funcMeta == nil || funcMeta.Kind != value.TypeFunc {
-		return value.Null(), fmt.Errorf("attempt to call non-function value")
-	}
+	// funcMeta := calleeVal.Meta
+	// if funcMeta == nil || funcMeta.Kind != value.TypeFunc {
+	// 	return value.Null(), fmt.Errorf("attempt to call non-function value")
+	// }
 
 	// TODO: Implement function invocation logic (bytecode, native call, etc.)
 	// For now, assume native Go function stored in calleeVal.Data as func([]value.Value) (value.Value, error)
@@ -374,7 +374,7 @@ func (i *Interpreter) VisitCallExpr(expr *nifast.CallExpr) (value.Value, error) 
 	return value.Null(), fmt.Errorf("function call not implemented for this callee type")
 }
 
-func (i *Interpreter) VisitIndexExpr(expr *nifast.IndexExpr) (value.Value, error) {
+func (i *Interpreter) VisitIndexExpr(expr *ast.IndexExpr) (value.Value, error) {
 	// Evaluate the collection expression
 	collectionVal, err := i.Evaluate(expr.Collection)
 	if err != nil {
@@ -422,7 +422,7 @@ func (i *Interpreter) VisitIndexExpr(expr *nifast.IndexExpr) (value.Value, error
 	}
 }
 
-func (i *Interpreter) VisitGetExpr(expr *nifast.GetExpr) (value.Value, error) {
+func (i *Interpreter) VisitGetExpr(expr *ast.GetExpr) (value.Value, error) {
 	// Evaluate object expression
 	objectVal, err := i.Evaluate(expr.Object)
 	if err != nil {
@@ -450,7 +450,7 @@ func (i *Interpreter) VisitGetExpr(expr *nifast.GetExpr) (value.Value, error) {
 	return val, nil
 }
 
-func (i *Interpreter) VisitListExpr(expr *nifast.ListExpr) (value.Value, error) {
+func (i *Interpreter) VisitListExpr(expr *ast.ListExpr) (value.Value, error) {
 	elements := make([]value.Value, 0, len(expr.Elements))
 	for _, elementExpr := range expr.Elements {
 		val, err := i.Evaluate(elementExpr)
@@ -465,7 +465,7 @@ func (i *Interpreter) VisitListExpr(expr *nifast.ListExpr) (value.Value, error) 
 	}, nil
 }
 
-func (i *Interpreter) VisitDictExpr(expr *nifast.DictExpr) (value.Value, error) {
+func (i *Interpreter) VisitDictExpr(expr *ast.DictExpr) (value.Value, error) {
 	dict := make(map[string]value.Value, len(expr.Pairs))
 	for _, pair := range expr.Pairs {
 		keyVal, err := i.Evaluate(pair[0])
@@ -489,7 +489,7 @@ func (i *Interpreter) VisitDictExpr(expr *nifast.DictExpr) (value.Value, error) 
 	}, nil
 }
 
-func (i *Interpreter) VisitFuncExpr(expr *nifast.FuncExpr) (value.Value, error) {
+func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) (value.Value, error) {
 	// Create a callable function closure value from this FuncExpr AST node
 
 	// For now, pack the FuncExpr itself as data and keep meta for type info
@@ -503,7 +503,7 @@ func (i *Interpreter) VisitFuncExpr(expr *nifast.FuncExpr) (value.Value, error) 
 }
 
 // VisitFuncStmt defines a function in the environment.
-func (i *Interpreter) VisitFuncStmt(stmt *nifast.FuncStmt) error {
+func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) error {
 	// Wrap the function expression in a callable Value
 	fnValue := value.Value{
 		Type: value.ValueStruct, // or define a specific function value type
@@ -516,7 +516,7 @@ func (i *Interpreter) VisitFuncStmt(stmt *nifast.FuncStmt) error {
 
 // VisitReturnStmt returns a value from a function.
 // Here, we use panic as control flow to unwind the call stack for returns.
-func (i *Interpreter) VisitReturnStmt(stmt *nifast.ReturnStmt) error {
+func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
 	var retVal value.Value
 	var err error
 	if stmt.Value != nil {
@@ -532,12 +532,12 @@ func (i *Interpreter) VisitReturnStmt(stmt *nifast.ReturnStmt) error {
 }
 
 // VisitBreakStmt handles break statement in loops.
-func (i *Interpreter) VisitBreakStmt(stmt *nifast.BreakStmt) error {
+func (i *Interpreter) VisitBreakStmt(stmt *ast.BreakStmt) error {
 	panic(BreakSignal{})
 }
 
 // VisitContinueStmt handles continue statement in loops.
-func (i *Interpreter) VisitContinueStmt(stmt *nifast.ContinueStmt) error {
+func (i *Interpreter) VisitContinueStmt(stmt *ast.ContinueStmt) error {
 	panic(ContinueSignal{})
 }
 
