@@ -1,11 +1,11 @@
 package interpreter
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 
-	"github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/token"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
@@ -89,7 +89,7 @@ func (i *Interpreter) VisitLiteralExpr(expr *nifast.LiteralExpr) (value.Value, e
 	tok := expr.Value
 	switch tok.Type {
 	case value.ValueInt:
-		if val, ok := tok.Data.(int64); ok {
+		if val, ok := tok.Data.(int); ok {
 			return value.Value{Type: value.ValueInt, Data: val}, nil
 		}
 		return value.Null(), errors.New("invalid int literal token data")
