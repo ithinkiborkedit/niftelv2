@@ -342,6 +342,166 @@ func (i *Interpreter) VisitForStmt(stmt *nifast.ForStmt) error {
 	return nil
 }
 
+func (i *Interpreter) VisitCallExpr(expr *nifast.CallExpr) (value.Value, error) {
+	// Evaluate the callee expression (should be a function)
+	calleeVal, err := i.Evaluate(expr.Callee)
+	if err != nil {
+		return value.Null(), err
+	}
+
+	// Evaluate all argument expressions
+	args := make([]value.Value, len(expr.Arguments))
+	for idx, argExpr := range expr.Arguments {
+		args[idx], err = i.Evaluate(argExpr)
+		if err != nil {
+			return value.Null(), err
+		}
+	}
+
+	// Check if callee is a function value (assumed to have type ValueStruct or special FuncInfo)
+	// You may need a function wrapper or closure struct; adjust as per your implementation
+	funcMeta := calleeVal.Meta
+	if funcMeta == nil || funcMeta.Kind != value.TypeFunc {
+		return value.Null(), fmt.Errorf("attempt to call non-function value")
+	}
+
+	// TODO: Implement function invocation logic (bytecode, native call, etc.)
+	// For now, assume native Go function stored in calleeVal.Data as func([]value.Value) (value.Value, error)
+	if nativeFunc, ok := calleeVal.Data.(func([]value.Value) (value.Value, error)); ok {
+		return nativeFunc(args)
+	}
+
+	return value.Null(), fmt.Errorf("function call not implemented for this callee type")
+}
+
+func (i *Interpreter) VisitIndexExpr(expr *nifast.IndexExpr) (value.Value, error) {
+	// Evaluate the collection expression
+	collectionVal, err := i.Evaluate(expr.Collection)
+	if err != nil {
+		return value.Null(), err
+	}
+
+	// Evaluate the index/key expression
+	indexVal, err := i.Evaluate(expr.Index)
+	if err != nil {
+		return value.Null(), err
+	}
+
+	switch collectionVal.Type {
+	case value.ValueList:
+		list, ok := collectionVal.Data.([]value.Value)
+		if !ok {
+			return value.Null(), fmt.Errorf("list data is corrupted")
+		}
+		idx, ok := indexVal.Data.(int)
+		if !ok {
+			return value.Null(), fmt.Errorf("list index must be integer")
+		}
+		if idx < 0 || idx >= len(list) {
+			return value.Null(), fmt.Errorf("list index out of range")
+		}
+		return list[idx], nil
+
+	case value.ValueDict:
+		dict, ok := collectionVal.Data.(map[string]value.Value)
+		if !ok {
+			return value.Null(), fmt.Errorf("dict data is corrupted")
+		}
+		keyStr, ok := indexVal.Data.(string)
+		if !ok {
+			return value.Null(), fmt.Errorf("dict key must be string")
+		}
+		val, exists := dict[keyStr]
+		if !exists {
+			return value.Null(), fmt.Errorf("dict key not found: %s", keyStr)
+		}
+		return val, nil
+
+	default:
+		return value.Null(), fmt.Errorf("indexing unsupported on type %v", collectionVal.Type)
+	}
+}
+
+func (i *Interpreter) VisitGetExpr(expr *nifast.GetExpr) (value.Value, error) {
+	// Evaluate object expression
+	objectVal, err := i.Evaluate(expr.Object)
+	if err != nil {
+		return value.Null(), err
+	}
+
+	// Only structs support property access
+	if objectVal.Type != value.ValueStruct {
+		return value.Null(), fmt.Errorf("attempt to get property on non-struct type")
+	}
+
+	// Access struct field by name (string from token)
+	fieldName := expr.Name.Lexeme
+
+	// Assume struct data stored as map[string]value.Value
+	fields, ok := objectVal.Data.(map[string]value.Value)
+	if !ok {
+		return value.Null(), fmt.Errorf("struct data corrupted")
+	}
+
+	val, exists := fields[fieldName]
+	if !exists {
+		return value.Null(), fmt.Errorf("struct field '%s' not found", fieldName)
+	}
+	return val, nil
+}
+
+func (i *Interpreter) VisitListExpr(expr *nifast.ListExpr) (value.Value, error) {
+	elements := make([]value.Value, 0, len(expr.Elements))
+	for _, elementExpr := range expr.Elements {
+		val, err := i.Evaluate(elementExpr)
+		if err != nil {
+			return value.Null(), err
+		}
+		elements = append(elements, val)
+	}
+	return value.Value{
+		Type: value.ValueList,
+		Data: elements,
+	}, nil
+}
+
+func (i *Interpreter) VisitDictExpr(expr *nifast.DictExpr) (value.Value, error) {
+	dict := make(map[string]value.Value, len(expr.Pairs))
+	for _, pair := range expr.Pairs {
+		keyVal, err := i.Evaluate(pair[0])
+		if err != nil {
+			return value.Null(), err
+		}
+		keyStr, ok := keyVal.Data.(string)
+		if !ok {
+			return value.Null(), fmt.Errorf("dictionary key must be a string")
+		}
+
+		valueVal, err := i.Evaluate(pair[1])
+		if err != nil {
+			return value.Null(), err
+		}
+		dict[keyStr] = valueVal
+	}
+	return value.Value{
+		Type: value.ValueDict,
+		Data: dict,
+	}, nil
+}
+
+func (i *Interpreter) VisitFuncExpr(expr *nifast.FuncExpr) (value.Value, error) {
+	// Create a callable function closure value from this FuncExpr AST node
+
+	// For now, pack the FuncExpr itself as data and keep meta for type info
+	// Actual call logic to be implemented in VisitCallExpr
+
+	return value.Value{
+		Type: value.ValueStruct, // Or a dedicated ValueFunc type if you have one
+		Data: expr,
+		Meta: nil, // Optional: assign Func type info if available
+	}, nil
+}
+
 // VisitFuncStmt defines a function in the environment.
 func (i *Interpreter) VisitFuncStmt(stmt *nifast.FuncStmt) error {
 	// Wrap the function expression in a callable Value
