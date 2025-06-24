@@ -71,6 +71,7 @@ func (l *Lexer) NextToken() (token.Token, error) {
 		if tok.Type == 0 || tok.Lexeme == "" {
 			continue
 		}
+		return tok, nil
 	}
 	return token.Token{
 		Type:   token.TokenEOF,
@@ -159,17 +160,13 @@ func (l *Lexer) match(expected rune) bool {
 
 func (l *Lexer) skipLineComment() {
 	for !l.isAtEnd() {
-		r, width := utf8.DecodeLastRuneInString(l.source[l.current:])
+		r, _ := utf8.DecodeLastRuneInString(l.source[l.current:])
 		if r == '\n' {
-			l.current += width
-			l.line++
-			l.column = 0
 			break
 		}
-		// 	r, _ := utf8.DecodeRuneInString(l.source[l.current:])
-		// 	if r == '\n' {
-		// 		break
-		// 	}
+		l.advance()
+	}
+	if !l.isAtEnd() {
 		l.advance()
 	}
 }
@@ -388,6 +385,7 @@ func (l *Lexer) scanToken() (token.Token, error) {
 	case '/':
 		if l.match('/') {
 			l.skipLineComment()
+			l.start = l.current
 			return l.scanToken()
 		} else if l.match('*') {
 			l.skipBlockComment()

@@ -1,42 +1,60 @@
 === RUN   TestLexer_ScanTokens
 advance() return l.current=0, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=1, start=0advance() return l.current=1, rune='\t' (U+0009)
+, Lexeme="\n", current=1, start=00: 
+ "\n" 
+advance() return l.current=1, rune='\t' (U+0009)
 advance() return l.current=2, rune='f' (U+0066)
 advance() return l.current=3, rune='u' (U+0075)
 advance() return l.current=4, rune='n' (U+006e)
 advance() return l.current=5, rune='c' (U+0063)
-scanToken() return type=func, Lexeme="func", current=6, start=2advance() return l.current=6, rune=' ' (U+0020)
+scanToken() return type=func, Lexeme="func", current=6, start=21: func "func" 
+advance() return l.current=6, rune=' ' (U+0020)
 advance() return l.current=7, rune='a' (U+0061)
 advance() return l.current=8, rune='d' (U+0064)
 advance() return l.current=9, rune='d' (U+0064)
-scanToken() return type=IDENTIFIER, Lexeme="add", current=10, start=7advance() return l.current=10, rune='(' (U+0028)
-scanToken() return type=(, Lexeme="(", current=11, start=10advance() return l.current=11, rune='a' (U+0061)
-scanToken() return type=IDENTIFIER, Lexeme="a", current=12, start=11advance() return l.current=12, rune=':' (U+003a)
-scanToken() return type=:, Lexeme=":", current=13, start=12advance() return l.current=13, rune=' ' (U+0020)
+scanToken() return type=IDENTIFIER, Lexeme="add", current=10, start=72: IDENTIFIER "add" 
+advance() return l.current=10, rune='(' (U+0028)
+scanToken() return type=(, Lexeme="(", current=11, start=103: ( "(" 
+advance() return l.current=11, rune='a' (U+0061)
+scanToken() return type=IDENTIFIER, Lexeme="a", current=12, start=114: IDENTIFIER "a" 
+advance() return l.current=12, rune=':' (U+003a)
+scanToken() return type=:, Lexeme=":", current=13, start=125: : ":" 
+advance() return l.current=13, rune=' ' (U+0020)
 advance() return l.current=14, rune='i' (U+0069)
 advance() return l.current=15, rune='n' (U+006e)
 advance() return l.current=16, rune='t' (U+0074)
-scanToken() return type=IDENTIFIER, Lexeme="int", current=17, start=14advance() return l.current=17, rune=',' (U+002c)
-scanToken() return type=,, Lexeme=",", current=18, start=17advance() return l.current=18, rune=' ' (U+0020)
+scanToken() return type=IDENTIFIER, Lexeme="int", current=17, start=146: IDENTIFIER "int" 
+advance() return l.current=17, rune=',' (U+002c)
+scanToken() return type=,, Lexeme=",", current=18, start=177: , "," 
+advance() return l.current=18, rune=' ' (U+0020)
 advance() return l.current=19, rune='b' (U+0062)
-scanToken() return type=IDENTIFIER, Lexeme="b", current=20, start=19advance() return l.current=20, rune=':' (U+003a)
-scanToken() return type=:, Lexeme=":", current=21, start=20advance() return l.current=21, rune=' ' (U+0020)
+scanToken() return type=IDENTIFIER, Lexeme="b", current=20, start=198: IDENTIFIER "b" 
+advance() return l.current=20, rune=':' (U+003a)
+scanToken() return type=:, Lexeme=":", current=21, start=209: : ":" 
+advance() return l.current=21, rune=' ' (U+0020)
 advance() return l.current=22, rune='i' (U+0069)
 advance() return l.current=23, rune='n' (U+006e)
 advance() return l.current=24, rune='t' (U+0074)
-scanToken() return type=IDENTIFIER, Lexeme="int", current=25, start=22advance() return l.current=25, rune=')' (U+0029)
-scanToken() return type=), Lexeme=")", current=26, start=25advance() return l.current=26, rune=' ' (U+0020)
+scanToken() return type=IDENTIFIER, Lexeme="int", current=25, start=2210: IDENTIFIER "int" 
+advance() return l.current=25, rune=')' (U+0029)
+scanToken() return type=), Lexeme=")", current=26, start=2511: ) ")" 
+advance() return l.current=26, rune=' ' (U+0020)
 advance() return l.current=27, rune='-' (U+002d)
-scanToken() return type=->, Lexeme="->", current=29, start=27advance() return l.current=29, rune=' ' (U+0020)
+scanToken() return type=->, Lexeme="->", current=29, start=2712: -> "->" 
+advance() return l.current=29, rune=' ' (U+0020)
 advance() return l.current=30, rune='i' (U+0069)
 advance() return l.current=31, rune='n' (U+006e)
 advance() return l.current=32, rune='t' (U+0074)
-scanToken() return type=IDENTIFIER, Lexeme="int", current=33, start=30advance() return l.current=33, rune=' ' (U+0020)
+scanToken() return type=IDENTIFIER, Lexeme="int", current=33, start=3013: IDENTIFIER "int" 
+advance() return l.current=33, rune=' ' (U+0020)
 advance() return l.current=34, rune='{' (U+007b)
-scanToken() return type={, Lexeme="{", current=35, start=34advance() return l.current=35, rune='\n' (U+000a)
+scanToken() return type={, Lexeme="{", current=35, start=3414: { "{" 
+advance() return l.current=35, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=36, start=35advance() return l.current=36, rune='\t' (U+0009)
+, Lexeme="\n", current=36, start=3515: 
+ "\n" 
+advance() return l.current=36, rune='\t' (U+0009)
 advance() return l.current=37, rune=' ' (U+0020)
 advance() return l.current=38, rune=' ' (U+0020)
 advance() return l.current=39, rune=' ' (U+0020)
@@ -46,66 +64,96 @@ advance() return l.current=42, rune='t' (U+0074)
 advance() return l.current=43, rune='u' (U+0075)
 advance() return l.current=44, rune='r' (U+0072)
 advance() return l.current=45, rune='n' (U+006e)
-scanToken() return type=return, Lexeme="return", current=46, start=40advance() return l.current=46, rune=' ' (U+0020)
+scanToken() return type=return, Lexeme="return", current=46, start=4016: return "return" 
+advance() return l.current=46, rune=' ' (U+0020)
 advance() return l.current=47, rune='a' (U+0061)
-scanToken() return type=IDENTIFIER, Lexeme="a", current=48, start=47advance() return l.current=48, rune=' ' (U+0020)
+scanToken() return type=IDENTIFIER, Lexeme="a", current=48, start=4717: IDENTIFIER "a" 
+advance() return l.current=48, rune=' ' (U+0020)
 advance() return l.current=49, rune='+' (U+002b)
-scanToken() return type=+, Lexeme="+", current=50, start=49advance() return l.current=50, rune=' ' (U+0020)
+scanToken() return type=+, Lexeme="+", current=50, start=4918: + "+" 
+advance() return l.current=50, rune=' ' (U+0020)
 advance() return l.current=51, rune='b' (U+0062)
-scanToken() return type=IDENTIFIER, Lexeme="b", current=52, start=51advance() return l.current=52, rune='\n' (U+000a)
+scanToken() return type=IDENTIFIER, Lexeme="b", current=52, start=5119: IDENTIFIER "b" 
+advance() return l.current=52, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=53, start=52advance() return l.current=53, rune='\t' (U+0009)
+, Lexeme="\n", current=53, start=5220: 
+ "\n" 
+advance() return l.current=53, rune='\t' (U+0009)
 advance() return l.current=54, rune='}' (U+007d)
-scanToken() return type=}, Lexeme="}", current=55, start=54advance() return l.current=55, rune='\n' (U+000a)
+scanToken() return type=}, Lexeme="}", current=55, start=5421: } "}" 
+advance() return l.current=55, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=56, start=55advance() return l.current=56, rune='\t' (U+0009)
+, Lexeme="\n", current=56, start=5522: 
+ "\n" 
+advance() return l.current=56, rune='\t' (U+0009)
 advance() return l.current=57, rune='v' (U+0076)
 advance() return l.current=58, rune='a' (U+0061)
 advance() return l.current=59, rune='r' (U+0072)
-scanToken() return type=var, Lexeme="var", current=60, start=57advance() return l.current=60, rune=' ' (U+0020)
+scanToken() return type=var, Lexeme="var", current=60, start=5723: var "var" 
+advance() return l.current=60, rune=' ' (U+0020)
 advance() return l.current=61, rune='r' (U+0072)
 advance() return l.current=62, rune='e' (U+0065)
 advance() return l.current=63, rune='s' (U+0073)
 advance() return l.current=64, rune='u' (U+0075)
 advance() return l.current=65, rune='l' (U+006c)
 advance() return l.current=66, rune='t' (U+0074)
-scanToken() return type=IDENTIFIER, Lexeme="result", current=67, start=61advance() return l.current=67, rune=':' (U+003a)
-scanToken() return type=:, Lexeme=":", current=68, start=67advance() return l.current=68, rune=' ' (U+0020)
+scanToken() return type=IDENTIFIER, Lexeme="result", current=67, start=6124: IDENTIFIER "result" 
+advance() return l.current=67, rune=':' (U+003a)
+scanToken() return type=:, Lexeme=":", current=68, start=6725: : ":" 
+advance() return l.current=68, rune=' ' (U+0020)
 advance() return l.current=69, rune='i' (U+0069)
 advance() return l.current=70, rune='n' (U+006e)
 advance() return l.current=71, rune='t' (U+0074)
-scanToken() return type=IDENTIFIER, Lexeme="int", current=72, start=69advance() return l.current=72, rune=' ' (U+0020)
+scanToken() return type=IDENTIFIER, Lexeme="int", current=72, start=6926: IDENTIFIER "int" 
+advance() return l.current=72, rune=' ' (U+0020)
 advance() return l.current=73, rune='=' (U+003d)
-scanToken() return type==, Lexeme="=", current=74, start=73advance() return l.current=74, rune=' ' (U+0020)
+scanToken() return type==, Lexeme="=", current=74, start=7327: = "=" 
+advance() return l.current=74, rune=' ' (U+0020)
 advance() return l.current=75, rune='a' (U+0061)
 advance() return l.current=76, rune='d' (U+0064)
 advance() return l.current=77, rune='d' (U+0064)
-scanToken() return type=IDENTIFIER, Lexeme="add", current=78, start=75advance() return l.current=78, rune='(' (U+0028)
-scanToken() return type=(, Lexeme="(", current=79, start=78advance() return l.current=79, rune='5' (U+0035)
-scanToken() return type=NUMBER, Lexeme="5", current=80, start=79advance() return l.current=80, rune=',' (U+002c)
-scanToken() return type=,, Lexeme=",", current=81, start=80advance() return l.current=81, rune='3' (U+0033)
-scanToken() return type=NUMBER, Lexeme="3", current=82, start=81advance() return l.current=82, rune=')' (U+0029)
-scanToken() return type=), Lexeme=")", current=83, start=82advance() return l.current=83, rune='\n' (U+000a)
+scanToken() return type=IDENTIFIER, Lexeme="add", current=78, start=7528: IDENTIFIER "add" 
+advance() return l.current=78, rune='(' (U+0028)
+scanToken() return type=(, Lexeme="(", current=79, start=7829: ( "(" 
+advance() return l.current=79, rune='5' (U+0035)
+scanToken() return type=NUMBER, Lexeme="5", current=80, start=7930: NUMBER "5" 
+advance() return l.current=80, rune=',' (U+002c)
+scanToken() return type=,, Lexeme=",", current=81, start=8031: , "," 
+advance() return l.current=81, rune='3' (U+0033)
+scanToken() return type=NUMBER, Lexeme="3", current=82, start=8132: NUMBER "3" 
+advance() return l.current=82, rune=')' (U+0029)
+scanToken() return type=), Lexeme=")", current=83, start=8233: ) ")" 
+advance() return l.current=83, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=84, start=83advance() return l.current=84, rune='\n' (U+000a)
+, Lexeme="\n", current=84, start=8334: 
+ "\n" 
+advance() return l.current=84, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=85, start=84advance() return l.current=85, rune='\t' (U+0009)
+, Lexeme="\n", current=85, start=8435: 
+ "\n" 
+advance() return l.current=85, rune='\t' (U+0009)
 advance() return l.current=86, rune='i' (U+0069)
 advance() return l.current=87, rune='f' (U+0066)
-scanToken() return type=if, Lexeme="if", current=88, start=86advance() return l.current=88, rune=' ' (U+0020)
+scanToken() return type=if, Lexeme="if", current=88, start=8636: if "if" 
+advance() return l.current=88, rune=' ' (U+0020)
 advance() return l.current=89, rune='r' (U+0072)
 advance() return l.current=90, rune='e' (U+0065)
 advance() return l.current=91, rune='s' (U+0073)
 advance() return l.current=92, rune='u' (U+0075)
 advance() return l.current=93, rune='l' (U+006c)
 advance() return l.current=94, rune='t' (U+0074)
-scanToken() return type=IDENTIFIER, Lexeme="result", current=95, start=89advance() return l.current=95, rune=' ' (U+0020)
+scanToken() return type=IDENTIFIER, Lexeme="result", current=95, start=8937: IDENTIFIER "result" 
+advance() return l.current=95, rune=' ' (U+0020)
 advance() return l.current=96, rune='5' (U+0035)
-scanToken() return type=NUMBER, Lexeme="5", current=97, start=96advance() return l.current=97, rune=' ' (U+0020)
+scanToken() return type=NUMBER, Lexeme="5", current=97, start=9638: NUMBER "5" 
+advance() return l.current=97, rune=' ' (U+0020)
 advance() return l.current=98, rune='{' (U+007b)
-scanToken() return type={, Lexeme="{", current=99, start=98advance() return l.current=99, rune='\n' (U+000a)
+scanToken() return type={, Lexeme="{", current=99, start=9839: { "{" 
+advance() return l.current=99, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=100, start=99advance() return l.current=100, rune='\t' (U+0009)
+, Lexeme="\n", current=100, start=9940: 
+ "\n" 
+advance() return l.current=100, rune='\t' (U+0009)
 advance() return l.current=101, rune=' ' (U+0020)
 advance() return l.current=102, rune=' ' (U+0020)
 advance() return l.current=103, rune='p' (U+0070)
@@ -113,8 +161,10 @@ advance() return l.current=104, rune='r' (U+0072)
 advance() return l.current=105, rune='i' (U+0069)
 advance() return l.current=106, rune='n' (U+006e)
 advance() return l.current=107, rune='t' (U+0074)
-scanToken() return type=print, Lexeme="print", current=108, start=103advance() return l.current=108, rune='(' (U+0028)
-scanToken() return type=(, Lexeme="(", current=109, start=108advance() return l.current=109, rune='"' (U+0022)
+scanToken() return type=print, Lexeme="print", current=108, start=10341: print "print" 
+advance() return l.current=108, rune='(' (U+0028)
+scanToken() return type=(, Lexeme="(", current=109, start=10842: ( "(" 
+advance() return l.current=109, rune='"' (U+0022)
 advance() return l.current=110, rune='s' (U+0073)
 advance() return l.current=111, rune='u' (U+0075)
 advance() return l.current=112, rune='c' (U+0063)
@@ -123,23 +173,34 @@ advance() return l.current=114, rune='e' (U+0065)
 advance() return l.current=115, rune='s' (U+0073)
 advance() return l.current=116, rune='s' (U+0073)
 advance() return l.current=117, rune='"' (U+0022)
-scanToken() return type=STRING, Lexeme="\"success\"", current=118, start=109advance() return l.current=118, rune=')' (U+0029)
-scanToken() return type=), Lexeme=")", current=119, start=118advance() return l.current=119, rune='\n' (U+000a)
+scanToken() return type=STRING, Lexeme="\"success\"", current=118, start=10943: STRING "\"success\"" 
+advance() return l.current=118, rune=')' (U+0029)
+scanToken() return type=), Lexeme=")", current=119, start=11844: ) ")" 
+advance() return l.current=119, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=120, start=119advance() return l.current=120, rune='\n' (U+000a)
+, Lexeme="\n", current=120, start=11945: 
+ "\n" 
+advance() return l.current=120, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=121, start=120advance() return l.current=121, rune='\t' (U+0009)
+, Lexeme="\n", current=121, start=12046: 
+ "\n" 
+advance() return l.current=121, rune='\t' (U+0009)
 advance() return l.current=122, rune='}' (U+007d)
-scanToken() return type=}, Lexeme="}", current=123, start=122advance() return l.current=123, rune=' ' (U+0020)
+scanToken() return type=}, Lexeme="}", current=123, start=12247: } "}" 
+advance() return l.current=123, rune=' ' (U+0020)
 advance() return l.current=124, rune='e' (U+0065)
 advance() return l.current=125, rune='l' (U+006c)
 advance() return l.current=126, rune='s' (U+0073)
 advance() return l.current=127, rune='e' (U+0065)
-scanToken() return type=else, Lexeme="else", current=128, start=124advance() return l.current=128, rune=' ' (U+0020)
+scanToken() return type=else, Lexeme="else", current=128, start=12448: else "else" 
+advance() return l.current=128, rune=' ' (U+0020)
 advance() return l.current=129, rune='{' (U+007b)
-scanToken() return type={, Lexeme="{", current=130, start=129advance() return l.current=130, rune='\n' (U+000a)
+scanToken() return type={, Lexeme="{", current=130, start=12949: { "{" 
+advance() return l.current=130, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=131, start=130advance() return l.current=131, rune='\t' (U+0009)
+, Lexeme="\n", current=131, start=13050: 
+ "\n" 
+advance() return l.current=131, rune='\t' (U+0009)
 advance() return l.current=132, rune=' ' (U+0020)
 advance() return l.current=133, rune=' ' (U+0020)
 advance() return l.current=134, rune='p' (U+0070)
@@ -147,22 +208,31 @@ advance() return l.current=135, rune='r' (U+0072)
 advance() return l.current=136, rune='i' (U+0069)
 advance() return l.current=137, rune='n' (U+006e)
 advance() return l.current=138, rune='t' (U+0074)
-scanToken() return type=print, Lexeme="print", current=139, start=134advance() return l.current=139, rune='(' (U+0028)
-scanToken() return type=(, Lexeme="(", current=140, start=139advance() return l.current=140, rune='"' (U+0022)
+scanToken() return type=print, Lexeme="print", current=139, start=13451: print "print" 
+advance() return l.current=139, rune='(' (U+0028)
+scanToken() return type=(, Lexeme="(", current=140, start=13952: ( "(" 
+advance() return l.current=140, rune='"' (U+0022)
 advance() return l.current=141, rune='f' (U+0066)
 advance() return l.current=142, rune='a' (U+0061)
 advance() return l.current=143, rune='i' (U+0069)
 advance() return l.current=144, rune='l' (U+006c)
 advance() return l.current=145, rune='"' (U+0022)
-scanToken() return type=STRING, Lexeme="\"fail\"", current=146, start=140advance() return l.current=146, rune=')' (U+0029)
-scanToken() return type=), Lexeme=")", current=147, start=146advance() return l.current=147, rune=' ' (U+0020)
+scanToken() return type=STRING, Lexeme="\"fail\"", current=146, start=14053: STRING "\"fail\"" 
+advance() return l.current=146, rune=')' (U+0029)
+scanToken() return type=), Lexeme=")", current=147, start=14654: ) ")" 
+advance() return l.current=147, rune=' ' (U+0020)
 advance() return l.current=148, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=149, start=148advance() return l.current=149, rune='\t' (U+0009)
+, Lexeme="\n", current=149, start=14855: 
+ "\n" 
+advance() return l.current=149, rune='\t' (U+0009)
 advance() return l.current=150, rune='}' (U+007d)
-scanToken() return type=}, Lexeme="}", current=151, start=150advance() return l.current=151, rune='\n' (U+000a)
+scanToken() return type=}, Lexeme="}", current=151, start=15056: } "}" 
+advance() return l.current=151, rune='\n' (U+000a)
 scanToken() return type=
-, Lexeme="\n", current=152, start=151advance() return l.current=152, rune='\t' (U+0009)
+, Lexeme="\n", current=152, start=15157: 
+ "\n" 
+advance() return l.current=152, rune='\t' (U+0009)
 advance() return l.current=153, rune='/' (U+002f)
 advance() return l.current=155, rune=' ' (U+0020)
 advance() return l.current=156, rune='s' (U+0073)
@@ -211,7 +281,7 @@ advance() return l.current=198, rune='*' (U+002a)
 advance() return l.current=199, rune='/' (U+002f)
 advance() return l.current=200, rune='\n' (U+000a)
 advance() return l.current=201, rune='\t' (U+0009)
-scanToken() return type=ILLEGAL, Lexeme="", current=202, start=1530: EOF "" 
+scanToken() return type=ILLEGAL, Lexeme="", current=202, start=20258: EOF "" 
 --- PASS: TestLexer_ScanTokens (0.00s)
 PASS
-ok  	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	(cached)
+ok  	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	0.303s
