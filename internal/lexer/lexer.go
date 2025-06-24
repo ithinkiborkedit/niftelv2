@@ -381,7 +381,7 @@ func (l *Lexer) scanToken() (token.Token, error) {
 	case '/':
 		if l.match('/') {
 			l.skipLineComment()
-			return token.Token{}, nil
+			return l.scanToken()
 		} else if l.match('*') {
 			l.skipBlockComment()
 			return l.scanToken()
