@@ -98,4 +98,3 @@ func (f *Function) Arity() int            { return len(f.params) }
 func (f *Function) Name() string          { return f.name }
 func (f *Function) IsNative() bool        { return f.isNative }
 func (f *Function) SourcePos() (int, int) { return f.sourceLine, f.sourceCol }
-func (r runtimecontrol.ReturnValue) Error()
