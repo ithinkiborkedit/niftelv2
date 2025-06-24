@@ -40,7 +40,7 @@ func TestLexer_ScanTokens(t *testing.T) {
 		}
 
 		for i, tok := range tokens {
-			if tok.Type == token.TokenIllegal {
+			if tok.Type == 0 || tok.Type == token.TokenIllegal {
 				t.Fatalf("%d: %v %q", i, tok.Type, tok.Lexeme)
 			}
 		}
