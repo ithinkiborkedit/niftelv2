@@ -3,8 +3,7 @@ package niftokens
 type TokenType int
 
 const (
-	TokenIllegal TokenType = iota
-	TokenEOF
+	TokenEOF TokenType = iota
 	TokenIdentifier
 	TokenNumber
 	TokenString
@@ -45,6 +44,7 @@ const (
 	TokenNewLine
 	TokenArrow
 	TokenColonEqual
+	TokenIllegal
 
 	//Keywords
 	TokenTrue
@@ -125,26 +125,26 @@ var tokenTypeToString = map[TokenType]string{
 	TokenNewLine:    "\n",
 }
 
-var tokenKeyWords = map[string]TokenType{
-	"true":     TokenTrue,
-	"type":     TokenT,
-	"struct":   TokenStruct,
-	"import":   TokenImport,
-	"as":       TokenAs,
-	"nil":      TokenNil,
-	"false":    TokenFalse,
-	"if":       TokenIf,
-	"else":     TokenElse,
-	"for":      TokenFor,
-	"in":       TokenIn,
-	"var":      TokenVar,
-	"func":     TokenFunc,
-	"return":   TokenReturn,
-	"while":    TokenWhile,
-	"print":    TokenPrint,
-	"break":    TokenBreak,
-	"continue": TokenContinue,
-}
+// var tokenKeyWords = map[string]TokenType{
+// 	"true":     TokenTrue,
+// 	"type":     TokenT,
+// 	"struct":   TokenStruct,
+// 	"import":   TokenImport,
+// 	"as":       TokenAs,
+// 	"nil":      TokenNil,
+// 	"false":    TokenFalse,
+// 	"if":       TokenIf,
+// 	"else":     TokenElse,
+// 	"for":      TokenFor,
+// 	"in":       TokenIn,
+// 	"var":      TokenVar,
+// 	"func":     TokenFunc,
+// 	"return":   TokenReturn,
+// 	"while":    TokenWhile,
+// 	"print":    TokenPrint,
+// 	"break":    TokenBreak,
+// 	"continue": TokenContinue,
+// }
 
 func (tt TokenType) String() string {
 	if s, ok := tokenTypeToString[tt]; ok {

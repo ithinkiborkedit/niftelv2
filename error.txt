@@ -281,7 +281,6 @@ advance() return l.current=198, rune='*' (U+002a)
 advance() return l.current=199, rune='/' (U+002f)
 advance() return l.current=200, rune='\n' (U+000a)
 advance() return l.current=201, rune='\t' (U+0009)
-scanToken() return type=ILLEGAL, Lexeme="", current=202, start=20258: EOF "" 
---- PASS: TestLexer_ScanTokens (0.00s)
-PASS
-ok  	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	0.303s
+scanToken() return type=EOF, Lexeme="", current=202, start=202signal: interrupt
+FAIL	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	26.829s
+FAIL
