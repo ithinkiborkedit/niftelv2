@@ -214,4 +214,4 @@ advance() return l.current=201, rune='\t' (U+0009)
 scanToken() return type=ILLEGAL, Lexeme="", current=202, start=1530: EOF "" 
 --- PASS: TestLexer_ScanTokens (0.00s)
 PASS
-ok  	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	0.314s
+ok  	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	0.260s
