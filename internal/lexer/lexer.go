@@ -428,7 +428,7 @@ func (l *Lexer) scanToken() (token.Token, error) {
 			l.start = l.current - utf8.RuneLen(ch)
 			return l.identifier()
 		} else {
-			return token.Token{}, fmt.Errorf("unexpected character %q", ch)
+			return token.Token{}, nil
 		}
 	}
 	// return token.Token{}, fmt.Errorf("unexpected character %q", ch)
