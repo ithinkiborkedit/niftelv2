@@ -12,7 +12,7 @@ import (
 func TestInterpreter_EvaluateLiteralInt(t *testing.T) {
 	interp := interpreter.NewInterpreter()
 
-	intToken := token.NifToken{
+	intToken := token.Token{
 		Type:   token.TokenNumber,
 		Lexeme: "42",
 		Data:   float64(42),
@@ -41,7 +41,7 @@ func TestInterpreter_EvaluateLiteralInt(t *testing.T) {
 func TestInterpreter_EvaluateBinaryExprIntComparisson(t *testing.T) {
 	interp := interpreter.NewInterpreter()
 
-	intTokenL := token.NifToken{
+	intTokenL := token.Token{
 		Type:   token.TokenNumber,
 		Lexeme: "42",
 		Data:   42,
@@ -49,7 +49,7 @@ func TestInterpreter_EvaluateBinaryExprIntComparisson(t *testing.T) {
 		Column: 1,
 	}
 
-	intTokenR := token.NifToken{
+	intTokenR := token.Token{
 		Type:   token.TokenNumber,
 		Lexeme: "100",
 		Data:   100,
@@ -62,7 +62,7 @@ func TestInterpreter_EvaluateBinaryExprIntComparisson(t *testing.T) {
 
 	binExpr := &ast.BinaryExpr{
 		Left:     left,
-		Operator: token.NifToken{Type: token.TokenLess, Lexeme: "<", Line: 1, Column: 2},
+		Operator: token.Token{Type: token.TokenLess, Lexeme: "<", Line: 1, Column: 2},
 		Right:    right,
 	}
 

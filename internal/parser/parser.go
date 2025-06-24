@@ -8,11 +8,11 @@ import (
 )
 
 type Parser struct {
-	tokens  []token.NifToken
+	tokens  []token.Token
 	current int
 }
 
-func New(tokens []token.NifToken) *Parser {
+func New(tokens []token.Token) *Parser {
 	return &Parser{
 		tokens: tokens,
 	}
@@ -49,22 +49,22 @@ func (p *Parser) isAtEnd() bool {
 	return p.peek().Type == token.TokenEOF
 }
 
-func (p *Parser) peek() token.NifToken {
+func (p *Parser) peek() token.Token {
 	return p.tokens[p.current]
 }
 
-func (p *Parser) advance() token.NifToken {
+func (p *Parser) advance() token.Token {
 	if !p.isAtEnd() {
 		p.current++
 	}
 	return p.previous()
 }
 
-func (p *Parser) previous() token.NifToken {
+func (p *Parser) previous() token.Token {
 	return p.tokens[p.current-1]
 }
 
-func (p *Parser) consume(tt token.TokenType, message string) token.NifToken {
+func (p *Parser) consume(tt token.TokenType, message string) token.Token {
 	if p.check(tt) {
 		return p.advance()
 	}
@@ -605,7 +605,7 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 	}
 	p.consume(token.TokenRParen, "expect ')' after parameters")
 
-	var returnType token.NifToken
+	var returnType token.Token
 	if p.match(token.TokenArrow) {
 		returnType = p.consume(token.TokenIdentifier, "expect return type after '->'")
 	}

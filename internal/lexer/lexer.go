@@ -9,25 +9,64 @@ import (
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 )
 
-// type Lexer struct {
-// 	input      string
-// 	start      int
-// 	current    int
-// 	line       int
-// 	column     int
-// 	width      int
-// 	tokens     []niftokens.NifToken
-// 	keywords   map[string]niftokens.TokenType
-// 	groupdepth int
-// }
-
 type Lexer struct {
 	source  string
 	start   int
 	current int
 	line    int
 	column  int
-	tokens  []token.NifToken
+}
+
+type TokenSource interface {
+	NextToken() (token.Token, error)
+}
+
+var tokenKeyWords = map[string]token.TokenType{
+	"true":     token.TokenTrue,
+	"type":     token.TokenT,
+	"struct":   token.TokenStruct,
+	"import":   token.TokenImport,
+	"as":       token.TokenAs,
+	"nil":      token.TokenNil,
+	"false":    token.TokenFalse,
+	"if":       token.TokenIf,
+	"else":     token.TokenElse,
+	"for":      token.TokenFor,
+	"in":       token.TokenIn,
+	"var":      token.TokenVar,
+	"func":     token.TokenFunc,
+	"return":   token.TokenReturn,
+	"while":    token.TokenWhile,
+	"print":    token.TokenPrint,
+	"break":    token.TokenBreak,
+	"continue": token.TokenContinue,
+}
+
+func (l *Lexer) NextToken() (token.Token, error) {
+	for !l.isAtEnd() {
+		return token.Token{
+			Type:   token.TokenEOF,
+			Lexeme: "",
+			Line:   l.line,
+			Column: l.column,
+		}, nil
+	}
+	l.start = l.current
+	// tok, matched := l.scanToken()
+	// if matched {
+	// 	return tok, nil
+	// }
+	return l.scanToken()
+}
+
+func (l *Lexer) makeToken(tt token.TokenType) token.Token {
+	lexeme := l.source[l.start:l.current]
+	return token.Token{
+		Type:   tt,
+		Lexeme: lexeme,
+		Line:   l.line,
+		Column: l.column,
+	}
 }
 
 func New(source string) *Lexer {
@@ -37,24 +76,24 @@ func New(source string) *Lexer {
 		current: 0,
 		line:    1,
 		column:  0,
-		tokens:  []token.NifToken{},
+		// tokens:  []token.Token{},
 	}
 }
 
-func (l *Lexer) ScanTokens() []token.NifToken {
-	for !l.isAtEnd() {
-		l.start = l.current
-		l.scanToken()
-	}
-	l.tokens = append(l.tokens, token.NifToken{
-		Type:   token.TokenEOF,
-		Lexeme: "",
-		Line:   l.line,
-		Column: l.column,
-	})
+// func (l *Lexer) ScanTokens() []token.Token {
+// 	for !l.isAtEnd() {
+// 		l.start = l.current
+// 		l.scanToken()
+// 	}
+// 	l.tokens = append(l.tokens, token.Token{
+// 		Type:   token.TokenEOF,
+// 		Lexeme: "",
+// 		Line:   l.line,
+// 		Column: l.column,
+// 	})
 
-	return l.tokens
-}
+// 	return l.tokens
+// }
 
 func (l *Lexer) isAtEnd() bool {
 	return l.current >= len(l.source)
@@ -73,15 +112,15 @@ func (l *Lexer) advance() rune {
 	return r
 }
 
-func (l *Lexer) addToken(tt token.TokenType) {
-	lexeme := l.source[l.start:l.current]
-	l.tokens = append(l.tokens, token.NifToken{
-		Type:   tt,
-		Lexeme: lexeme,
-		Line:   l.line,
-		Column: l.column,
-	})
-}
+// func (l *Lexer) addToken(tt token.TokenType) {
+// 	lexeme := l.source[l.start:l.current]
+// 	l.tokens = append(l.tokens, token.Token{
+// 		Type:   tt,
+// 		Lexeme: lexeme,
+// 		Line:   l.line,
+// 		Column: l.column,
+// 	})
+// }
 
 func (l *Lexer) match(expected rune) bool {
 	if l.isAtEnd() {
@@ -135,73 +174,123 @@ func (l *Lexer) peekNext() rune {
 	return r
 }
 
-func (l *Lexer) string(quote rune) {
+func (l *Lexer) string(quote rune) (token.Token, error) {
 	for !l.isAtEnd() {
 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
 		if r == quote {
 			l.advance()
 			lexeme := l.source[l.start:l.current]
-			l.tokens = append(l.tokens, token.NifToken{
+			return token.Token{
 				Type:   token.TokenString,
 				Lexeme: lexeme,
 				Line:   l.line,
 				Column: l.column,
-			})
-			return
+			}, nil
 		}
 		if r == '\n' {
 			l.line++
 			l.column = 0
 		}
+
 		if r == '\\' {
 			l.advance()
 		}
 		l.advance()
+		// r, _ := utf8.DecodeRuneInString(l.source[l.current:])
+		// if r == quote {
+		// 	l.advance()
+		// 	lexeme := l.source[l.start:l.current]
+		// 	l.tokens = append(l.tokens, token.Token{
+		// 		Type:   token.TokenString,
+		// 		Lexeme: lexeme,
+		// 		Line:   l.line,
+		// 		Column: l.column,
+		// 	})
+		// 	return
+		// }
+		// if r == '\n' {
+		// 	l.line++
+		// 	l.column = 0
+		// }
+		// if r == '\\' {
+		// 	l.advance()
+		// }
+		// l.advance()
 	}
-	l.errorf("unterminated string literal")
+	return token.Token{}, fmt.Errorf("unterminated string literal")
 }
 
-func (l *Lexer) number() {
+func (l *Lexer) number() (token.Token, error) {
 	for !l.isAtEnd() {
 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
-		if !(unicode.IsDigit(r) || r == '.') {
+		if !unicode.IsDigit(r) && r != '.' {
 			break
 		}
 		l.advance()
 	}
-
 	lexeme := l.source[l.start:l.current]
-	val, err := strconv.ParseFloat(lexeme, 64)
-	if err != nil {
-		l.errorf("invalid number literal: %s", lexeme)
-		val = 0.0
-	}
 
-	l.tokens = append(l.tokens, token.NifToken{
+	if _, err := strconv.ParseFloat(lexeme, 64); err != nil {
+		return token.Token{}, fmt.Errorf("invalid number literal: %s", lexeme)
+	}
+	// 	r, _ := utf8.DecodeRuneInString(l.source[l.current:])
+	// 	if !(unicode.IsDigit(r) || r == '.') {
+	// 		break
+	// 	}
+	// 	l.advance()
+	// }
+
+	// lexeme := l.source[l.start:l.current]
+	// val, err := strconv.ParseFloat(lexeme, 64)
+	// if err != nil {
+	// 	l.errorf("invalid number literal: %s", lexeme)
+	// 	val = 0.0
+	// }
+
+	return token.Token{
 		Type:   token.TokenNumber,
 		Lexeme: lexeme,
-		Data:   val,
+		// Data:   val,
 		Line:   l.line,
 		Column: l.column,
-	})
+	}, nil
 }
 
-func (l *Lexer) identifier() {
+func (l *Lexer) identifier() (token.Token, error) {
 	for !l.isAtEnd() {
 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
-		if !(unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_') {
+		if !unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
 			break
 		}
 		l.advance()
 	}
 	lexeme := l.source[l.start:l.current]
-	tt := lookupIdentifier(lexeme)
-	l.tokens = append(l.tokens, token.NifToken{
-		Type:   tt,
+
+	tokType := token.TokenIdentifier
+	if kwType, ok := tokenKeyWords[lexeme]; ok {
+		tokType = kwType
+	}
+
+	return token.Token{
+		Type:   tokType,
 		Lexeme: lexeme,
 		Line:   l.line,
 		Column: l.column,
-	})
+	}, nil
+	// 	r, _ := utf8.DecodeRuneInString(l.source[l.current:])
+	// 	if !(unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_') {
+	// 		break
+	// 	}
+	// 	l.advance()
+	// }
+	// lexeme := l.source[l.start:l.current]
+	// tt := lookupIdentifier(lexeme)
+	// l.tokens = append(l.tokens, token.Token{
+	// 	Type:   tt,
+	// 	Lexeme: lexeme,
+	// 	Line:   l.line,
+	// 	Column: l.column,
+	// })
 }
 
 func lookupIdentifier(lexeme string) token.TokenType {
@@ -230,93 +319,93 @@ func lookupIdentifier(lexeme string) token.TokenType {
 	return token.TokenIdentifier
 }
 
-func (l *Lexer) scanToken() {
+func (l *Lexer) scanToken() (token.Token, error) {
 	ch := l.advance()
 	switch ch {
 	case '(':
-		l.addToken(token.TokenLParen)
+		l.makeToken(token.TokenLParen)
 	case ')':
-		l.addToken(token.TokenRParen)
+		l.makeToken(token.TokenRParen)
 	case '{':
-		l.addToken(token.TokenLBrace)
+		l.makeToken(token.TokenLBrace)
 	case '}':
-		l.addToken(token.TokenRBrace)
+		l.makeToken(token.TokenRBrace)
 	case '[':
-		l.addToken(token.TokenLBracket)
+		l.makeToken(token.TokenLBracket)
 	case ']':
-		l.addToken(token.TokenRBracket)
+		l.makeToken(token.TokenRBracket)
 	case ',':
-		l.addToken(token.TokenComma)
+		l.makeToken(token.TokenComma)
 	case '.':
-		l.addToken(token.TokenDot)
+		l.makeToken(token.TokenDot)
 	case ';':
-		l.addToken(token.TokenSemicolon)
+		l.makeToken(token.TokenSemicolon)
 	case ':':
 		if l.match('=') {
-			l.addToken(token.TokenColonEqual)
+			l.makeToken(token.TokenColonEqual)
 		} else {
-			l.addToken(token.TokenColon)
+			l.makeToken(token.TokenColon)
 		}
 	case '+':
-		l.addToken(token.TokenPlus)
+		l.makeToken(token.TokenPlus)
 	case '-':
 		if l.match('>') {
-			l.addToken(token.TokenArrow)
+			l.makeToken(token.TokenArrow)
 		} else {
-			l.addToken(token.TokenBang)
+			l.makeToken(token.TokenBang)
 		}
 	case '*':
-		l.addToken(token.TokenStar)
+		l.makeToken(token.TokenStar)
 	case '/':
 		if l.match('/') {
 			l.skipLineComment()
 		} else if l.match('*') {
 			l.skipBlockComment()
 		} else {
-			l.addToken(token.TokenFWDSlash)
+			l.makeToken(token.TokenFWDSlash)
 		}
 	case '%':
-		l.addToken(token.TokenPercent)
+		l.makeToken(token.TokenPercent)
 	case '=':
 		if l.match('=') {
-			l.addToken(token.TokenEqality)
+			l.makeToken(token.TokenEqality)
 		} else {
-			l.addToken(token.TokenAssign)
+			l.makeToken(token.TokenAssign)
 		}
 	case '!':
 		if l.match('=') {
-			l.addToken(token.TokenBangEqal)
+			l.makeToken(token.TokenBangEqal)
 		} else {
-			l.addToken(token.TokenBang)
+			l.makeToken(token.TokenBang)
 		}
 	case '<':
 		if l.match('=') {
-			l.addToken(token.TokenLessEq)
+			l.makeToken(token.TokenLessEq)
 		} else {
-			l.addToken(token.TokenLess)
+			l.makeToken(token.TokenLess)
 		}
 	case '>':
 		if l.match('=') {
-			l.addToken(token.TokenGreaterEq)
+			l.makeToken(token.TokenGreaterEq)
 		} else {
-			l.addToken(token.TokenGreater)
+			l.makeToken(token.TokenGreater)
 		}
 	case '&':
 		if l.match('&') {
-			l.addToken(token.TokenAnd)
+			l.makeToken(token.TokenAnd)
 		} else {
 			l.errorf("unexpected character: %q", ch)
 		}
 	case '|':
 		if l.match('|') {
-			l.addToken(token.TokenOr)
+			l.makeToken(token.TokenOr)
 		} else {
 			l.errorf("unexpected character: %q", ch)
 		}
 	case '"', '\'':
 		l.string(ch)
 	case '\n':
-		l.addToken(token.TokenNewLine)
+		l.makeToken(token.TokenNewLine)
 		l.line++
 		l.column = 0
 	case ' ', '\r', '\t':
@@ -330,6 +419,7 @@ func (l *Lexer) scanToken() {
 			l.errorf("unexpected character: '%q'", ch)
 		}
 	}
+	return token.Token{}, fmt.Errorf("unexpected character %q", ch)
 }
 
 // func (l *Lexer) ScanTokens() []niftokens.NifToken {
