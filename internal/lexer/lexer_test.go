@@ -28,14 +28,12 @@ func TestLexer_ScanTokens(t *testing.T) {
 	var tokens []token.Token
 	for {
 		tok, err := lex.NextToken()
+
 		if err != nil {
 			t.Fatalf("lexer error: %v", err)
 		}
 		tokens = append(tokens, tok)
 
-		for i, tok := range tokens {
-			t.Logf("%03d: %-20v %q", i, tok.Type, tok.Lexeme)
-		}
 		fmt.Printf("%d: %v %q\n", len(tokens)-1, tok.Type, tok.Lexeme)
 		if tok.Type == token.TokenEOF {
 			break

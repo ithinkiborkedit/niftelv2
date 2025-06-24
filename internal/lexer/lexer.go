@@ -46,6 +46,7 @@ func (l *Lexer) NextToken() (token.Token, error) {
 	for !l.isAtEnd() {
 		l.start = l.current
 		tok, err := l.scanToken()
+		fmt.Printf("scanToken() return type=%v, Lexeme=%q, current=%d, start=%d", tok.Type, tok.Lexeme, l.current, l.start)
 		if err != nil {
 			return token.Token{}, err
 		}
@@ -55,18 +56,13 @@ func (l *Lexer) NextToken() (token.Token, error) {
 		if tok.Type == 0 {
 			continue
 		}
-		return token.Token{
-			Type:   token.TokenEOF,
-			Lexeme: "",
-			Line:   l.line,
-			Column: l.column,
-		}, nil
 	}
-	// tok, matched := l.scanToken()
-	// if matched {
-	// 	return tok, nil
-	// }
-	return l.scanToken()
+	return token.Token{
+		Type:   token.TokenEOF,
+		Lexeme: "",
+		Line:   l.line,
+		Column: l.column,
+	}, nil
 }
 
 func (l *Lexer) makeToken(tt token.TokenType) token.Token {
@@ -117,6 +113,7 @@ func (l *Lexer) advance() rune {
 	}
 
 	r, width := utf8.DecodeRuneInString(l.source[l.current:])
+	fmt.Printf("advance() return l.current=%d, rune=%q (U+%04x)\n", l.current, r, r)
 	l.current += width
 	l.column++
 	return r
@@ -333,87 +330,89 @@ func (l *Lexer) scanToken() (token.Token, error) {
 	ch := l.advance()
 	switch ch {
 	case '(':
-		l.makeToken(token.TokenLParen)
+		return l.makeToken(token.TokenLParen), nil
 	case ')':
-		l.makeToken(token.TokenRParen)
+		return l.makeToken(token.TokenRParen), nil
 	case '{':
-		l.makeToken(token.TokenLBrace)
+		return l.makeToken(token.TokenLBrace), nil
 	case '}':
-		l.makeToken(token.TokenRBrace)
+		return l.makeToken(token.TokenRBrace), nil
 	case '[':
-		l.makeToken(token.TokenLBracket)
+		return l.makeToken(token.TokenLBracket), nil
 	case ']':
-		l.makeToken(token.TokenRBracket)
+		return l.makeToken(token.TokenRBracket), nil
 	case ',':
-		l.makeToken(token.TokenComma)
+		return l.makeToken(token.TokenComma), nil
 	case '.':
-		l.makeToken(token.TokenDot)
+		return l.makeToken(token.TokenDot), nil
 	case ';':
-		l.makeToken(token.TokenSemicolon)
+		return l.makeToken(token.TokenSemicolon), nil
 	case ':':
 		if l.match('=') {
-			l.makeToken(token.TokenColonEqual)
+			return l.makeToken(token.TokenColonEqual), nil
 		} else {
-			l.makeToken(token.TokenColon)
+			return l.makeToken(token.TokenColon), nil
 		}
 	case '+':
-		l.makeToken(token.TokenPlus)
+		return l.makeToken(token.TokenPlus), nil
 	case '-':
 		if l.match('>') {
-			l.makeToken(token.TokenArrow)
+			return l.makeToken(token.TokenArrow), nil
 		} else {
-			l.makeToken(token.TokenBang)
+			return l.makeToken(token.TokenBang), nil
 		}
 	case '*':
-		l.makeToken(token.TokenStar)
+		return l.makeToken(token.TokenStar), nil
 	case '/':
 		if l.match('/') {
 			l.skipLineComment()
+			return token.Token{}, nil
 		} else if l.match('*') {
 			l.skipBlockComment()
+			return token.Token{}, nil
 		} else {
-			l.makeToken(token.TokenFWDSlash)
+			return l.makeToken(token.TokenFWDSlash), nil
 		}
 	case '%':
 		l.makeToken(token.TokenPercent)
 	case '=':
 		if l.match('=') {
-			l.makeToken(token.TokenEqality)
+			return l.makeToken(token.TokenEqality), nil
 		} else {
-			l.makeToken(token.TokenAssign)
+			return l.makeToken(token.TokenAssign), nil
 		}
 	case '!':
 		if l.match('=') {
-			l.makeToken(token.TokenBangEqal)
+			return l.makeToken(token.TokenBangEqal), nil
 		} else {
-			l.makeToken(token.TokenBang)
+			return l.makeToken(token.TokenBang), nil
 		}
 	case '<':
 		if l.match('=') {
-			l.makeToken(token.TokenLessEq)
+			return l.makeToken(token.TokenLessEq), nil
 		} else {
-			l.makeToken(token.TokenLess)
+			return l.makeToken(token.TokenLess), nil
 		}
 	case '>':
 		if l.match('=') {
-			l.makeToken(token.TokenGreaterEq)
+			return l.makeToken(token.TokenGreaterEq), nil
 		} else {
-			l.makeToken(token.TokenGreater)
+			return l.makeToken(token.TokenGreater), nil
 		}
 	case '&':
 		if l.match('&') {
-			l.makeToken(token.TokenAnd)
+			return l.makeToken(token.TokenAnd), nil
 		} else {
 			l.errorf("unexpected character: %q", ch)
 		}
 	case '|':
 		if l.match('|') {
-			l.makeToken(token.TokenOr)
+			return l.makeToken(token.TokenOr), nil
 		} else {
 			l.errorf("unexpected character: %q", ch)
 		}
 	case '"', '\'':
-		l.string(ch)
+		return l.string(ch)
 	case '\n':
 		tok := l.makeToken(token.TokenNewLine)
 		l.line++
@@ -423,9 +422,11 @@ func (l *Lexer) scanToken() (token.Token, error) {
 		return token.Token{}, nil
 	default:
 		if unicode.IsDigit(ch) {
-			l.number()
+			l.start = l.current - utf8.RuneLen(ch)
+			return l.number()
 		} else if unicode.IsLetter(ch) || ch == '_' {
-			l.identifier()
+			l.start = l.current - utf8.RuneLen(ch)
+			return l.identifier()
 		} else {
 			l.errorf("unexpected character: '%q'", ch)
 		}
