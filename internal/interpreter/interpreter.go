@@ -5,8 +5,10 @@ import (
 	"fmt"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/function"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/runtimecontrol"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
@@ -507,15 +509,22 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) (value.Value, error) {
 
 // VisitFuncStmt defines a function in the environment.
 func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) error {
-	// Wrap the function expression in a callable Value
-	fnValue := value.Value{
-		Type: value.ValueStruct, // or define a specific function value type
-		Data: stmt,              // Keep the AST node to execute on call
-		Meta: nil,
-	}
-	i.env.Define(stmt.Name.Lexeme, fnValue)
-	return nil
+	fn := function.NewUserFunc(
+		stmt.Name.Lexeme,
+		stmt.Params,
+		stmt.Body,
+		i.env)
+
 }
+
+// Wrap the function expression in a callable Value
+// fnValue := value.Value{
+// Type: value.ValueStruct, // or define a specific function value type
+// Data: stmt,              // Keep the AST node to execute on call
+// 	Meta: nil,
+// }
+// i.env.Define(stmt.Name.Lexeme, fnValue)
+// return nil
 
 // VisitReturnStmt returns a value from a function.
 // Here, we use panic as control flow to unwind the call stack for returns.
@@ -531,32 +540,32 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
 		retVal = value.Null()
 	}
 	// panic with a special ReturnValue to unwind execution
-	panic(ReturnValue{Value: retVal})
+	panic(runtimecontrol.ReturnValue{Value: retVal})
 }
 
 // VisitBreakStmt handles break statement in loops.
 func (i *Interpreter) VisitBreakStmt(stmt *ast.BreakStmt) error {
-	panic(BreakSignal{})
+	panic(runtimecontrol.BreakSignal{})
 }
 
 // VisitContinueStmt handles continue statement in loops.
 func (i *Interpreter) VisitContinueStmt(stmt *ast.ContinueStmt) error {
-	panic(ContinueSignal{})
+	panic(runtimecontrol.ContinueSignal{})
 }
 
 // ReturnValue is used internally to signal return from function.
-type ReturnValue struct {
-	Value value.Value
-}
+// type ReturnValue struct {
+// 	Value value.Value
+// }
 
-func (r ReturnValue) Error() string { return "function return" }
+// func (r ReturnValue) Error() string { return "function return" }
 
 // BreakSignal signals a break in loops.
-type BreakSignal struct{}
+// type BreakSignal struct{}
 
-func (b BreakSignal) Error() string { return "break" }
+// func (b BreakSignal) Error() string { return "break" }
 
-// ContinueSignal signals a continue in loops.
-type ContinueSignal struct{}
+// // ContinueSignal signals a continue in loops.
+// type ContinueSignal struct{}
 
-func (c ContinueSignal) Error() string { return "continue" }
+// func (c ContinueSignal) Error() string { return "continue" }

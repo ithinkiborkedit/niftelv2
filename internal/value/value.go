@@ -16,6 +16,7 @@ const (
 	ValueList
 	ValueDict
 	ValueStruct
+	ValueFunc
 )
 
 type Value struct {
