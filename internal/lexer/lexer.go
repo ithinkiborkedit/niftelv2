@@ -428,10 +428,10 @@ func (l *Lexer) scanToken() (token.Token, error) {
 			l.start = l.current - utf8.RuneLen(ch)
 			return l.identifier()
 		} else {
-			l.errorf("unexpected character: '%q'", ch)
+			return token.Token{}, fmt.Errorf("unexpected character %q", ch)
 		}
 	}
-	return token.Token{}, fmt.Errorf("unexpected character %q", ch)
+	// return token.Token{}, fmt.Errorf("unexpected character %q", ch)
 }
 
 // func (l *Lexer) ScanTokens() []niftokens.NifToken {
