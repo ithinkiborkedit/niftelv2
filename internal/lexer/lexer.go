@@ -42,8 +42,23 @@ var tokenKeyWords = map[string]token.TokenType{
 	"continue": token.TokenContinue,
 }
 
+func (l *Lexer) skipWhiteSpace() {
+	for {
+		if l.isAtEnd() {
+			return
+		}
+		ch, _ := utf8.DecodeRuneInString(l.source[l.current:])
+		if ch == ' ' || ch == '\t' || ch == '\r' {
+			l.advance()
+		} else {
+			break
+		}
+	}
+}
+
 func (l *Lexer) NextToken() (token.Token, error) {
 	for !l.isAtEnd() {
+		l.skipWhiteSpace()
 		l.start = l.current
 		tok, err := l.scanToken()
 		fmt.Printf("scanToken() return type=%v, Lexeme=%q, current=%d, start=%d", tok.Type, tok.Lexeme, l.current, l.start)
@@ -418,9 +433,9 @@ func (l *Lexer) scanToken() (token.Token, error) {
 		l.line++
 		l.column = 0
 		return tok, nil
-	case ' ', '\r', '\t':
-		fmt.Println("skipping whitespace...")
-		return token.Token{}, nil
+	// case ' ', '\r', '\t':
+	// fmt.Println("skipping whitespace...")
+	// return token.Token{}, nil
 	default:
 		if unicode.IsDigit(ch) {
 			l.start = l.current - utf8.RuneLen(ch)
