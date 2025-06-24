@@ -285,3 +285,5 @@ scanToken() return type=EOF, Lexeme="", current=202, start=20258: EOF ""
 --- PASS: TestLexer_ScanTokens (0.00s)
 PASS
 ok  	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	(cached)
+
+d
