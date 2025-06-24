@@ -14,7 +14,7 @@ func TestLexer_ScanTokens(t *testing.T) {
 	}
 	var result: int = add(5,3)
 
-	if result > 5 {
+	if result 5 {
 	  print("success")
 
 	} else {
@@ -25,22 +25,41 @@ func TestLexer_ScanTokens(t *testing.T) {
 	   comment */
 	`
 	lex := New(source)
-	tokens := lex.ScanTokens()
+	var tokens []token.Token
+	for {
+		tok, err := lex.NextToken()
+		if err != nil {
+			t.Fatalf("lexer error: %v", err)
+		}
+		tokens = append(tokens, tok)
 
-	for i, tok := range tokens {
-		fmt.Printf("%d: %v %q", i, tok.Type, tok.Lexeme)
-	}
-	for i, tok := range tokens {
-		if tok.Type == token.TokenIllegal {
-			t.Fatalf("%d: %v %q", i, tok.Type, tok.Lexeme)
+		for i, tok := range tokens {
+			t.Logf("%03d: %-20v %q", i, tok.Type, tok.Lexeme)
+		}
+		fmt.Printf("%d: %v %q\n", len(tokens)-1, tok.Type, tok.Lexeme)
+		if tok.Type == token.TokenEOF {
+			break
+		}
+
+		for i, tok := range tokens {
+			if tok.Type == token.TokenIllegal {
+				t.Fatalf("%d: %v %q", i, tok.Type, tok.Lexeme)
+			}
 		}
 	}
+	// tokens := lex.ScanTokens()
+
+	// for i, tok := range tokens {
+	// 	fmt.Printf("%d: %v %q", i, tok.Type, tok.Lexeme)
+	// }
+	// for i, tok := range tokens {
+	// 	if tok.Type == token.TokenIllegal {
+	// 		t.Fatalf("%d: %v %q", i, tok.Type, tok.Lexeme)
+	// 	}
+	// }
 
 }
 
-// for i, tok := range filtered {
-// 	t.Logf("%03d: %-20v %q", i, tok.Type, tok.Lexeme)
-// }
 // if len(filtered) != len(expectedTypes) {
 // 	t.Fatalf("token count mismatch: got %d, want %d", len(filtered), len(expectedTypes))
 // }

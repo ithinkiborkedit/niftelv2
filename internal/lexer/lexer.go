@@ -44,6 +44,17 @@ var tokenKeyWords = map[string]token.TokenType{
 
 func (l *Lexer) NextToken() (token.Token, error) {
 	for !l.isAtEnd() {
+		l.start = l.current
+		tok, err := l.scanToken()
+		if err != nil {
+			return token.Token{}, err
+		}
+		// if tok.Type == token.TokenIllegal {
+		// 	return tok, nil
+		// }
+		if tok.Type == 0 {
+			continue
+		}
 		return token.Token{
 			Type:   token.TokenEOF,
 			Lexeme: "",
@@ -51,7 +62,6 @@ func (l *Lexer) NextToken() (token.Token, error) {
 			Column: l.column,
 		}, nil
 	}
-	l.start = l.current
 	// tok, matched := l.scanToken()
 	// if matched {
 	// 	return tok, nil
@@ -405,11 +415,12 @@ func (l *Lexer) scanToken() (token.Token, error) {
 	case '"', '\'':
 		l.string(ch)
 	case '\n':
-		l.makeToken(token.TokenNewLine)
+		tok := l.makeToken(token.TokenNewLine)
 		l.line++
 		l.column = 0
+		return tok, nil
 	case ' ', '\r', '\t':
-
+		return token.Token{}, nil
 	default:
 		if unicode.IsDigit(ch) {
 			l.number()
