@@ -32,9 +32,9 @@ func TestLexer_ScanTokens(t *testing.T) {
 			t.Fatalf("lexer error %v", err)
 		}
 
-		if tok.Type == 0 {
-			continue
-		}
+		// if tok.Type == 0 {
+		// 	continue
+		// }
 
 		fmt.Printf("%d: %v %q \n", len(tokens), tok.Type, tok.Lexeme)
 
