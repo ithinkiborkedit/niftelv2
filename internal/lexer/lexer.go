@@ -419,6 +419,7 @@ func (l *Lexer) scanToken() (token.Token, error) {
 		l.column = 0
 		return tok, nil
 	case ' ', '\r', '\t':
+		fmt.Println("skipping whitespace...")
 		return token.Token{}, nil
 	default:
 		if unicode.IsDigit(ch) {
