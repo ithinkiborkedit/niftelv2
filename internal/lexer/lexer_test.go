@@ -45,16 +45,6 @@ func TestLexer_ScanTokens(t *testing.T) {
 			}
 		}
 	}
-	// tokens := lex.ScanTokens()
-
-	// for i, tok := range tokens {
-	// 	fmt.Printf("%d: %v %q", i, tok.Type, tok.Lexeme)
-	// }
-	// for i, tok := range tokens {
-	// 	if tok.Type == token.TokenIllegal {
-	// 		t.Fatalf("%d: %v %q", i, tok.Type, tok.Lexeme)
-	// 	}
-	// }
 
 }
 
