@@ -288,6 +288,37 @@ func (i *Interpreter) VisitWhileStmt(stmt *ast.WhileStmt) error {
 	return nil
 }
 
+func (i *Interpreter) PushEnv(env *environment.Environment) {
+	i.env = env
+}
+
+func (i *Interpreter) PopEnv() {
+	panic("PopEnv not Implemeted!")
+}
+
+func (i *Interpreter) GetEnv() *environment.Environment {
+	return i.env
+}
+
+func (i *Interpreter) ExecuteBlock(block *ast.BlockStmt, env *environment.Environment) (value.Value, error) {
+	previous := i.env
+	i.env = env
+
+	defer func() {
+		i.env = previous
+	}()
+
+	var result value.Value
+
+	for _, stmt := range block.Statements {
+		err := i.Execute(stmt)
+		if err != nil {
+			return result, err
+		}
+	}
+	return result, nil
+}
+
 func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) error {
 	previousEnv := i.env
 	i.env = environment.NewEnvironment(previousEnv)
@@ -354,7 +385,10 @@ func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) (value.Value, error) {
 		return value.Null(), err
 	}
 
-	// Evaluate all argument expressions
+	callable, ok := calleeVal.Data.(function.Callable)
+	if !ok {
+		return value.Null(), fmt.Errorf("attempt to call non-function value")
+	}
 	args := make([]value.Value, len(expr.Arguments))
 	for idx, argExpr := range expr.Arguments {
 		args[idx], err = i.Evaluate(argExpr)
@@ -363,20 +397,7 @@ func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) (value.Value, error) {
 		}
 	}
 
-	// Check if callee is a function value (assumed to have type ValueStruct or special FuncInfo)
-	// You may need a function wrapper or closure struct; adjust as per your implementation
-	// funcMeta := calleeVal.Meta
-	// if funcMeta == nil || funcMeta.Kind != value.TypeFunc {
-	// 	return value.Null(), fmt.Errorf("attempt to call non-function value")
-	// }
-
-	// TODO: Implement function invocation logic (bytecode, native call, etc.)
-	// For now, assume native Go function stored in calleeVal.Data as func([]value.Value) (value.Value, error)
-	if nativeFunc, ok := calleeVal.Data.(func([]value.Value) (value.Value, error)); ok {
-		return nativeFunc(args)
-	}
-
-	return value.Null(), fmt.Errorf("function call not implemented for this callee type")
+	return callable.Call(args, i)
 }
 
 func (i *Interpreter) VisitIndexExpr(expr *ast.IndexExpr) (value.Value, error) {
@@ -513,21 +534,16 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) error {
 		stmt.Name.Lexeme,
 		stmt.Params,
 		stmt.Body,
-		i.env)
-
+		i.env,
+		stmt.Func.Line,
+		stmt.Func.Column)
+	i.env.Define(stmt.Name.Lexeme, value.Value{
+		Type: value.ValueFunc,
+		Data: fn,
+	})
+	return nil
 }
 
-// Wrap the function expression in a callable Value
-// fnValue := value.Value{
-// Type: value.ValueStruct, // or define a specific function value type
-// Data: stmt,              // Keep the AST node to execute on call
-// 	Meta: nil,
-// }
-// i.env.Define(stmt.Name.Lexeme, fnValue)
-// return nil
-
-// VisitReturnStmt returns a value from a function.
-// Here, we use panic as control flow to unwind the call stack for returns.
 func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
 	var retVal value.Value
 	var err error
