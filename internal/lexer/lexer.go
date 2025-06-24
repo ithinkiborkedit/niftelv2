@@ -68,7 +68,7 @@ func (l *Lexer) NextToken() (token.Token, error) {
 		// if tok.Type == token.TokenIllegal {
 		// 	return tok, nil
 		// }
-		if tok.Type == 0 {
+		if tok.Type == 0 || tok.Lexeme == "" {
 			continue
 		}
 	}
