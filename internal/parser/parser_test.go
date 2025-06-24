@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 )
 
 func lexAll(source string) []niftokens.Token {
@@ -67,4 +67,5 @@ func TestParser_Parse(t *testing.T) {
 	if !ok {
 		t.Fatalf("Third stmt is not PrintStmt, got %T", stmts[2])
 	}
+	_ = printStmt
 }
