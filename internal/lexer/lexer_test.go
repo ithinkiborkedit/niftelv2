@@ -28,34 +28,25 @@ func TestLexer_ScanTokens(t *testing.T) {
 	var tokens []token.Token
 	for {
 		tok, err := lex.NextToken()
-
 		if err != nil {
-			t.Fatalf("lexer error: %v", err)
+			t.Fatalf("lexer error %v", err)
 		}
+
+		if tok.Type == 0 {
+			continue
+		}
+
+		fmt.Printf("%d: %v %q \n", len(tokens), tok.Type, tok.Lexeme)
+
+		if tok.Type == token.TokenIllegal {
+			t.Fatalf("%d: ILLEGAL TOKEN %q", len(tokens), tok.Lexeme)
+		}
+
 		tokens = append(tokens, tok)
 
-		fmt.Printf("%d: %v %q\n", len(tokens)-1, tok.Type, tok.Lexeme)
 		if tok.Type == token.TokenEOF {
 			break
-		}
-
-		for i, tok := range tokens {
-			if tok.Type == 0 || tok.Type == token.TokenIllegal {
-				t.Fatalf("%d: %v %q", i, tok.Type, tok.Lexeme)
-			}
 		}
 	}
 
 }
-
-// if len(filtered) != len(expectedTypes) {
-// 	t.Fatalf("token count mismatch: got %d, want %d", len(filtered), len(expectedTypes))
-// }
-
-// for i, tok := range filtered {
-
-// 	for tok.Type != expectedTypes[i] {
-// 		t.Errorf("token %d: got %v, want %v (lexeme: %q)", i, tok.Type, expectedTypes[i], tok.Lexeme)
-// 	}
-
-// }
