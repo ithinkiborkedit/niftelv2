@@ -374,7 +374,7 @@ func (l *Lexer) scanToken() (token.Token, error) {
 			return l.makeToken(token.TokenFWDSlash), nil
 		}
 	case '%':
-		l.makeToken(token.TokenPercent)
+		return l.makeToken(token.TokenPercent), nil
 	case '=':
 		if l.match('=') {
 			return l.makeToken(token.TokenEqality), nil
@@ -403,13 +403,13 @@ func (l *Lexer) scanToken() (token.Token, error) {
 		if l.match('&') {
 			return l.makeToken(token.TokenAnd), nil
 		} else {
-			l.errorf("unexpected character: %q", ch)
+			return token.Token{}, fmt.Errorf("unexpected character: %q", ch)
 		}
 	case '|':
 		if l.match('|') {
 			return l.makeToken(token.TokenOr), nil
 		} else {
-			l.errorf("unexpected character: %q", ch)
+			return token.Token{}, fmt.Errorf("unexpected character: %q", ch)
 		}
 	case '"', '\'':
 		return l.string(ch)
