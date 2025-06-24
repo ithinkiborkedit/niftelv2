@@ -384,7 +384,7 @@ func (l *Lexer) scanToken() (token.Token, error) {
 			return token.Token{}, nil
 		} else if l.match('*') {
 			l.skipBlockComment()
-			return token.Token{}, nil
+			return l.scanToken()
 		} else {
 			return l.makeToken(token.TokenFWDSlash), nil
 		}
