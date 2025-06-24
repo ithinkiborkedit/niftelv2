@@ -185,9 +185,9 @@ advance() return l.current=172, rune='e' (U+0065)
 advance() return l.current=173, rune='n' (U+006e)
 advance() return l.current=174, rune='t' (U+0074)
 advance() return l.current=175, rune='\n' (U+000a)
-scanToken() return type=
-, Lexeme="// single line comment\n", current=176, start=153advance() return l.current=176, rune='\t' (U+0009)
+advance() return l.current=176, rune='\t' (U+0009)
 advance() return l.current=177, rune='/' (U+002f)
+advance() return l.current=178, rune='*' (U+002a)
 advance() return l.current=179, rune=' ' (U+0020)
 advance() return l.current=180, rune='b' (U+0062)
 advance() return l.current=181, rune='l' (U+006c)
@@ -211,7 +211,7 @@ advance() return l.current=198, rune='*' (U+002a)
 advance() return l.current=199, rune='/' (U+002f)
 advance() return l.current=200, rune='\n' (U+000a)
 advance() return l.current=201, rune='\t' (U+0009)
-scanToken() return type=ILLEGAL, Lexeme="", current=202, start=1770: EOF "" 
+scanToken() return type=ILLEGAL, Lexeme="", current=202, start=1530: EOF "" 
 --- PASS: TestLexer_ScanTokens (0.00s)
 PASS
-ok  	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	(cached)
+ok  	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	0.314s

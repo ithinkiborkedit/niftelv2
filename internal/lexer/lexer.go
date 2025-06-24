@@ -159,10 +159,17 @@ func (l *Lexer) match(expected rune) bool {
 
 func (l *Lexer) skipLineComment() {
 	for !l.isAtEnd() {
-		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
+		r, width := utf8.DecodeLastRuneInString(l.source[l.current:])
 		if r == '\n' {
+			l.current += width
+			l.line++
+			l.column = 0
 			break
 		}
+		// 	r, _ := utf8.DecodeRuneInString(l.source[l.current:])
+		// 	if r == '\n' {
+		// 		break
+		// 	}
 		l.advance()
 	}
 }
