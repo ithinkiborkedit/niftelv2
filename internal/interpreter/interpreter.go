@@ -3,7 +3,6 @@ package interpreter
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
@@ -90,11 +89,15 @@ func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) (value.Value, erro
 	tok := expr.Value
 	switch tok.Type {
 	case token.TokenNumber:
-		intVal, err := strconv.Atoi(tok.Lexeme)
-		if err != nil {
+		switch val := tok.Data.(type) {
+		case int:
+			return value.Value{Type: value.ValueInt, Data: val}, nil
+		case float64:
+			return value.Value{Type: value.ValueInt, Data: val}, nil
+		default:
 			return value.Null(), errors.New("invalid int literal token data")
+
 		}
-		return value.Value{Type: value.ValueInt, Data: intVal}, nil
 
 	case token.TokenString:
 		return value.Value{Type: value.ValueString, Data: tok.Lexeme}, nil
@@ -134,7 +137,7 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) (value.Value, error)
 	switch expr.Operator.Type {
 	case token.TokenPlus:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			return value.Value{Type: value.ValueInt, Data: left.Data.(int64) + right.Data.(int64)}, nil
+			return value.Value{Type: value.ValueInt, Data: left.Data.(float64) + right.Data.(float64)}, nil
 		}
 		if left.Type == value.ValueString && right.Type == value.ValueString {
 			return value.Value{Type: value.ValueString, Data: left.Data.(string) + right.Data.(string)}, nil

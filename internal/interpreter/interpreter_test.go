@@ -15,6 +15,7 @@ func TestInterpreter_EvaluateLiteralInt(t *testing.T) {
 	intToken := token.NifToken{
 		Type:   token.TokenNumber,
 		Lexeme: "42",
+		Data:   float64(42),
 		Line:   1,
 		Column: 1,
 	}
@@ -43,13 +44,15 @@ func TestInterpreter_EvaluateBinaryExprIntComparisson(t *testing.T) {
 	intTokenL := token.NifToken{
 		Type:   token.TokenNumber,
 		Lexeme: "42",
+		Data:   42,
 		Line:   1,
 		Column: 1,
 	}
 
 	intTokenR := token.NifToken{
 		Type:   token.TokenNumber,
-		Lexeme: "1",
+		Lexeme: "100",
+		Data:   100,
 		Line:   1,
 		Column: 1,
 	}
