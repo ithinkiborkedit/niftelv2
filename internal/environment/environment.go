@@ -2,7 +2,6 @@ package environment
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
@@ -10,7 +9,6 @@ import (
 type Environment struct {
 	variables map[string]value.Value
 	enclosing *Environment
-	mu        sync.RWMutex
 }
 
 func NewEnvironment(enclosing *Environment) *Environment {
@@ -21,14 +19,10 @@ func NewEnvironment(enclosing *Environment) *Environment {
 }
 
 func (e *Environment) Define(name string, val value.Value) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
 	e.variables[name] = val
 }
 
 func (e *Environment) Assign(name string, val value.Value) error {
-	e.mu.Lock()
-	defer e.mu.Unlock()
 
 	if _, ok := e.variables[name]; ok {
 		e.variables[name] = val
@@ -42,9 +36,7 @@ func (e *Environment) Assign(name string, val value.Value) error {
 }
 
 func (e *Environment) Get(name string) (value.Value, error) {
-	e.mu.RLock()
 	val, ok := e.variables[name]
-	e.mu.RUnlock()
 	if ok {
 		return val, nil
 	}
