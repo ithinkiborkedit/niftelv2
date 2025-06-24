@@ -3,19 +3,26 @@ package parser
 import (
 	"fmt"
 
+	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 )
 
 type Parser struct {
-	tokens  []token.Token
-	current int
+	src      lexer.TokenSource
+	curr     token.Token
+	ahead    token.Token
+	hasAhead bool
+	prev     token.Token
+	err      error
 }
 
-func New(tokens []token.Token) *Parser {
-	return &Parser{
-		tokens: tokens,
+func New(src lexer.TokenSource) *Parser {
+	p := &Parser{
+		src: src,
 	}
+	p.advance()
+	return p
 }
 
 func (p *Parser) Parse() ([]ast.Stmt, error) {
@@ -46,22 +53,35 @@ func (p *Parser) match(types ...token.TokenType) bool {
 }
 
 func (p *Parser) isAtEnd() bool {
-	return p.peek().Type == token.TokenEOF
+	return p.curr.Type == token.TokenEOF
 }
 
 func (p *Parser) peek() token.Token {
-	return p.tokens[p.current]
+	if !p.hasAhead {
+		p.ahead, p.err = p.src.NextToken()
+		p.hasAhead = true
+	}
+	return p.ahead
 }
 
 func (p *Parser) advance() token.Token {
-	if !p.isAtEnd() {
-		p.current++
+	p.prev = p.curr
+	if p.hasAhead {
+		p.curr = p.ahead
+		p.hasAhead = false
+	} else {
+		p.curr, p.err = p.src.NextToken()
 	}
-	return p.previous()
+	// if !p.isAtEnd() {
+	// 	p.current++
+	// }
+	// return p.previous()
+	return p.curr
 }
 
 func (p *Parser) previous() token.Token {
-	return p.tokens[p.current-1]
+	return p.prev
+	// return p.tokens[p.current-1]
 }
 
 func (p *Parser) consume(tt token.TokenType, message string) token.Token {
@@ -72,11 +92,7 @@ func (p *Parser) consume(tt token.TokenType, message string) token.Token {
 }
 
 func (p *Parser) check(tt token.TokenType) bool {
-	if p.isAtEnd() {
-		return false
-	}
-
-	return p.peek().Type == tt
+	return p.curr.Type == tt
 }
 
 func (p *Parser) skipnewLines() {
@@ -85,7 +101,7 @@ func (p *Parser) skipnewLines() {
 	}
 }
 
-func (p *Parser) consumeStatementEnd(message string) {
+func (p *Parser) consumeStatementEnd() {
 	for p.check(token.TokenNewLine) {
 		p.advance()
 	}
@@ -256,7 +272,7 @@ func (p *Parser) varDeclaration() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consumeStatementEnd("expect end of variable declaration")
+	p.consumeStatementEnd()
 
 	return &ast.VarStmt{
 		Name: name,
@@ -275,7 +291,7 @@ func (p *Parser) shortVarDeclaration() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consumeStatementEnd("expected end of short variable declaration.")
+	p.consumeStatementEnd()
 
 	return &ast.ShortVarStmt{
 		Name: name,
@@ -343,22 +359,22 @@ func (p *Parser) finishCall(callee ast.Expr) (ast.Expr, error) {
 
 func (p *Parser) primaryExpr() (ast.Expr, error) {
 	if p.match(token.TokenFalse) {
-		return &ast.LiteralExpr{Value: p.previous()}, nil
+		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
 	if p.match(token.TokenTrue) {
-		return &ast.LiteralExpr{Value: p.previous()}, nil
+		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
 	if p.match(token.TokenNull) {
-		return &ast.LiteralExpr{Value: p.previous()}, nil
+		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
 	if p.match(token.TokenNumber) {
-		return &ast.LiteralExpr{Value: p.previous()}, nil
+		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
 	if p.match(token.TokenString) {
-		return &ast.LiteralExpr{Value: p.previous()}, nil
+		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
 	if p.match(token.TokenIdentifier) {
-		return &ast.LiteralExpr{Value: p.previous()}, nil
+		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
 	if p.match(token.TokenLParen) {
 		expr, err := p.expression()
@@ -433,7 +449,7 @@ func (p *Parser) assignmentStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consumeStatementEnd("expected end of an assignment statement")
+	p.consumeStatementEnd()
 
 	return &ast.AssignStmt{
 		Name:  name,
@@ -446,7 +462,7 @@ func (p *Parser) printStatement() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.consumeStatementEnd("expect end of a print statement")
+	p.consumeStatementEnd()
 	return &ast.PrintStmt{
 		Expr: expr,
 	}, nil
@@ -464,7 +480,7 @@ func (p *Parser) returnStatement() (ast.Stmt, error) {
 		}
 		value = val
 	}
-	p.consumeStatementEnd("expect end of a print statement")
+	p.consumeStatementEnd()
 
 	return &ast.ReturnStmt{
 		Keyword: keyword,
@@ -531,7 +547,7 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 
 func (p *Parser) continueStatement() (ast.Stmt, error) {
 	keyword := p.previous()
-	p.consumeStatementEnd("expect end of continue statement")
+	p.consumeStatementEnd()
 	return &ast.ContinueStmt{
 		Keyword: keyword,
 	}, nil
@@ -543,7 +559,7 @@ func (p *Parser) expressionStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consumeStatementEnd("expected end of expression statement")
+	p.consumeStatementEnd()
 	return &ast.ExprStmt{
 		Expr: expr,
 	}, nil
@@ -551,7 +567,7 @@ func (p *Parser) expressionStatement() (ast.Stmt, error) {
 
 func (p *Parser) breakStatement() (ast.Stmt, error) {
 	keyword := p.previous()
-	p.consumeStatementEnd("expected end of break statement")
+	p.consumeStatementEnd()
 	return &ast.BreakStmt{
 		Keyword: keyword,
 	}, nil

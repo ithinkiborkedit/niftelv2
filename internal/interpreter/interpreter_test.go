@@ -33,7 +33,7 @@ func TestInterpreter_EvaluateLiteralInt(t *testing.T) {
 		t.Fatalf("expected valueInt type got %v", val.Type)
 	}
 
-	if intVal, ok := val.Data.(int); !ok || intVal != 42 {
+	if intVal, ok := val.Data.(float64); !ok || intVal != 42 {
 		t.Errorf("expected int 42, got %v (ok=%v)", val.Data, ok)
 	}
 }
