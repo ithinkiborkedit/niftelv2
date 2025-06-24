@@ -160,7 +160,7 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) (value.Value, error)
 		return value.Null(), fmt.Errorf("unsupported operand types for *: %v and %v", left.Type, right.Type)
 	case token.TokenFWDSlash:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			if right.Data.(int64) == 0 {
+			if right.Data.(float64) == 0 {
 				return value.Null(), fmt.Errorf("division by zero")
 			}
 			return value.Value{Type: value.ValueInt, Data: left.Data.(float64) / right.Data.(float64)}, nil
@@ -206,7 +206,7 @@ func (i *Interpreter) VisitUnaryExpr(expr *ast.UnaryExpr) (value.Value, error) {
 		if right.Type != value.ValueInt {
 			return value.Null(), fmt.Errorf("operator - requires int operand")
 		}
-		return value.Value{Type: value.ValueInt, Data: -right.Data.(int64)}, nil
+		return value.Value{Type: value.ValueInt, Data: -right.Data.(float64)}, nil
 	default:
 		return value.Null(), fmt.Errorf("unsupported unary operator %v", expr.Operator.Lexeme)
 	}
@@ -303,7 +303,6 @@ func (i *Interpreter) PopEnv() {
 	}
 	i.env = i.envStack[n-1]
 	i.envStack = i.envStack[:n-1]
-	panic("PopEnv not Implemeted!")
 }
 
 func (i *Interpreter) GetEnv() *environment.Environment {
@@ -352,9 +351,10 @@ func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) error {
 
 // VisitForStmt executes a for loop.
 func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) error {
-	previousEnv := i.env
-	i.env = environment.NewEnvironment(previousEnv)
-	defer func() { i.env = previousEnv }()
+	// previousEnv := i.env
+	// i.env = environment.NewEnvironment(previousEnv)
+	forEnv := environment.NewEnvironment(i.env)
+	defer i.PushEnv(forEnv)
 
 	// Init statement
 	if stmt.Init != nil {
@@ -437,8 +437,9 @@ func (i *Interpreter) VisitIndexExpr(expr *ast.IndexExpr) (value.Value, error) {
 		if !ok {
 			return value.Null(), fmt.Errorf("list data is corrupted")
 		}
-		idx, ok := indexVal.Data.(int)
-		if !ok {
+		idxFloat, ok := indexVal.Data.(float64)
+		idx := int(idxFloat)
+		if !ok || float64(idx) != idxFloat {
 			return value.Null(), fmt.Errorf("list index must be integer")
 		}
 		if idx < 0 || idx >= len(list) {
