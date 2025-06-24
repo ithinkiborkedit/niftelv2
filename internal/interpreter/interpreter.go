@@ -14,7 +14,8 @@ import (
 
 // Interpreter interprets and executes Niftel code.
 type Interpreter struct {
-	env *environment.Environment
+	env      *environment.Environment
+	envStack []*environment.Environment
 	// Add flags, call stacks, etc. here as needed
 }
 
@@ -93,7 +94,9 @@ func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) (value.Value, erro
 	case token.TokenNumber:
 		switch val := tok.Data.(type) {
 		case int:
-			return value.Value{Type: value.ValueInt, Data: val}, nil
+			return value.Value{Type: value.ValueInt, Data: float64(val)}, nil
+		case int64:
+			return value.Value{Type: value.ValueInt, Data: float64(val)}, nil
 		case float64:
 			return value.Value{Type: value.ValueInt, Data: val}, nil
 		default:
@@ -147,12 +150,12 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) (value.Value, error)
 		return value.Null(), fmt.Errorf("unsupported operand types for +: %v and %v", left.Type, right.Type)
 	case token.TokenMinus:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			return value.Value{Type: value.ValueInt, Data: left.Data.(int64) - right.Data.(int64)}, nil
+			return value.Value{Type: value.ValueInt, Data: left.Data.(float64) - right.Data.(float64)}, nil
 		}
 		return value.Null(), fmt.Errorf("unsupported operand types for -: %v and %v", left.Type, right.Type)
 	case token.TokenStar:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			return value.Value{Type: value.ValueInt, Data: left.Data.(int64) * right.Data.(int64)}, nil
+			return value.Value{Type: value.ValueInt, Data: left.Data.(float64) * right.Data.(float64)}, nil
 		}
 		return value.Null(), fmt.Errorf("unsupported operand types for *: %v and %v", left.Type, right.Type)
 	case token.TokenFWDSlash:
@@ -160,17 +163,17 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) (value.Value, error)
 			if right.Data.(int64) == 0 {
 				return value.Null(), fmt.Errorf("division by zero")
 			}
-			return value.Value{Type: value.ValueInt, Data: left.Data.(int64) / right.Data.(int64)}, nil
+			return value.Value{Type: value.ValueInt, Data: left.Data.(float64) / right.Data.(float64)}, nil
 		}
 		return value.Null(), fmt.Errorf("unsupported operand types for /: %v and %v", left.Type, right.Type)
 	case token.TokenGreater:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			return value.Value{Type: value.ValueBool, Data: left.Data.(int64) > right.Data.(int64)}, nil
+			return value.Value{Type: value.ValueBool, Data: left.Data.(float64) > right.Data.(float64)}, nil
 		}
 		return value.Null(), fmt.Errorf("unsupported operand types for >: %v and %v", left.Type, right.Type)
 	case token.TokenLess:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			return value.Value{Type: value.ValueBool, Data: left.Data.(int64) < right.Data.(int64)}, nil
+			return value.Value{Type: value.ValueBool, Data: left.Data.(float64) < right.Data.(float64)}, nil
 		}
 		return value.Null(), fmt.Errorf("unsupported operand types for <: %v and %v", left.Type, right.Type)
 	case token.TokenEqality:
@@ -289,10 +292,17 @@ func (i *Interpreter) VisitWhileStmt(stmt *ast.WhileStmt) error {
 }
 
 func (i *Interpreter) PushEnv(env *environment.Environment) {
+	i.envStack = append(i.envStack, i.env)
 	i.env = env
 }
 
 func (i *Interpreter) PopEnv() {
+	n := len(i.envStack)
+	if n == 0 {
+		panic("env stack underflow")
+	}
+	i.env = i.envStack[n-1]
+	i.envStack = i.envStack[:n-1]
 	panic("PopEnv not Implemeted!")
 }
 
@@ -320,15 +330,23 @@ func (i *Interpreter) ExecuteBlock(block *ast.BlockStmt, env *environment.Enviro
 }
 
 func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) error {
-	previousEnv := i.env
-	i.env = environment.NewEnvironment(previousEnv)
-	defer func() { i.env = previousEnv }()
-
+	blockEnv := environment.NewEnvironment(i.env)
+	i.PushEnv(blockEnv)
+	defer i.PopEnv()
 	for _, s := range stmt.Statements {
 		if err := i.Execute(s); err != nil {
 			return err
 		}
 	}
+	// previousEnv := i.env
+	// i.env = environment.NewEnvironment(previousEnv)
+	// defer func() { i.env = previousEnv }()
+
+	// for _, s := range stmt.Statements {
+	// 	if err := i.Execute(s); err != nil {
+	// 		return err
+	// 	}
+	// }
 	return nil
 }
 
@@ -521,10 +539,18 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) (value.Value, error) {
 	// For now, pack the FuncExpr itself as data and keep meta for type info
 	// Actual call logic to be implemented in VisitCallExpr
 
+	fn := function.NewUserFunc(
+		"<anonymous>",
+		expr.Params,
+		expr.Body,
+		i.env,
+		expr.Func.Line,
+		expr.Func.Column)
+
 	return value.Value{
-		Type: value.ValueStruct, // Or a dedicated ValueFunc type if you have one
-		Data: expr,
-		Meta: nil, // Optional: assign Func type info if available
+		Type: value.ValueFunc, // Or a dedicated ValueFunc type if you have one
+		Data: fn,
+		// Meta: nil, // Optional: assign Func type info if available
 	}, nil
 }
 
@@ -568,20 +594,3 @@ func (i *Interpreter) VisitBreakStmt(stmt *ast.BreakStmt) error {
 func (i *Interpreter) VisitContinueStmt(stmt *ast.ContinueStmt) error {
 	panic(runtimecontrol.ContinueSignal{})
 }
-
-// ReturnValue is used internally to signal return from function.
-// type ReturnValue struct {
-// 	Value value.Value
-// }
-
-// func (r ReturnValue) Error() string { return "function return" }
-
-// BreakSignal signals a break in loops.
-// type BreakSignal struct{}
-
-// func (b BreakSignal) Error() string { return "break" }
-
-// // ContinueSignal signals a continue in loops.
-// type ContinueSignal struct{}
-
-// func (c ContinueSignal) Error() string { return "continue" }
