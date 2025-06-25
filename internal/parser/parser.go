@@ -463,33 +463,60 @@ func (p *Parser) CallExpr() (ast.Expr, error) {
 		return nil, err
 	}
 	for {
-		if p.match(token.TokenLParen) {
+		ok, err := p.match(token.TokenLParen)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
 			expr, err = p.finishCall(expr)
 			if err != nil {
 				return nil, err
 			}
-		} else if p.match(token.TokenDot) {
-			name := p.consume(token.TokenIdentifier, "Expected property name '.'")
-			expr = &ast.GetExpr{
-				Object: expr,
-				Name:   name,
-			}
-		} else if p.match(token.TokenLBracket) {
-			index, err := p.expression()
+			continue
+		}
+		ok, err = p.match(token.TokenDot)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			name, err := p.consume(token.TokenIdentifier, "Expected property name after '.'")
 			if err != nil {
 				return nil, err
 			}
-			braket := p.consume(token.TokenRBracket, "expected ']' after index")
-			expr = &ast.IndexExpr{
-				Collection: expr,
-				Bracket:    braket,
-				Index:      index,
+			if ok {
+				name, err := p.consume(token.TokenIdentifier, "expected property name after '.'")
+				if err != nil {
+					return nil, err
+				}
+				expr = &ast.GetExpr{
+					Object: expr,
+					Name:   name,
+				}
+				continue
 			}
-		} else {
+			ok, err := p.match(token.TokenLBracket)
+			if err != nil {
+				return nil, err
+			}
+			if ok {
+				index, err := p.expression()
+				if err != nil {
+					return nil, err
+				}
+				bracket, err := p.consume(token.TokenRBracket, "expected ']' after index")
+				if err != nil {
+					return nil, err
+				}
+				expr = &ast.IndexExpr{
+					Collection: expr,
+					Bracket:    bracket,
+					Index:      index,
+				}
+				continue
+			}
 			break
 		}
 	}
-
 	return expr, nil
 }
 
