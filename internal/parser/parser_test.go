@@ -1,7 +1,6 @@
 package parser_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
@@ -11,7 +10,7 @@ import (
 
 // Helper: returns a TokenSource from a string source.
 func tokenSourceFromString(source string) lexer.TokenSource {
-	return lexer.New(strings.NewReader(source))
+	return lexer.New(source)
 }
 
 func TestParser_Parse(t *testing.T) {
