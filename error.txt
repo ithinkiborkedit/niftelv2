@@ -1,16 +1,7 @@
-advance() return l.current=0, rune='v' (U+0076)
-advance() return l.current=1, rune='a' (U+0061)
-advance() return l.current=2, rune='r' (U+0072)
-scanToken() return type=var, Lexeme="var", current=3, start=0advance() return l.current=3, rune=' ' (U+0020)
-advance() return l.current=4, rune='x' (U+0078)
-scanToken() return type=IDENTIFIER, Lexeme="x", current=5, start=4advance() return l.current=5, rune=':' (U+003a)
-scanToken() return type=:, Lexeme=":", current=6, start=5advance() return l.current=6, rune=' ' (U+0020)
-advance() return l.current=7, rune='i' (U+0069)
-advance() return l.current=8, rune='n' (U+006e)
-advance() return l.current=9, rune='t' (U+0074)
-scanToken() return type=IDENTIFIER, Lexeme="int", current=10, start=7advance() return l.current=10, rune=' ' (U+0020)
-advance() return l.current=11, rune='=' (U+003d)
-scanToken() return type==, Lexeme="=", current=12, start=11advance() return l.current=12, rune=' ' (U+0020)
-advance() return l.current=13, rune='1' (U+0031)
-advance() return l.current=14, rune='0' (U+0030)
-scanToken() return type=NUMBER, Lexeme="10", current=15, start=13
+>>> 10+10
+advance() return l.current=0, rune='1' (U+0031)
+advance() return l.current=1, rune='0' (U+0030)
+scanToken() return type=NUMBER, Lexeme="10", current=2, start=0advance() return l.current=2, rune='+' (U+002b)
+scanToken() return type=+, Lexeme="+", current=3, start=2advance() return l.current=3, rune='1' (U+0031)
+advance() return l.current=4, rune='0' (U+0030)
+scanToken() return type=NUMBER, Lexeme="10", current=5, start=320
