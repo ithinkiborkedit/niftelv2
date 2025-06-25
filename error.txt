@@ -1,15 +1,3 @@
->>> var x = 10
-advance() return l.current=0, rune='v' (U+0076)
-advance() return l.current=1, rune='a' (U+0061)
-advance() return l.current=2, rune='r' (U+0072)
-scanToken() return type=var, Lexeme="var", current=3, start=0advance() return l.current=3, rune=' ' (U+0020)
-advance() return l.current=4, rune='x' (U+0078)
-scanToken() return type=IDENTIFIER, Lexeme="x", current=5, start=4advance() return l.current=5, rune=' ' (U+0020)
-advance() return l.current=6, rune='=' (U+003d)
-scanToken() return type==, Lexeme="=", current=7, start=6Parse error [Parse error] expected ':' after variable name. Got '=' at line 1
-
-
->>> var x: int = 10
 advance() return l.current=0, rune='v' (U+0076)
 advance() return l.current=1, rune='a' (U+0061)
 advance() return l.current=2, rune='r' (U+0072)
@@ -25,4 +13,4 @@ advance() return l.current=11, rune='=' (U+003d)
 scanToken() return type==, Lexeme="=", current=12, start=11advance() return l.current=12, rune=' ' (U+0020)
 advance() return l.current=13, rune='1' (U+0031)
 advance() return l.current=14, rune='0' (U+0030)
-scanToken() return type=NUMBER, Lexeme="10", current=15, start=13Runtime error: invalid int literal token data
+scanToken() return type=NUMBER, Lexeme="10", current=15, start=13
