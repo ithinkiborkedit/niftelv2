@@ -26,6 +26,10 @@ func NewInterpreter() *Interpreter {
 	}
 }
 
+func (i *Interpreter) Eval(expr ast.Expr) (value.Value, error) {
+	return i.Evaluate(expr)
+}
+
 // Evaluate dispatches to the correct Expr handler.
 func (i *Interpreter) Evaluate(expr ast.Expr) (value.Value, error) {
 	switch e := expr.(type) {

@@ -1,1 +1,7 @@
-cannot use stmts (variable of type []nifast.Stmt) as nifast.Stmt value in argument to interp.Execute: []nifast.Stmt does not implement nifast.Stmt (missing method Pos)
+>>> x = 1
+advance() return l.current=0, rune='x' (U+0078)
+scanToken() return type=IDENTIFIER, Lexeme="x", current=1, start=0advance() return l.current=1, rune=' ' (U+0020)
+advance() return l.current=2, rune='=' (U+003d)
+scanToken() return type==, Lexeme="=", current=3, start=2advance() return l.current=3, rune=' ' (U+0020)
+advance() return l.current=4, rune='1' (U+0031)
+scanToken() return type=NUMBER, Lexeme="1", current=5, start=4Runtime error: invalid int literal token data
