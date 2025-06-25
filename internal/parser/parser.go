@@ -113,17 +113,20 @@ func (p *Parser) check(tt token.TokenType) bool {
 	return p.curr.Type == tt
 }
 
-func (p *Parser) skipnewLines() {
+func (p *Parser) skipnewLines() error {
 	for p.check(token.TokenNewLine) {
-		p.advance()
+		if err := p.advance(); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (p *Parser) consumeStatementEnd() {
-	for p.check(token.TokenNewLine) {
-		p.advance()
-	}
-}
+// func (p *Parser) skipnewLines() {
+// 	for p.check(token.TokenNewLine) {
+// 		p.advance()
+// 	}
+// }
 
 func (p *Parser) expression() (ast.Expr, error) {
 	return p.orExpr()
@@ -134,18 +137,41 @@ func (p *Parser) orExpr() (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	for p.match(token.TokenOr) {
+	for {
+		m, err := p.match(token.TokenOr)
+		if err != nil {
+			return nil, err
+		}
+		if !m {
+			break
+		}
 		operator := p.previous()
 		right, err := p.andExpr()
 		if err != nil {
 			return nil, err
 		}
+
 		left = &ast.BinaryExpr{
 			Left:     left,
 			Operator: operator,
 			Right:    right,
 		}
+
 	}
+	// operator := p.previous()
+	// right, err := p.andExpr()
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	if !m {
+	// 		break
+	// 	}
+	// 	left = &ast.BinaryExpr{
+	// 		Left:     left,
+	// 		Operator: operator,
+	// 		Right:    right,
+	// 	}
+	// }
 	return left, nil
 }
 
@@ -154,18 +180,38 @@ func (p *Parser) andExpr() (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	for p.match(token.TokenAnd) {
+	for {
+		m, err := p.match(token.TokenAnd)
+		if err != nil {
+			return nil, err
+		}
+		if !m {
+			break
+		}
 		operator := p.previous()
 		right, err := p.equalityExpr()
 		if err != nil {
 			return nil, err
 		}
+
 		left = &ast.BinaryExpr{
 			Left:     left,
 			Operator: operator,
 			Right:    right,
 		}
 	}
+	// for p.match(token.TokenAnd) {
+	// 	operator := p.previous()
+	// 	right, err := p.equalityExpr()
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	left = &ast.BinaryExpr{
+	// 		Left:     left,
+	// 		Operator: operator,
+	// 		Right:    right,
+	// 	}
+	// }
 	return left, nil
 
 }
@@ -175,18 +221,38 @@ func (p *Parser) equalityExpr() (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	for p.match(token.TokenEqality, token.TokenBangEqal) {
+	for {
+		m, err := p.match(token.TokenEqality)
+		if err != nil {
+			return nil, err
+		}
+		if !m {
+			break
+		}
 		operator := p.previous()
 		right, err := p.comparissonExpr()
 		if err != nil {
 			return nil, err
 		}
+
 		left = &ast.BinaryExpr{
 			Left:     left,
 			Operator: operator,
 			Right:    right,
 		}
 	}
+	// for p.match(token.TokenEqality, token.TokenBangEqal) {
+	// 	operator := p.previous()
+	// 	right, err := p.comparissonExpr()
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	left = &ast.BinaryExpr{
+	// 		Left:     left,
+	// 		Operator: operator,
+	// 		Right:    right,
+	// 	}
+	// }
 	return left, nil
 }
 
@@ -195,24 +261,47 @@ func (p *Parser) comparissonExpr() (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	for p.match(
-		token.TokenLess,
-		token.TokenLessEq,
-		token.TokenGreater,
-		token.TokenGreaterEq,
-	) {
+	for {
+		m, err := p.match(token.TokenLess,
+			token.TokenLessEq,
+			token.TokenGreater,
+			token.TokenGreaterEq)
+		if err != nil {
+			return nil, err
+		}
+		if !m {
+			break
+		}
 		operator := p.previous()
 		right, err := p.termExpr()
 		if err != nil {
 			return nil, err
 		}
+
 		left = &ast.BinaryExpr{
 			Left:     left,
 			Operator: operator,
 			Right:    right,
 		}
 	}
+
+	// for p.match(
+	// 	token.TokenLess,
+	// 	token.TokenLessEq,
+	// 	token.TokenGreater,
+	// 	token.TokenGreaterEq,
+	// ) {
+	// 	operator := p.previous()
+	// 	right, err := p.termExpr()
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	left = &ast.BinaryExpr{
+	// 		Left:     left,
+	// 		Operator: operator,
+	// 		Right:    right,
+	// 	}
+	// }
 
 	return left, nil
 }
@@ -222,18 +311,37 @@ func (p *Parser) termExpr() (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	for p.match(token.TokenPlus, token.TokenMinus) {
+	for {
+		m, err := p.match(token.TokenPlus, token.TokenMinus)
+		if err != nil {
+			return nil, err
+		}
+		if !m {
+			break
+		}
 		operator := p.previous()
 		right, err := p.factorExpr()
 		if err != nil {
 			return nil, err
 		}
+
 		left = &ast.BinaryExpr{
 			Left:     left,
 			Operator: operator,
 			Right:    right,
 		}
+
+		// for p.match(token.TokenPlus, token.TokenMinus) {
+		// 	operator := p.previous()
+		// 	right, err := p.factorExpr()
+		// 	if err != nil {
+		// 		return nil, err
+		// 	}
+		// 	left = &ast.BinaryExpr{
+		// 		Left:     left,
+		// 		Operator: operator,
+		// 		Right:    right,
+		// 	}
 	}
 
 	return left, nil
@@ -245,12 +353,20 @@ func (p *Parser) factorExpr() (ast.Expr, error) {
 		return nil, err
 	}
 
-	for p.match(token.TokenStar, token.TokenFWDSlash, token.TokenPercent) {
+	for {
+		m, err := p.match(token.TokenStar, token.TokenFWDSlash, token.TokenPercent)
+		if err != nil {
+			return nil, err
+		}
+		if !m {
+			break
+		}
 		operator := p.previous()
 		right, err := p.UnaryExpr()
 		if err != nil {
 			return nil, err
 		}
+
 		left = &ast.BinaryExpr{
 			Left:     left,
 			Operator: operator,
@@ -258,11 +374,28 @@ func (p *Parser) factorExpr() (ast.Expr, error) {
 		}
 	}
 
+	// for p.match(token.TokenStar, token.TokenFWDSlash, token.TokenPercent) {
+	// 	operator := p.previous()
+	// 	right, err := p.UnaryExpr()
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	left = &ast.BinaryExpr{
+	// 		Left:     left,
+	// 		Operator: operator,
+	// 		Right:    right,
+	// 	}
+	// }
+
 	return left, nil
 }
 
 func (p *Parser) UnaryExpr() (ast.Expr, error) {
-	if p.match(token.TokenMinus, token.TokenBang) {
+	m, err := p.match(token.TokenMinus, token.TokenBang)
+	if err != nil {
+		return nil, err
+	}
+	if m {
 		operator := p.previous()
 		right, err := p.UnaryExpr()
 		if err != nil {
@@ -273,6 +406,13 @@ func (p *Parser) UnaryExpr() (ast.Expr, error) {
 			Right:    right,
 		}, nil
 	}
+	// if p.match(token.TokenMinus, token.TokenBang) {
+	// 	operator := p.previous()
+	// 	right, err := p.UnaryExpr()
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	return p.CallExpr()
 }
@@ -290,7 +430,7 @@ func (p *Parser) varDeclaration() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consumeStatementEnd()
+	p.skipnewLines()
 
 	return &ast.VarStmt{
 		Name: name,
@@ -309,7 +449,7 @@ func (p *Parser) shortVarDeclaration() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consumeStatementEnd()
+	p.skipnewLines()
 
 	return &ast.ShortVarStmt{
 		Name: name,
@@ -467,7 +607,7 @@ func (p *Parser) assignmentStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consumeStatementEnd()
+	p.skipnewLines()
 
 	return &ast.AssignStmt{
 		Name:  name,
@@ -480,7 +620,7 @@ func (p *Parser) printStatement() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.consumeStatementEnd()
+	p.skipnewLines()
 	return &ast.PrintStmt{
 		Expr: expr,
 	}, nil
@@ -498,7 +638,7 @@ func (p *Parser) returnStatement() (ast.Stmt, error) {
 		}
 		value = val
 	}
-	p.consumeStatementEnd()
+	p.skipnewLines()
 
 	return &ast.ReturnStmt{
 		Keyword: keyword,
@@ -565,7 +705,7 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 
 func (p *Parser) continueStatement() (ast.Stmt, error) {
 	keyword := p.previous()
-	p.consumeStatementEnd()
+	p.skipnewLines()
 	return &ast.ContinueStmt{
 		Keyword: keyword,
 	}, nil
@@ -577,7 +717,7 @@ func (p *Parser) expressionStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consumeStatementEnd()
+	p.skipnewLines()
 	return &ast.ExprStmt{
 		Expr: expr,
 	}, nil
@@ -585,7 +725,7 @@ func (p *Parser) expressionStatement() (ast.Stmt, error) {
 
 func (p *Parser) breakStatement() (ast.Stmt, error) {
 	keyword := p.previous()
-	p.consumeStatementEnd()
+	p.skipnewLines()
 	return &ast.BreakStmt{
 		Keyword: keyword,
 	}, nil
