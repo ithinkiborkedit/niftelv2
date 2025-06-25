@@ -66,7 +66,7 @@ func (p *Parser) isAtEnd() bool {
 
 func (p *Parser) peek() (token.Token, error) {
 	if !p.hasAhead {
-		tok, err := p.src.NextToken()
+		tok, err := p.peek()
 		if err != nil {
 			return token.Token{}, err
 		}
@@ -574,7 +574,14 @@ func (p *Parser) finishCall(callee ast.Expr) (ast.Expr, error) {
 }
 
 func (p *Parser) primaryExpr() (ast.Expr, error) {
-	ok, err := p.match(token.TokenFalse)
+	ok, err := p.match(token.TokenFunc)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		return p.funcExpression()
+	}
+	ok, err = p.match(token.TokenFalse)
 	if err != nil {
 		return nil, err
 	}
@@ -670,7 +677,10 @@ func (p *Parser) listLiteralExpr() (ast.Expr, error) {
 			}
 		}
 	}
-	p.consume(token.TokenRBracket, "expected ']' after list elements")
+	_, err := p.consume(token.TokenRBracket, "expected ']' after list elements")
+	if err != nil {
+		return nil, err
+	}
 	return &ast.ListExpr{
 		Elements: elements,
 	}, nil
@@ -935,7 +945,7 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 			if err != nil {
 				return nil, err
 			}
-			if ok {
+			if !ok {
 				break
 			}
 		}
@@ -979,7 +989,6 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 
 func (p *Parser) funcExpression() (ast.Expr, error) {
 	funcTok := p.previous()
-
 	_, err := p.consume(token.TokenLParen, "expect '(' after func in function literal")
 	if err != nil {
 		return nil, err
@@ -1007,7 +1016,7 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 			if err != nil {
 				return nil, err
 			}
-			if ok {
+			if !ok {
 				break
 			}
 		}
