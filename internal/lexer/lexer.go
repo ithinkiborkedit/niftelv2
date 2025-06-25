@@ -256,27 +256,13 @@ func (l *Lexer) number() (token.Token, error) {
 	}
 	lexeme := l.source[l.start:l.current]
 
-	if _, err := strconv.ParseFloat(lexeme, 64); err != nil {
+	if val, err := strconv.ParseFloat(lexeme, 64); err != nil {
 		return token.Token{}, fmt.Errorf("invalid number literal: %s", lexeme)
 	}
-	// 	r, _ := utf8.DecodeRuneInString(l.source[l.current:])
-	// 	if !(unicode.IsDigit(r) || r == '.') {
-	// 		break
-	// 	}
-	// 	l.advance()
-	// }
-
-	// lexeme := l.source[l.start:l.current]
-	// val, err := strconv.ParseFloat(lexeme, 64)
-	// if err != nil {
-	// 	l.errorf("invalid number literal: %s", lexeme)
-	// 	val = 0.0
-	// }
-
 	return token.Token{
 		Type:   token.TokenNumber,
 		Lexeme: lexeme,
-		// Data:   val,
+		Data:   val,
 		Line:   l.line,
 		Column: l.column,
 	}, nil
