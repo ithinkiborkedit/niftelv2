@@ -1,29 +1,17 @@
 package parser_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
 )
 
-func lexAll(source string) []niftokens.Token {
-	lex := lexer.New(source)
-	var tokens []niftokens.Token
-	for {
-		tok, err := lex.NextToken()
-		if err != nil {
-			panic(err)
-		}
-		if tok.Type == niftokens.TokenEOF {
-			tokens = append(tokens, tok)
-			break
-		}
-		tokens = append(tokens, tok)
-	}
-	return tokens
+// Helper: returns a TokenSource from a string source.
+func tokenSourceFromString(source string) lexer.TokenSource {
+	return lexer.New(strings.NewReader(source))
 }
 
 func TestParser_Parse(t *testing.T) {
@@ -32,14 +20,14 @@ func TestParser_Parse(t *testing.T) {
 		var y: int = x + 1
 		print(x)
 	`
-	tokens := lexAll(source)
+	// Use the lexer directly as TokenSource
+	tokSrc := tokenSourceFromString(source)
+	p := parser.New(tokSrc)
 
-	p := parser.New(tokens)
 	stmts, err := p.Parse()
 	if err != nil {
 		t.Fatalf("Parse failed: %v", err)
 	}
-
 	if len(stmts) != 3 {
 		t.Fatalf("Expected 3 statements, got %d", len(stmts))
 	}
@@ -67,5 +55,5 @@ func TestParser_Parse(t *testing.T) {
 	if !ok {
 		t.Fatalf("Third stmt is not PrintStmt, got %T", stmts[2])
 	}
-	_ = printStmt
+	_ = printStmt // Can add more assertions if desired
 }
