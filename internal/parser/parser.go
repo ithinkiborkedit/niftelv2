@@ -66,7 +66,7 @@ func (p *Parser) isAtEnd() bool {
 
 func (p *Parser) peek() (token.Token, error) {
 	if !p.hasAhead {
-		tok, err := p.peek()
+		tok, err := p.src.NextToken()
 		if err != nil {
 			return token.Token{}, err
 		}
@@ -785,7 +785,10 @@ func (p *Parser) ifStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consume(token.TokenLBrace, "expect '{' after if condition")
+	_, err = p.consume(token.TokenLBrace, "expect '{' after if condition")
+	if err != nil {
+		return nil, err
+	}
 
 	thenBranch, err := p.blockStatement()
 	if err != nil {
@@ -798,7 +801,10 @@ func (p *Parser) ifStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 	if ok {
-		p.consume(token.TokenLBrace, "expect '{' after else")
+		_, err = p.consume(token.TokenLBrace, "expect '{' after else")
+		if err != nil {
+			return nil, err
+		}
 		elseBranch, err = p.blockStatement()
 		if err != nil {
 			return nil, err
@@ -889,7 +895,10 @@ func (p *Parser) whileStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consume(token.TokenLBrace, "expect '{' after while condition")
+	_, err = p.consume(token.TokenLBrace, "expect '{' after while condition")
+	if err != nil {
+		return nil, err
+	}
 	body, err := p.blockStatement()
 	if err != nil {
 		return nil, err
