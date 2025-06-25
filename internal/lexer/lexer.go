@@ -61,7 +61,7 @@ func (l *Lexer) NextToken() (token.Token, error) {
 		l.skipWhiteSpace()
 		l.start = l.current
 		tok, err := l.scanToken()
-		fmt.Printf("scanToken() return type=%v, Lexeme=%q, current=%d, start=%d", tok.Type, tok.Lexeme, l.current, l.start)
+		// fmt.Printf("scanToken() return type=%v, Lexeme=%q, current=%d, start=%d", tok.Type, tok.Lexeme, l.current, l.start)
 		if err != nil {
 			return token.Token{}, err
 		}
@@ -129,7 +129,7 @@ func (l *Lexer) advance() rune {
 	}
 
 	r, width := utf8.DecodeRuneInString(l.source[l.current:])
-	fmt.Printf("advance() return l.current=%d, rune=%q (U+%04x)\n", l.current, r, r)
+	// fmt.Printf("advance() return l.current=%d, rune=%q (U+%04x)\n", l.current, r, r)
 	l.current += width
 	l.column++
 	return r
