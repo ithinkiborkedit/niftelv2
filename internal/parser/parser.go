@@ -592,11 +592,8 @@ func (p *Parser) whileStatement() (ast.Stmt, error) {
 }
 
 func (p *Parser) checkNext(tt token.TokenType) bool {
-	if p.current+1 >= len(p.tokens) {
-		return false
-	}
 
-	return p.tokens[p.current+1].Type == tt
+	return p.peek().Type == tt
 }
 
 func (p *Parser) funcDeclaration() (ast.Stmt, error) {
