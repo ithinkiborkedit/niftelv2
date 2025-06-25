@@ -35,8 +35,12 @@ func main() {
 			continue
 		}
 
-		err = interp.Execute(stmts)
-
-		// node, err := parser
+		for _, stmt := range stmts {
+			err := interp.Execute(stmt)
+			if err != nil {
+				fmt.Printf("Runtime error: %v\n", err)
+				break
+			}
+		}
 	}
 }
