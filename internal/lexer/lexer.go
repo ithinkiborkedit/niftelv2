@@ -256,7 +256,8 @@ func (l *Lexer) number() (token.Token, error) {
 	}
 	lexeme := l.source[l.start:l.current]
 
-	if val, err := strconv.ParseFloat(lexeme, 64); err != nil {
+	val, err := strconv.ParseFloat(lexeme, 64)
+	if err != nil {
 		return token.Token{}, fmt.Errorf("invalid number literal: %s", lexeme)
 	}
 	return token.Token{
