@@ -27,7 +27,10 @@ func New(src lexer.TokenSource) *Parser {
 
 func (p *Parser) Parse() ([]ast.Stmt, error) {
 	var statements []ast.Stmt
-	p.skipnewLines()
+	err := p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 	for !p.isAtEnd() {
 		stmt, err := p.statement()
 		if err != nil {
@@ -36,7 +39,10 @@ func (p *Parser) Parse() ([]ast.Stmt, error) {
 		if stmt != nil {
 			statements = append(statements, stmt)
 		}
-		p.skipnewLines()
+		err = p.skipnewLines()
+		if err != nil {
+			return nil, err
+		}
 	}
 	return statements, nil
 }
@@ -439,7 +445,10 @@ func (p *Parser) varDeclaration() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.skipnewLines()
+	err = p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 
 	return &ast.VarStmt{
 		Name: name,
@@ -464,7 +473,10 @@ func (p *Parser) shortVarDeclaration() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.skipnewLines()
+	err = p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 
 	return &ast.ShortVarStmt{
 		Name: name,
@@ -653,7 +665,7 @@ func (p *Parser) listLiteralExpr() (ast.Expr, error) {
 			if err != nil {
 				return nil, err
 			}
-			if ok {
+			if !ok {
 				break
 			}
 		}
@@ -682,7 +694,7 @@ func (p *Parser) dictLiteralExpr() (ast.Expr, error) {
 			if err != nil {
 				return nil, err
 			}
-			if ok {
+			if !ok {
 				break
 			}
 		}
@@ -699,14 +711,20 @@ func (p *Parser) assignmentStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consume(token.TokenAssign, "expect '=' for assignment statement")
+	_, err = p.consume(token.TokenAssign, "expect '=' for assignment statement")
+	if err != nil {
+		return nil, err
+	}
 
 	value, err := p.expression()
 	if err != nil {
 		return nil, err
 	}
 
-	p.skipnewLines()
+	err = p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 
 	return &ast.AssignStmt{
 		Name:  name,
@@ -719,7 +737,10 @@ func (p *Parser) printStatement() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.skipnewLines()
+	err = p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 	return &ast.PrintStmt{
 		Expr: expr,
 	}, nil
@@ -737,7 +758,10 @@ func (p *Parser) returnStatement() (ast.Stmt, error) {
 		}
 		value = val
 	}
-	p.skipnewLines()
+	err := p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 
 	return &ast.ReturnStmt{
 		Keyword: keyword,
@@ -783,7 +807,10 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 	var statements []ast.Stmt
 
 	for {
-		p.skipnewLines()
+		err := p.skipnewLines()
+		if err != nil {
+			return nil, err
+		}
 
 		if p.check(token.TokenRBrace) || p.isAtEnd() {
 			break
@@ -795,7 +822,10 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 		if stmt != nil {
 			statements = append(statements, stmt)
 		}
-		p.skipnewLines()
+		err = p.skipnewLines()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	p.consume(token.TokenRBrace, "expected '}' after block")
@@ -807,7 +837,10 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 
 func (p *Parser) continueStatement() (ast.Stmt, error) {
 	keyword := p.previous()
-	p.skipnewLines()
+	err := p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 	return &ast.ContinueStmt{
 		Keyword: keyword,
 	}, nil
@@ -819,7 +852,10 @@ func (p *Parser) expressionStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.skipnewLines()
+	err = p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 	return &ast.ExprStmt{
 		Expr: expr,
 	}, nil
@@ -827,7 +863,10 @@ func (p *Parser) expressionStatement() (ast.Stmt, error) {
 
 func (p *Parser) breakStatement() (ast.Stmt, error) {
 	keyword := p.previous()
-	p.skipnewLines()
+	err := p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 	return &ast.BreakStmt{
 		Keyword: keyword,
 	}, nil
@@ -852,6 +891,12 @@ func (p *Parser) whileStatement() (ast.Stmt, error) {
 }
 
 func (p *Parser) checkNext(tt token.TokenType) bool {
+	tok, err := p.peek()
+	if err != nil {
+		return false
+	}
+	p.ahead = tok
+	p.hasAhead = true
 
 	return p.ahead.Type == tt
 }
@@ -863,7 +908,10 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.consume(token.TokenLParen, "expect '(' after function name")
+	_, err = p.consume(token.TokenLParen, "expect '(' after function name")
+	if err != nil {
+		return nil, err
+	}
 
 	var params []ast.Param
 	if !p.check(token.TokenRParen) {
@@ -872,7 +920,10 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 			if err != nil {
 				return nil, err
 			}
-			p.consume(token.TokenColon, "expected colon after parameter name")
+			_, err = p.consume(token.TokenColon, "expected colon after parameter name")
+			if err != nil {
+				return nil, err
+			}
 			paramType, err := p.consume(token.TokenIdentifier, "expected ':' after parameter name")
 			if err != nil {
 				return nil, err
@@ -889,7 +940,10 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 			}
 		}
 	}
-	p.consume(token.TokenRParen, "expect ')' after parameters")
+	_, err = p.consume(token.TokenRParen, "expect ')' after parameters")
+	if err != nil {
+		return nil, err
+	}
 
 	var returnType token.Token
 	ok, err := p.match(token.TokenArrow)
@@ -903,7 +957,10 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 		}
 	}
 
-	p.consume(token.TokenLBrace, "expect '{' before function body")
+	_, err = p.consume(token.TokenLBrace, "expect '{' before function body")
+	if err != nil {
+		return nil, err
+	}
 	body, err := p.blockStatement()
 	if err != nil {
 		return nil, err
@@ -923,7 +980,10 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 func (p *Parser) funcExpression() (ast.Expr, error) {
 	funcTok := p.previous()
 
-	p.consume(token.TokenLParen, "expect '(' after func in function literal")
+	_, err := p.consume(token.TokenLParen, "expect '(' after func in function literal")
+	if err != nil {
+		return nil, err
+	}
 
 	var params []ast.Param
 
@@ -933,7 +993,10 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 			if err != nil {
 				return nil, err
 			}
-			p.consume(token.TokenColon, "expected ':' after parameter name")
+			_, err = p.consume(token.TokenColon, "expected ':' after parameter name")
+			if err != nil {
+				return nil, err
+			}
 			paramType, err := p.consume(token.TokenIdentifier, "expected parameter type")
 			if err != nil {
 				return nil, err
@@ -950,9 +1013,15 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 		}
 	}
 
-	p.consume(token.TokenRParen, "expect ')' after parameter list")
+	_, err = p.consume(token.TokenRParen, "expect ')' after parameter list")
+	if err != nil {
+		return nil, err
+	}
 
-	p.consume(token.TokenLBrace, "expect '{' before function body in function literal")
+	_, err = p.consume(token.TokenLBrace, "expect '{' before function body in function literal")
+	if err != nil {
+		return nil, err
+	}
 	body, err := p.blockStatement()
 	if err != nil {
 		return nil, err
@@ -984,7 +1053,10 @@ func (p *Parser) forStatement() (ast.Stmt, error) {
 			return nil, err
 		}
 	}
-	p.consume(token.TokenSemicolon, "expected ';' after for init")
+	_, err = p.consume(token.TokenSemicolon, "expected ';' after for init")
+	if err != nil {
+		return nil, err
+	}
 
 	var cond ast.Expr
 	if !p.check(token.TokenSemicolon) {
@@ -993,7 +1065,10 @@ func (p *Parser) forStatement() (ast.Stmt, error) {
 			return nil, err
 		}
 	}
-	p.consume(token.TokenSemicolon, "expected ';' after for init")
+	_, err = p.consume(token.TokenSemicolon, "expected ';' after for init")
+	if err != nil {
+		return nil, err
+	}
 
 	var post ast.Stmt
 
@@ -1008,7 +1083,10 @@ func (p *Parser) forStatement() (ast.Stmt, error) {
 		}
 	}
 
-	p.consume(token.TokenLBrace, "expected '{' after for clause")
+	_, err = p.consume(token.TokenLBrace, "expected '{' after for clause")
+	if err != nil {
+		return nil, err
+	}
 	body, err := p.blockStatement()
 	if err != nil {
 		return nil, err
