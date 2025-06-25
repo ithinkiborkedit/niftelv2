@@ -251,6 +251,7 @@ func (i *Interpreter) VisitPrintStmt(stmt *ast.PrintStmt) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("IN PRINT STMT!")
 	fmt.Println(val.String())
 	return nil
 }

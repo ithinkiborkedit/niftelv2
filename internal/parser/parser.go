@@ -628,7 +628,7 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 		return nil, err
 	}
 	if ok {
-		return &ast.LiteralExpr{Value: p.prev}, nil
+		return &ast.VariableExpr{Name: p.prev}, nil
 	}
 	ok, err = p.match(token.TokenLParen)
 	if err != nil {
