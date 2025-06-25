@@ -1110,4 +1110,5 @@ func (p *Parser) statement() (ast.Stmt, error) {
 		return p.expressionStatement()
 	}
 
+	return p.expressionStatement()
 }
