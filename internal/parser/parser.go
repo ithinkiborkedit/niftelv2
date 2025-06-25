@@ -419,9 +419,18 @@ func (p *Parser) UnaryExpr() (ast.Expr, error) {
 
 func (p *Parser) varDeclaration() (ast.Stmt, error) {
 	// p.consume(token.TokenVar, "Expect 'var' keyword")
-	name := p.consume(token.TokenIdentifier, "expect variable name after var")
-	p.consume(token.TokenColon, "expected ':' after variable name")
-	typ := p.consume(token.TokenIdentifier, "expect type after variable name")
+	name, err := p.consume(token.TokenIdentifier, "expect variable name after var")
+	if err != nil {
+		return nil, err
+	}
+	_, err = p.consume(token.TokenColon, "expected ':' after variable name")
+	if err != nil {
+		return nil, err
+	}
+	typ, err := p.consume(token.TokenIdentifier, "expect type after variable name")
+	if err != nil {
+		return nil, err
+	}
 
 	p.consume(token.TokenAssign, "expect '=' after variable type")
 
@@ -440,9 +449,15 @@ func (p *Parser) varDeclaration() (ast.Stmt, error) {
 }
 
 func (p *Parser) shortVarDeclaration() (ast.Stmt, error) {
-	name := p.consume(token.TokenIdentifier, "expect variable name before ':='")
+	name, err := p.consume(token.TokenIdentifier, "expect variable name before ':='")
+	if err != nil {
+		return nil, err
+	}
 
-	p.consume(token.TokenColonEqual, "Expected ':=' for short variable declaration")
+	_, err = p.consume(token.TokenColonEqual, "Expected ':=' for short variable declaration")
+	if err != nil {
+		return nil, err
+	}
 
 	init, err := p.expression()
 	if err != nil {
@@ -526,12 +541,19 @@ func (p *Parser) finishCall(callee ast.Expr) (ast.Expr, error) {
 				return nil, err
 			}
 			arguments = append(arguments, arg)
-			if !p.match(token.TokenComma) {
+			ok, err := p.match(token.TokenComma)
+			if err != nil {
+				return nil, err
+			}
+			if !ok {
 				break
 			}
 		}
 	}
-	paren := p.consume(token.TokenRParen, "expected ')' after arguments")
+	paren, err := p.consume(token.TokenRParen, "expected ')' after arguments")
+	if err != nil {
+		return nil, err
+	}
 	return &ast.CallExpr{
 		Callee:    callee,
 		Paren:     paren,
@@ -540,40 +562,82 @@ func (p *Parser) finishCall(callee ast.Expr) (ast.Expr, error) {
 }
 
 func (p *Parser) primaryExpr() (ast.Expr, error) {
-	if p.match(token.TokenFalse) {
+	ok, err := p.match(token.TokenFalse)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
-	if p.match(token.TokenTrue) {
+	// if p.match(token.TokenFalse) {
+	// 	return &ast.LiteralExpr{Value: p.prev}, nil
+	// }
+	ok, err = p.match(token.TokenTrue)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
-	if p.match(token.TokenNull) {
+
+	ok, err = p.match(token.TokenNull)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
-	if p.match(token.TokenNumber) {
+	ok, err = p.match(token.TokenNumber)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
-	if p.match(token.TokenString) {
+	ok, err = p.match(token.TokenString)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
-	if p.match(token.TokenIdentifier) {
+	ok, err = p.match(token.TokenIdentifier)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
-	if p.match(token.TokenLParen) {
+	ok, err = p.match(token.TokenLParen)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		expr, err := p.expression()
 		if err != nil {
 			return nil, err
 		}
-		p.consume(token.TokenRParen, "expected ')' after expression")
+		_, err = p.consume(token.TokenRParen, "expected ')' after expression")
+		if err != nil {
+			return nil, err
+		}
 		return expr, nil
 	}
-	if p.match(token.TokenLBracket) {
+	ok, err = p.match(token.TokenLBracket)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.listLiteralExpr()
 	}
-	if p.match(token.TokenLBrace) {
+	ok, err = p.match(token.TokenLBrace)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.dictLiteralExpr()
 	}
-
-	return nil, fmt.Errorf("unexpected token '%s' as line %d", p.peek().Lexeme, p.peek().Line)
+	return nil, fmt.Errorf("unexpected token '%s' as line %d", p.curr.Lexeme, p.curr.Line)
 }
 
 func (p *Parser) listLiteralExpr() (ast.Expr, error) {
@@ -585,7 +649,11 @@ func (p *Parser) listLiteralExpr() (ast.Expr, error) {
 				return nil, err
 			}
 			elements = append(elements, elem)
-			if !p.match(token.TokenComma) {
+			ok, err := p.match(token.TokenComma)
+			if err != nil {
+				return nil, err
+			}
+			if ok {
 				break
 			}
 		}
@@ -610,7 +678,11 @@ func (p *Parser) dictLiteralExpr() (ast.Expr, error) {
 				return nil, err
 			}
 			pairs = append(pairs, [2]ast.Expr{key, value})
-			if !p.match(token.TokenComma) {
+			ok, err := p.match(token.TokenComma)
+			if err != nil {
+				return nil, err
+			}
+			if ok {
 				break
 			}
 		}
@@ -622,7 +694,10 @@ func (p *Parser) dictLiteralExpr() (ast.Expr, error) {
 }
 
 func (p *Parser) assignmentStatement() (ast.Stmt, error) {
-	name := p.consume(token.TokenIdentifier, "expect variable name before '='")
+	name, err := p.consume(token.TokenIdentifier, "expect variable name before '='")
+	if err != nil {
+		return nil, err
+	}
 
 	p.consume(token.TokenAssign, "expect '=' for assignment statement")
 
@@ -684,13 +759,16 @@ func (p *Parser) ifStatement() (ast.Stmt, error) {
 	}
 
 	var elseBranch ast.Stmt
-	if p.match(token.TokenElse) {
+	ok, err := p.match(token.TokenElse)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		p.consume(token.TokenLBrace, "expect '{' after else")
 		elseBranch, err = p.blockStatement()
 		if err != nil {
 			return nil, err
 		}
-
 	}
 
 	return &ast.IfStmt{
@@ -775,25 +853,38 @@ func (p *Parser) whileStatement() (ast.Stmt, error) {
 
 func (p *Parser) checkNext(tt token.TokenType) bool {
 
-	return p.peek().Type == tt
+	return p.ahead.Type == tt
 }
 
 func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 	funcTok := p.previous()
 
-	name := p.consume(token.TokenIdentifier, "expected function name after 'func'")
+	name, err := p.consume(token.TokenIdentifier, "expected function name after 'func'")
+	if err != nil {
+		return nil, err
+	}
 	p.consume(token.TokenLParen, "expect '(' after function name")
 
 	var params []ast.Param
 	if !p.check(token.TokenRParen) {
 		for {
-			paramName := p.consume(token.TokenIdentifier, "expected parameter name")
+			paramName, err := p.consume(token.TokenIdentifier, "expected parameter name")
+			if err != nil {
+				return nil, err
+			}
 			p.consume(token.TokenColon, "expected colon after parameter name")
-			paramType := p.consume(token.TokenIdentifier, "expected ':' after parameter name")
+			paramType, err := p.consume(token.TokenIdentifier, "expected ':' after parameter name")
+			if err != nil {
+				return nil, err
+			}
 
 			params = append(params, ast.Param{Name: paramName, Type: paramType})
 
-			if !p.match(token.TokenComma) {
+			ok, err := p.match(token.TokenComma)
+			if err != nil {
+				return nil, err
+			}
+			if ok {
 				break
 			}
 		}
@@ -801,8 +892,15 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 	p.consume(token.TokenRParen, "expect ')' after parameters")
 
 	var returnType token.Token
-	if p.match(token.TokenArrow) {
-		returnType = p.consume(token.TokenIdentifier, "expect return type after '->'")
+	ok, err := p.match(token.TokenArrow)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		returnType, err = p.consume(token.TokenIdentifier, "expect return type after '->'")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	p.consume(token.TokenLBrace, "expect '{' before function body")
@@ -831,16 +929,27 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 
 	if !p.check(token.TokenRParen) {
 		for {
-			paramName := p.consume(token.TokenIdentifier, "expected parameter name")
+			paramName, err := p.consume(token.TokenIdentifier, "expected parameter name")
+			if err != nil {
+				return nil, err
+			}
 			p.consume(token.TokenColon, "expected ':' after parameter name")
-			paramType := p.consume(token.TokenIdentifier, "expected parameter type")
+			paramType, err := p.consume(token.TokenIdentifier, "expected parameter type")
+			if err != nil {
+				return nil, err
+			}
 
 			params = append(params, ast.Param{Name: paramName, Type: paramType})
-			if !p.match(token.TokenComma) {
+			ok, err := p.match(token.TokenComma)
+			if err != nil {
+				return nil, err
+			}
+			if ok {
 				break
 			}
 		}
 	}
+
 	p.consume(token.TokenRParen, "expect ')' after parameter list")
 
 	p.consume(token.TokenLBrace, "expect '{' before function body in function literal")
@@ -915,42 +1024,90 @@ func (p *Parser) forStatement() (ast.Stmt, error) {
 }
 
 func (p *Parser) statement() (ast.Stmt, error) {
-	if p.match(token.TokenVar) {
+	ok, err := p.match(token.TokenVar)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.varDeclaration()
 	}
+	// ok,err p.match(token.TokenVar) {
+	// 	return p.varDeclaration()
+	// }
 	if p.check(token.TokenIdentifier) && p.checkNext(token.TokenColonEqual) {
 		return p.shortVarDeclaration()
 	}
+
 	if p.check(token.TokenIdentifier) && p.checkNext(token.TokenAssign) {
 		return p.assignmentStatement()
 	}
-	if p.match(token.TokenPrint) {
+	ok, err = p.match(token.TokenPrint)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.printStatement()
 	}
-	if p.match(token.TokenIf) {
+
+	ok, err = p.match(token.TokenIf)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.ifStatement()
 	}
-	if p.match(token.TokenWhile) {
+
+	ok, err = p.match(token.TokenWhile)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.whileStatement()
 	}
-	if p.match(token.TokenFor) {
+
+	ok, err = p.match(token.TokenFor)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.forStatement()
 	}
-	if p.match(token.TokenFunc) {
+	ok, err = p.match(token.TokenFunc)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.funcDeclaration()
 	}
-	if p.match(token.TokenReturn) {
+
+	ok, err = p.match(token.TokenReturn)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.returnStatement()
 	}
-	if p.match(token.TokenBreak) {
+
+	ok, err = p.match(token.TokenBreak)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.breakStatement()
 	}
-	if p.match(token.TokenContinue) {
+	ok, err = p.match(token.TokenContinue)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.continueStatement()
 	}
-	if p.match(token.TokenLBrace) {
+	ok, err = p.match(token.TokenLBrace)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		return p.expressionStatement()
 	}
 
-	return p.expressionStatement()
 }
