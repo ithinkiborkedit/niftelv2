@@ -41,42 +41,52 @@ func (p *Parser) Parse() ([]ast.Stmt, error) {
 	return statements, nil
 }
 
-func (p *Parser) match(types ...token.TokenType) bool {
+func (p *Parser) match(types ...token.TokenType) (bool, error) {
 	for _, tt := range types {
 		if p.check(tt) {
-			p.advance()
-			return true
+			if err := p.advance(); err != nil {
+				return false, err
+			}
+			return true, nil
 		}
 	}
 
-	return false
+	return false, nil
 }
 
 func (p *Parser) isAtEnd() bool {
 	return p.curr.Type == token.TokenEOF
 }
 
-func (p *Parser) peek() token.Token {
+func (p *Parser) peek() (token.Token, error) {
 	if !p.hasAhead {
-		p.ahead, p.err = p.src.NextToken()
+		tok, err := p.src.NextToken()
+		if err != nil {
+			return token.Token{}, err
+		}
+		p.ahead = tok
 		p.hasAhead = true
 	}
-	return p.ahead
+	return p.ahead, nil
 }
 
-func (p *Parser) advance() token.Token {
+func (p *Parser) advance() error {
 	p.prev = p.curr
 	if p.hasAhead {
 		p.curr = p.ahead
 		p.hasAhead = false
 	} else {
-		p.curr, p.err = p.src.NextToken()
+		tok, err := p.src.NextToken()
+		if err != nil {
+			return err
+		}
+		p.curr = tok
 	}
 	// if !p.isAtEnd() {
 	// 	p.current++
 	// }
 	// return p.previous()
-	return p.curr
+	return nil
 }
 
 func (p *Parser) previous() token.Token {
@@ -84,11 +94,19 @@ func (p *Parser) previous() token.Token {
 	// return p.tokens[p.current-1]
 }
 
-func (p *Parser) consume(tt token.TokenType, message string) token.Token {
+func (p *Parser) consume(tt token.TokenType, message string) (token.Token, error) {
 	if p.check(tt) {
-		return p.advance()
+		tok := p.curr
+		if err := p.advance(); err != nil {
+			return token.Token{}, err
+		}
+		return tok, nil
 	}
-	panic(fmt.Sprintf("[Parse error] %s. Got '%s' at line %d", message, p.peek().Lexeme, p.peek().Line))
+
+	return token.Token{}, fmt.Errorf("[Parse error] %s. Got '%s' at line %d", message, p.curr.Lexeme, p.curr.Line)
+	// 	return p.advance()
+	// }
+	// panic(fmt.Sprintf("[Parse error] %s. Got '%s' at line %d", message, p.peek().Lexeme, p.peek().Line))
 }
 
 func (p *Parser) check(tt token.TokenType) bool {
