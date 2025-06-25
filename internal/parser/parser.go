@@ -438,7 +438,10 @@ func (p *Parser) varDeclaration() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	p.consume(token.TokenAssign, "expect '=' after variable type")
+	_, err = p.consume(token.TokenAssign, "expect '=' after variable type")
+	if err != nil {
+		return nil, err
+	}
 
 	init, err := p.expression()
 	if err != nil {
@@ -694,7 +697,10 @@ func (p *Parser) dictLiteralExpr() (ast.Expr, error) {
 			if err != nil {
 				return nil, err
 			}
-			p.consume(token.TokenColon, "expect ':' after dictionary key")
+			_, err = p.consume(token.TokenColon, "expect ':' after dictionary key")
+			if err != nil {
+				return nil, err
+			}
 			value, err := p.expression()
 			if err != nil {
 				return nil, err
@@ -709,7 +715,10 @@ func (p *Parser) dictLiteralExpr() (ast.Expr, error) {
 			}
 		}
 	}
-	p.consume(token.TokenRBrace, "Expect '}' after dictionary entries")
+	_, err := p.consume(token.TokenRBrace, "Expect '}' after dictionary entries")
+	if err != nil {
+		return nil, err
+	}
 	return &ast.DictExpr{
 		Pairs: pairs,
 	}, nil
@@ -844,7 +853,10 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 		}
 	}
 
-	p.consume(token.TokenRBrace, "expected '}' after block")
+	_, err := p.consume(token.TokenRBrace, "expected '}' after block")
+	if err != nil {
+		return nil, err
+	}
 	return &ast.BlockStmt{
 		Statements: statements,
 		LBrace:     lbrace,
