@@ -29,6 +29,14 @@ func main() {
 		lex := lexer.New(line)
 		par := parser.New(lex)
 
+		stmts, err := par.Parse()
+		if err != nil {
+			fmt.Printf("Parse error %v\n", err)
+			continue
+		}
+
+		err = interp.Execute(stmts)
+
 		// node, err := parser
 	}
 }

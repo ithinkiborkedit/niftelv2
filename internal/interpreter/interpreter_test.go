@@ -79,20 +79,4 @@ func TestInterpreter_EvaluateBinaryExprIntComparisson(t *testing.T) {
 		t.Fatalf("expected true for 42 < 100, got %v", result.Data)
 	}
 
-	// literalExpr := &ast.LiteralExpr{
-	// 	Value: intToken,
-	// }
-
-	// val, err := interp.Evaluate(literalExpr)
-	// if err != nil {
-	// 	t.Fatalf("Evaluate returned error: %v", err)
-	// }
-
-	// if val.Type != value.ValueInt {
-	// 	t.Fatalf("expected valueInt type got %v", val.Type)
-	// }
-
-	// if intVal, ok := val.Data.(int); !ok || intVal != 42 {
-	// 	t.Errorf("expected int 42, got %v (ok=%v)", val.Data, ok)
-	// }
 }
