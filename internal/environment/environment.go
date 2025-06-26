@@ -24,9 +24,6 @@ func (e *Environment) Define(name string, val value.Value) {
 	fmt.Printf("ENV DEFINING '%s' as type %v", name, val.Type)
 	e.variables[name] = val
 }
-
-func (e *Environment) Register(name string, typ *value.Value) {}
-
 func (e *Environment) Assign(name string, val value.Value) error {
 
 	if _, ok := e.variables[name]; ok {
