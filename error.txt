@@ -1,12 +1,14 @@
-Niftel REPL v0
 >>> func add(a: int, b: int) -> int {
 DEBUG stms: []nifast.Stmt(nil)
 ...return a+b
 DEBUG stms: []nifast.Stmt(nil)
 ...}
-DEBUG stms: []nifast.Stmt{(*nifast.FuncStmt)(0x1400010a4e0)}
+DEBUG stms: []nifast.Stmt{(*nifast.FuncStmt)(0x140001924e0)}
 REPL: STATEMENT type: *nifast.FuncStmt
+Defining function: add
+ENV DEFINING 'add' as type 8 
 >>> add(1,2)
-DEBUG stms: []nifast.Stmt{(*nifast.ExprStmt)(0x14000010110)}
+DEBUG stms: []nifast.Stmt{(*nifast.ExprStmt)(0x140001a2190)}
 REPL: STATEMENT type: *nifast.ExprStmt
-ENV LOOKING UP 'add' as type 0Runtime error: undefined variable add
+ENV LOOKING UP 'add' as type 8CALL EXPR DEBUG: [1 2], &{map[add:{8 0x140001821e0 <nil>}] <nil>}CALLING Function: add, args: [{{IDENTIFIER a <nil> 1 10} {IDENTIFIER int <nil> 1 15}} {{IDENTIFIER b <nil> 1 18} {IDENTIFIER int <nil> 1 23}}]ENV DEFINING 'a' as type 1ENV DEFINING 'b' as type 1ENV LOOKING UP 'a' as type 1ENV LOOKING UP 'b' as type 1Function CALLER caught panic: runtimecontrol.ReturnValue{Value:value.Value{Type:1, Data:3, Meta:(*value.TypeInfo)(nil)}}
+Function returning 3

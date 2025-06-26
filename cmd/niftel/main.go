@@ -77,6 +77,11 @@ func main() {
 				if !result.IsNull() {
 					fmt.Println(result.String())
 				}
+			default:
+				err := interp.Execute(stmt)
+				if err != nil {
+					fmt.Printf("Runtime error: %v\n", err)
+				}
 			}
 		}
 		buffer.Reset()
