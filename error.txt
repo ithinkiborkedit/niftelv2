@@ -4,13 +4,12 @@ DEBUG stms: []nifast.Stmt(nil)
 ...return a+b
 DEBUG stms: []nifast.Stmt(nil)
 ...}
-DEBUG stms: []nifast.Stmt{(*nifast.FuncStmt)(0x1400010a4e0)}
+DEBUG stms: []nifast.Stmt{(*nifast.FuncStmt)(0x140001244e0)}
 REPL: STATEMENT type: *nifast.FuncStmt
 Defining function: add
 ENV DEFINING 'add' as type 8
 >>>add(1,2)
-DEBUG stms: []nifast.Stmt{(*nifast.ExprStmt)(0x14000010150)}
+DEBUG stms: []nifast.Stmt{(*nifast.ExprStmt)(0x1400012c100)}
 REPL: STATEMENT type: *nifast.ExprStmt
-ENV LOOKING UP 'add' as type 8CALL EXPR DEBUG: [1 2], &{map[add:{8 0x1400006c2a0 <nil>}] <nil>}CALLING Function: add, args: [{{IDENTIFIER a <nil> 1 10} {IDENTIFIER int <nil> 1 15}} {{IDENTIFIER b <nil> 1 18} {IDENTIFIER int <nil> 1 23}}]ENV DEFINING 'a' as type 1ENV DEFINING 'b' as type 1ENV LOOKING UP 'a' as type 1ENV LOOKING UP 'b' as type 1Function CALLER caught panic: runtimecontrol.ReturnValue{Value:value.Value{Type:1, Data:3, Meta:(*value.TypeInfo)(nil)}}
-Function returning 3
-DEBUG result: value.Value{Type:0, Data:interface {}(nil), Meta:(*value.TypeInfo)(nil)}
+ENV LOOKING UP 'add' as type 8CALL EXPR DEBUG: [1 2], &{map[add:{8 0x14000100240 <nil>}] <nil>}CALLING Function: add, args: [{{IDENTIFIER a <nil> 1 10} {IDENTIFIER int <nil> 1 15}} {{IDENTIFIER b <nil> 1 18} {IDENTIFIER int <nil> 1 23}}]ENV DEFINING 'a' as type 1ENV DEFINING 'b' as type 1ENV LOOKING UP 'a' as type 1ENV LOOKING UP 'b' as type 1DEBUG result: value.Value{Type:1, Data:3, Meta:(*value.TypeInfo)(nil)}
+3

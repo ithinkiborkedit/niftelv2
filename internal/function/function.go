@@ -5,7 +5,6 @@ import (
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/runtimecontrol"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
@@ -76,26 +75,26 @@ func (f *Function) Call(args []value.Value, interp InterpreterAPI) (value.Value,
 	var ret value.Value = value.Null()
 	var err error
 
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Printf("Function CALLER caught panic: %#v\n", r)
-			if rv, ok := r.(runtimecontrol.ReturnValue); ok {
-				fmt.Printf("Function returning %v\n", rv.Value)
-				ret = rv.Value
-				err = nil
-			} else {
-				panic(r)
-			}
-		}
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		fmt.Printf("Function CALLER caught panic: %#v\n", r)
+	// 		if rv, ok := r.(runtimecontrol.ReturnValue); ok {
+	// 			fmt.Printf("Function returning %v\n", rv.Value)
+	// 			ret = rv.Value
+	// 			err = nil
+	// 		} else {
+	// 			panic(r)
+	// 		}
+	// 	}
 
-	}()
+	// }()
 	// ret, err = interp.ExecuteBlock(f.body, callEnv)
 	_, execErr := interp.ExecuteBlock(f.body, callEnv)
 	if execErr != nil {
-		err = execErr
+		return value.Null(), execErr
 	}
 	fmt.Printf("RETURNING from function.Call: %#v, err: %v\n", ret, err)
-	return ret, err
+	return value.Null(), nil
 }
 
 func (f *Function) Arity() int            { return len(f.params) }
