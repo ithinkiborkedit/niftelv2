@@ -88,10 +88,11 @@ func (f *Function) Call(args []value.Value, interp InterpreterAPI) (value.Value,
 
 	}()
 
-	_, execErr := interp.ExecuteBlock(f.body, callEnv)
-	if execErr != nil {
-		err = execErr
-	}
+	// _, execErr := interp.ExecuteBlock(f.body, callEnv)
+	ret, err = interp.ExecuteBlock(f.body, callEnv)
+	// if execErr != nil {
+	// 	err = execErr
+	// }
 	return ret, err
 }
 
