@@ -1,3 +1,4 @@
->>>struct Person {
+Niftel REPL v0
+>>> struct Person {
 DEBUG stms: []nifast.Stmt(nil)
-Parser error: unexepcted token in struct body: '' at line 2 
+Parser error: unexpected token in struct body: '' at line 2 
