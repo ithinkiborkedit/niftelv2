@@ -85,6 +85,15 @@ type DictExpr struct {
 func (*DictExpr) exprNode()         {}
 func (e *DictExpr) Pos() (int, int) { return e.LBrace.Line, e.LBrace.Column }
 
+type StructLiteralExpr struct {
+	TypeName token.Token
+	Fields   map[string]Expr
+	LBrace   token.Token
+}
+
+func (*StructLiteralExpr) exprNode()         {}
+func (e *StructLiteralExpr) Pos() (int, int) { return e.LBrace.Line, e.LBrace.Column }
+
 type FuncExpr struct {
 	Params []Param
 	Body   *BlockStmt

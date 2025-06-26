@@ -48,7 +48,16 @@ func (v Value) String() string {
 		}
 		return "<dict>"
 	case ValueStruct:
-		return fmt.Sprintf("Struct{%v}", v.Data)
+		inst, ok := v.Data.(*StructInstance)
+		if !ok {
+			return "<struct-corrupt>"
+		}
+		fields := []string{}
+		for _, fnameTok := range inst.Type.Fields {
+			fname := fnameTok.Lexeme
+			fields = append(fields, fmt.Sprintf("%s: %v", fname, inst.Fields[fname].String()))
+		}
+		return fmt.Sprintf("%s{%s}", inst.Type.Name, strings.Join(fields, ", "))
 	default:
 		return fmt.Sprintf("<unknown value: %v>", reflect.TypeOf(v.Data))
 	}
