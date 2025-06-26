@@ -1,12 +1,15 @@
 package parser
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 )
+
+var ErrIncomplete = errors.New("incomplete input")
 
 type Parser struct {
 	src      lexer.TokenSource
@@ -164,20 +167,7 @@ func (p *Parser) orExpr() (ast.Expr, error) {
 		}
 
 	}
-	// operator := p.previous()
-	// right, err := p.andExpr()
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	if !m {
-	// 		break
-	// 	}
-	// 	left = &ast.BinaryExpr{
-	// 		Left:     left,
-	// 		Operator: operator,
-	// 		Right:    right,
-	// 	}
-	// }
+
 	return left, nil
 }
 
@@ -206,18 +196,6 @@ func (p *Parser) andExpr() (ast.Expr, error) {
 			Right:    right,
 		}
 	}
-	// for p.match(token.TokenAnd) {
-	// 	operator := p.previous()
-	// 	right, err := p.equalityExpr()
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	left = &ast.BinaryExpr{
-	// 		Left:     left,
-	// 		Operator: operator,
-	// 		Right:    right,
-	// 	}
-	// }
 	return left, nil
 
 }
@@ -307,17 +285,6 @@ func (p *Parser) termExpr() (ast.Expr, error) {
 			Right:    right,
 		}
 
-		// for p.match(token.TokenPlus, token.TokenMinus) {
-		// 	operator := p.previous()
-		// 	right, err := p.factorExpr()
-		// 	if err != nil {
-		// 		return nil, err
-		// 	}
-		// 	left = &ast.BinaryExpr{
-		// 		Left:     left,
-		// 		Operator: operator,
-		// 		Right:    right,
-		// 	}
 	}
 
 	return left, nil
@@ -350,19 +317,6 @@ func (p *Parser) factorExpr() (ast.Expr, error) {
 		}
 	}
 
-	// for p.match(token.TokenStar, token.TokenFWDSlash, token.TokenPercent) {
-	// 	operator := p.previous()
-	// 	right, err := p.UnaryExpr()
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	left = &ast.BinaryExpr{
-	// 		Left:     left,
-	// 		Operator: operator,
-	// 		Right:    right,
-	// 	}
-	// }
-
 	return left, nil
 }
 
@@ -382,13 +336,6 @@ func (p *Parser) UnaryExpr() (ast.Expr, error) {
 			Right:    right,
 		}, nil
 	}
-	// if p.match(token.TokenMinus, token.TokenBang) {
-	// 	operator := p.previous()
-	// 	right, err := p.UnaryExpr()
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// }
 
 	return p.CallExpr()
 }
@@ -502,6 +449,9 @@ func (p *Parser) CallExpr() (ast.Expr, error) {
 			}
 			bracket, err := p.consume(token.TokenRBracket, "expected ']' after index")
 			if err != nil {
+				if p.curr.Type == token.TokenEOF {
+					return nil, ErrIncomplete
+				}
 				return nil, err
 			}
 			expr = &ast.IndexExpr{
@@ -537,6 +487,9 @@ func (p *Parser) finishCall(callee ast.Expr) (ast.Expr, error) {
 	}
 	paren, err := p.consume(token.TokenRParen, "expected ')' after arguments")
 	if err != nil {
+		if p.curr.Type == token.TokenEOF {
+			return nil, ErrIncomplete
+		}
 		return nil, err
 	}
 	return &ast.CallExpr{
@@ -611,6 +564,9 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 		}
 		_, err = p.consume(token.TokenRParen, "expected ')' after expression")
 		if err != nil {
+			if p.curr.Type == token.TokenEOF {
+				return nil, ErrIncomplete
+			}
 			return nil, err
 		}
 		return expr, nil
@@ -652,6 +608,9 @@ func (p *Parser) listLiteralExpr() (ast.Expr, error) {
 	}
 	_, err := p.consume(token.TokenRBracket, "expected ']' after list elements")
 	if err != nil {
+		if p.curr.Type == token.TokenEOF {
+			return nil, ErrIncomplete
+		}
 		return nil, err
 	}
 	return &ast.ListExpr{
@@ -687,6 +646,9 @@ func (p *Parser) dictLiteralExpr() (ast.Expr, error) {
 	}
 	_, err := p.consume(token.TokenRBrace, "Expect '}' after dictionary entries")
 	if err != nil {
+		if p.curr.Type == token.TokenEOF {
+			return nil, ErrIncomplete
+		}
 		return nil, err
 	}
 	return &ast.DictExpr{
@@ -825,6 +787,9 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 
 	_, err := p.consume(token.TokenRBrace, "expected '}' after block")
 	if err != nil {
+		if p.curr.Type == token.TokenEOF {
+			return nil, ErrIncomplete
+		}
 		return nil, err
 	}
 	return &ast.BlockStmt{
@@ -943,6 +908,9 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 	}
 	_, err = p.consume(token.TokenRParen, "expect ')' after parameters")
 	if err != nil {
+		if p.curr.Type == token.TokenEOF {
+			return nil, ErrIncomplete
+		}
 		return nil, err
 	}
 
@@ -1015,6 +983,9 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 
 	_, err = p.consume(token.TokenRParen, "expect ')' after parameter list")
 	if err != nil {
+		if p.curr.Type == token.TokenEOF {
+			return nil, ErrIncomplete
+		}
 		return nil, err
 	}
 

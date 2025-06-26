@@ -1,4 +1,4 @@
->>> var xDict: dict = {"a":1, "b":2, "c":3}
->>> print(xDict)
+>>> if x > y {
+...print("yes")
 IN PRINT STMT!
-map["a":1 "b":2 "c":3]
+"yes"
