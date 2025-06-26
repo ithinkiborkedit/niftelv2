@@ -49,6 +49,8 @@ func (i *Interpreter) Evaluate(expr ast.Expr) (value.Value, error) {
 		return i.VisitListExpr(e)
 	case *ast.DictExpr:
 		return i.VisitDictExpr(e)
+	case *ast.StructLiteralExpr:
+		return i.VisitStructLiteralExpr(e)
 	case *ast.FuncExpr:
 		return i.VisitFuncExpr(e)
 	default:
@@ -91,6 +93,48 @@ func (i *Interpreter) Execute(stmt ast.Stmt) error {
 }
 
 // --- Expression Visitors ---
+
+func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) (value.Value, error) {
+	structName := expr.TypeName.Lexeme
+
+	typeInfo, ok := value.GetType(structName)
+	if !ok || typeInfo.Kind != value.TypeKindStruct {
+		return value.Null(), fmt.Errorf("struct tpye '%s' not found", structName)
+	}
+
+	structType := &value.StructType{
+		Name:   typeInfo.Name,
+		Fields: make([]token.Token, 0, len(typeInfo.Fields)),
+	}
+	for fname := range typeInfo.Fields {
+		structType.Fields = append(structType.Fields, token.Token{Lexeme: fname})
+	}
+
+	instance := &value.StructInstance{
+		Type:   structType,
+		Fields: make(map[string]value.Value),
+	}
+
+	for fname, exprval := range expr.Fields {
+		val, err := i.Evaluate(exprval)
+		if err != nil {
+			return value.Null(), fmt.Errorf("error in field '%s': %w", fname, err)
+		}
+		instance.Fields[fname] = val
+	}
+
+	for fname := range typeInfo.Fields {
+		if _, ok := instance.Fields[fname]; !ok {
+			instance.Fields[fname] = value.Null()
+		}
+	}
+
+	return value.Value{
+		Type: value.ValueStruct,
+		Data: instance,
+		Meta: typeInfo,
+	}, nil
+}
 
 func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) (value.Value, error) {
 	tok := expr.Value
@@ -487,16 +531,21 @@ func (i *Interpreter) VisitGetExpr(expr *ast.GetExpr) (value.Value, error) {
 		return value.Null(), fmt.Errorf("attempt to get property on non-struct type")
 	}
 
+	inst, ok := objectVal.Data.(*value.StructInstance)
+	if !ok || inst == nil {
+		return value.Null(), fmt.Errorf("struct instance is corrupt")
+	}
+
 	// Access struct field by name (string from token)
 	fieldName := expr.Name.Lexeme
 
 	// Assume struct data stored as map[string]value.Value
-	fields, ok := objectVal.Data.(map[string]value.Value)
-	if !ok {
-		return value.Null(), fmt.Errorf("struct data corrupted")
-	}
+	// fields, ok := objectVal.Data.(map[string]value.Value)
+	// if !ok {
+	// 	return value.Null(), fmt.Errorf("struct data corrupted")
+	// }
 
-	val, exists := fields[fieldName]
+	val, exists := inst.Fields[fieldName]
 	if !exists {
 		return value.Null(), fmt.Errorf("struct field '%s' not found", fieldName)
 	}

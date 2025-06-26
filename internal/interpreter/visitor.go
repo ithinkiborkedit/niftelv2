@@ -16,6 +16,7 @@ type ExprVisitor interface {
 	VisitListExpr(expr *ast.ListExpr) (value.Value, error)
 	VisitDictExpr(expr *ast.DictExpr) (value.Value, error)
 	VisitFuncExpr(expr *ast.FuncExpr) (value.Value, error)
+	VisitStructLiteralExpr(expr *ast.StructLiteralExpr) (value.Value, error)
 }
 
 type StmtVisitor interface {

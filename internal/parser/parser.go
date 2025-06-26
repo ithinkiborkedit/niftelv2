@@ -1005,6 +1005,82 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 	}, nil
 }
 
+func (p *Parser) structDeclartion() (ast.Stmt, error) {
+	structTok := p.previous()
+
+	name, err := p.consume(token.TokenIdentifier, "ecpected a struct name after 'struct'")
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.consume(token.TokenLBrace, "expected '{' after struct name")
+	if err != nil {
+		return nil, err
+	}
+
+	var fields []ast.VarStmt
+	var methods []ast.FuncStmt
+
+	for !p.check(token.TokenRBrace) && !p.isAtEnd() {
+		err = p.skipnewLines()
+		if err != nil {
+			return nil, err
+		}
+
+		ok, err := p.match(token.TokenFunc)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			method, err := p.funcDeclaration()
+			if err != nil {
+				return nil, err
+			}
+			fn, ok := method.(*ast.FuncStmt)
+			if !ok {
+				return nil, fmt.Errorf("expected function statement in struct body")
+			}
+			methods = append(methods, *fn)
+			continue
+		}
+
+		if p.check(token.TokenIdentifier) {
+			fieldName, err := p.consume(token.TokenIdentifier, "expected field name in struct")
+			if err != nil {
+				return nil, err
+			}
+			_, err = p.consume(token.TokenColon, "expected ':' after struct field name")
+			if err != nil {
+				return nil, err
+			}
+			fieldType, err := p.consume(token.TokenIdentifier, "expected field type in struct")
+			if err != nil {
+				return nil, err
+			}
+			fields = append(fields, ast.VarStmt{
+				Name: fieldName,
+				Type: fieldType,
+			})
+			err = p.skipnewLines()
+			if err != nil {
+				return nil, err
+			}
+			continue
+		}
+		return nil, fmt.Errorf("unexepcted token in struct body: '%s' at line %d", p.curr.Lexeme, p.curr.Line)
+	}
+	_, err = p.consume(token.TokenRBrace, "expected '}' after struct body")
+	if err != nil {
+		return nil, err
+	}
+	return &ast.StructStmt{
+		Name:    name,
+		Fields:  fields,
+		Methods: methods,
+		Struct:  structTok,
+	}, nil
+}
+
 func (p *Parser) forStatement() (ast.Stmt, error) {
 	forTok := p.previous()
 	var init ast.Stmt
@@ -1080,9 +1156,15 @@ func (p *Parser) statement() (ast.Stmt, error) {
 	if ok {
 		return p.varDeclaration()
 	}
-	// ok,err p.match(token.TokenVar) {
-	// 	return p.varDeclaration()
-	// }
+
+	ok, err = p.match(token.TokenStruct)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		return p.structDeclartion()
+	}
+
 	if p.check(token.TokenIdentifier) && p.checkNext(token.TokenColonEqual) {
 		return p.shortVarDeclaration()
 	}
