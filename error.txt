@@ -1,15 +1,10 @@
-Niftel REPL v0
 >>> var x: int = 10
->>> var y: int = 5    
->>> if x+y == 15 {
+>>> var y: int = 5
+>>> if x < y {
 ...print("yes")
-...}
-IN PRINT STMT!
-"yes"
->>> if x > y {
-...print("no")
 ...} else {
-...print("yes")
+...print("no")
 ...}
+If conditon value.Value{Type:4, Data:false, Meta:(*value.TypeInfo)(nil)} (type=4)
 IN PRINT STMT!
 "no"

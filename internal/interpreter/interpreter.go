@@ -266,6 +266,7 @@ func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("If conditon %#v (type=%v)\n", cond, cond.Type)
 	if cond.Type != value.ValueBool {
 		return fmt.Errorf("if condition must evaluate to bool")
 	}
