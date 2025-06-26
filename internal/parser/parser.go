@@ -1090,6 +1090,11 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 		return nil, fmt.Errorf("unexpected token in struct body: '%s' at line %d", p.curr.Lexeme, p.curr.Line)
 	}
 
+	err = p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
+
 	// Must see a closing brace
 	_, err = p.consume(token.TokenRBrace, "expected '}' after struct body")
 	if err != nil {
