@@ -1,10 +1,7 @@
->>> var x: int = 10
->>> var y: int = 5
->>> if x < y {
-...print("yes")
-...} else {
-...print("no")
+>>> func greet(){
+...print("hello!")
 ...}
-If conditon value.Value{Type:4, Data:false, Meta:(*value.TypeInfo)(nil)} (type=4)
+>>> greet()
 IN PRINT STMT!
-"no"
+"hello!"
+null
