@@ -1,3 +1,30 @@
+case *ast.ExprStmt:
+    var result value.Value
+    var evalErr error
+    func() {
+        defer func() {
+            if r := recover(); r != nil {
+                if ret, ok := r.(runtimecontrol.ReturnValue); ok {
+                    result = ret.Value
+                    evalErr = nil
+                } else {
+                    panic(r)
+                }
+            }
+        }()
+        result, evalErr = interp.Eval(s.Expr)
+    }()
+    if evalErr != nil {
+        fmt.Printf("Runtime error: %v\n", evalErr)
+        break
+    }
+    if !result.IsNull() {
+        fmt.Println(result.String())
+    }
+
+
+
+
 Niftel REPL v0
 >>> func add(a: int, b: int) -> int {
 ...return a+b
