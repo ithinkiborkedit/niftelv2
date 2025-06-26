@@ -13,6 +13,12 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("TOP-LEVEL PANIC: %#v\n", r)
+			panic(r)
+		}
+	}()
 	var buffer strings.Builder
 	interp := interpreter.NewInterpreter()
 	reader := bufio.NewReader(os.Stdin)

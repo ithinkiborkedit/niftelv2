@@ -1,7 +1,8 @@
 Niftel REPL v0
->>>  func add(a: int, b: int) -> int {
+>>> func add(a: int, b: int) -> int {
 ...return a+b
 ...}
 >>> add(1,2)
-CALL EXPR DEBUG: &[1 2], &{map[add:{8 0x1400011e1e0 <nil>}] <nil>}Function returning 3
+CALL EXPR DEBUG: &[1 2], &{map[add:{8 0x14000076240 <nil>}] <nil>}CALLING Function: add, args: [{{IDENTIFIER a <nil> 1 10} {IDENTIFIER int <nil> 1 15}} {{IDENTIFIER b <nil> 1 18} {IDENTIFIER int <nil> 1 23}}]Function CALLER caught panic: runtimecontrol.ReturnValue{Value:value.Value{Type:1, Data:3, Meta:(*value.TypeInfo)(nil)}}
+Function returning 3
 DEBGUG result: value.Value{Type:0, Data:interface {}(nil), Meta:(*value.TypeInfo)(nil)}

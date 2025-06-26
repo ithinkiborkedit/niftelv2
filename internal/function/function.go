@@ -57,6 +57,7 @@ func NewNativeFunc(name string, fn func([]value.Value, InterpreterAPI) (value.Va
 }
 
 func (f *Function) Call(args []value.Value, interp InterpreterAPI) (value.Value, error) {
+	fmt.Printf("CALLING Function: %v, args: %v", f.name, f.params)
 	if f.isNative {
 		return f.nativeFunc(args, interp)
 	}
@@ -77,6 +78,7 @@ func (f *Function) Call(args []value.Value, interp InterpreterAPI) (value.Value,
 
 	defer func() {
 		if r := recover(); r != nil {
+			fmt.Printf("Function CALLER caught panic: %#v\n", r)
 			if rv, ok := r.(runtimecontrol.ReturnValue); ok {
 				fmt.Printf("Function returning %v\n", rv.Value)
 				ret = rv.Value
@@ -87,12 +89,12 @@ func (f *Function) Call(args []value.Value, interp InterpreterAPI) (value.Value,
 		}
 
 	}()
-
-	// _, execErr := interp.ExecuteBlock(f.body, callEnv)
-	ret, err = interp.ExecuteBlock(f.body, callEnv)
-	// if execErr != nil {
-	// 	err = execErr
-	// }
+	// ret, err = interp.ExecuteBlock(f.body, callEnv)
+	_, execErr := interp.ExecuteBlock(f.body, callEnv)
+	if execErr != nil {
+		err = execErr
+	}
+	fmt.Printf("RETURNING from function.Call: %#v, err: %v\n", ret, err)
 	return ret, err
 }
 
