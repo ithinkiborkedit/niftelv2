@@ -19,6 +19,7 @@ func NewEnvironment(enclosing *Environment) *Environment {
 }
 
 func (e *Environment) Define(name string, val value.Value) {
+	fmt.Printf("ENV DEFINING '%s' as type %v", name, val.Type)
 	e.variables[name] = val
 }
 
@@ -37,6 +38,7 @@ func (e *Environment) Assign(name string, val value.Value) error {
 
 func (e *Environment) Get(name string) (value.Value, error) {
 	val, ok := e.variables[name]
+	fmt.Printf("ENV LOOKING UP '%s' as type %v", name, val.Type)
 	if ok {
 		return val, nil
 	}

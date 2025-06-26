@@ -421,7 +421,7 @@ func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) (value.Value, error) {
 		}
 	}
 
-	fmt.Printf("CALL EXPR DEBUG: %v, %v", &args, i.env)
+	fmt.Printf("CALL EXPR DEBUG: %v, %v", args, i.env)
 
 	return callable.Call(args, i)
 }
@@ -560,6 +560,7 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) (value.Value, error) {
 
 // VisitFuncStmt defines a function in the environment.
 func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) error {
+	fmt.Printf("Defining function: %s\n", stmt.Name.Lexeme)
 	fn := function.NewUserFunc(
 		stmt.Name.Lexeme,
 		stmt.Params,

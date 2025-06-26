@@ -1,5 +1,6 @@
+Niftel REPL v0
 >>> func add(a: int, b: int) -> int {
 ...return a+b
 ...}
 >>> add(1,2)
-Runtime error: undefined variable add
+ENV LOOKING UP 'add' as type 0Runtime error: undefined variable add
