@@ -1,7 +1,97 @@
-Niftel REPL v0
->>> struct Person {
-[DEBUG] struct body: token 
- lexem='
-' line='1'
-DEBUG stms: []nifast.Stmt(nil)
-Parser error: unexpected token in struct body: '' at line 2 
+=== RUN   TestLexer_ScanTokens
+0: 
+ "\n" 
+1: func "func" 
+2: IDENTIFIER "add" 
+3: ( "(" 
+4: IDENTIFIER "a" 
+5: : ":" 
+6: IDENTIFIER "int" 
+7: , "," 
+8: IDENTIFIER "b" 
+9: : ":" 
+10: IDENTIFIER "int" 
+11: ) ")" 
+12: -> "->" 
+13: IDENTIFIER "int" 
+14: { "{" 
+15: 
+ "\n" 
+16: return "return" 
+17: IDENTIFIER "a" 
+18: + "+" 
+19: IDENTIFIER "b" 
+20: 
+ "\n" 
+21: } "}" 
+22: 
+ "\n" 
+23: var "var" 
+24: IDENTIFIER "result" 
+25: : ":" 
+26: IDENTIFIER "int" 
+27: = "=" 
+28: IDENTIFIER "add" 
+29: ( "(" 
+30: NUMBER "5" 
+31: , "," 
+32: NUMBER "3" 
+33: ) ")" 
+34: 
+ "\n" 
+35: 
+ "\n" 
+36: if "if" 
+37: IDENTIFIER "result" 
+38: NUMBER "5" 
+39: { "{" 
+40: 
+ "\n" 
+41: print "print" 
+42: ( "(" 
+43: STRING "\"success\"" 
+44: ) ")" 
+45: 
+ "\n" 
+46: 
+ "\n" 
+47: } "}" 
+48: else "else" 
+49: { "{" 
+50: 
+ "\n" 
+51: print "print" 
+52: ( "(" 
+53: STRING "\"fail\"" 
+54: ) ")" 
+55: 
+ "\n" 
+56: } "}" 
+57: 
+ "\n" 
+58: 
+ "\n" 
+59: struct "struct" 
+60: IDENTIFIER "Person" 
+61: { "{" 
+62: 
+ "\n" 
+63: IDENTIFIER "a" 
+64: : ":" 
+65: IDENTIFIER "int" 
+66: 
+ "\n" 
+67: IDENTIFIER "b" 
+68: : ":" 
+69: IDENTIFIER "int" 
+70: 
+ "\n" 
+71: } "}" 
+72: 
+ "\n" 
+73: 
+ "\n" 
+74: EOF "" 
+--- PASS: TestLexer_ScanTokens (0.00s)
+PASS
+ok  	github.com/ithinkiborkedit/niftelv2.git/internal/lexer	(cached)

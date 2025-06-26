@@ -1070,6 +1070,10 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 				Name: fieldName,
 				Type: fieldType,
 			})
+			err = p.skipnewLines()
+			if err != nil {
+				return nil, err
+			}
 			continue
 		}
 

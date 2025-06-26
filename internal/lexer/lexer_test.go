@@ -20,6 +20,12 @@ func TestLexer_ScanTokens(t *testing.T) {
 	} else {
 	  print("fail") 
 	}
+
+	struct Person {
+	  a: int
+	  b: int
+	}
+
 	// single line comment
 	/* block
 	   comment */
@@ -31,10 +37,6 @@ func TestLexer_ScanTokens(t *testing.T) {
 		if err != nil {
 			t.Fatalf("lexer error %v", err)
 		}
-
-		// if tok.Type == 0 {
-		// 	continue
-		// }
 
 		fmt.Printf("%d: %v %q \n", len(tokens), tok.Type, tok.Lexeme)
 
