@@ -1,7 +1,5 @@
->>> func greet(){
-...print("hello!")
+>>> func add(a: int, b: int) -> int {
+...return a+b
 ...}
->>> greet()
-IN PRINT STMT!
-"hello!"
+>>> add(1,2)
 null
