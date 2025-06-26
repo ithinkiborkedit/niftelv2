@@ -1,35 +1,5 @@
-case *ast.ExprStmt:
-    var result value.Value
-    var evalErr error
-    func() {
-        defer func() {
-            if r := recover(); r != nil {
-                if ret, ok := r.(runtimecontrol.ReturnValue); ok {
-                    result = ret.Value
-                    evalErr = nil
-                } else {
-                    panic(r)
-                }
-            }
-        }()
-        result, evalErr = interp.Eval(s.Expr)
-    }()
-    if evalErr != nil {
-        fmt.Printf("Runtime error: %v\n", evalErr)
-        break
-    }
-    if !result.IsNull() {
-        fmt.Println(result.String())
-    }
-
-
-
-
-Niftel REPL v0
 >>> func add(a: int, b: int) -> int {
 ...return a+b
 ...}
 >>> add(1,2)
-CALL EXPR DEBUG: &[1 2], &{map[add:{8 0x14000076240 <nil>}] <nil>}CALLING Function: add, args: [{{IDENTIFIER a <nil> 1 10} {IDENTIFIER int <nil> 1 15}} {{IDENTIFIER b <nil> 1 18} {IDENTIFIER int <nil> 1 23}}]Function CALLER caught panic: runtimecontrol.ReturnValue{Value:value.Value{Type:1, Data:3, Meta:(*value.TypeInfo)(nil)}}
-Function returning 3
-DEBGUG result: value.Value{Type:0, Data:interface {}(nil), Meta:(*value.TypeInfo)(nil)}
+Runtime error: undefined variable add
