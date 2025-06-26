@@ -516,22 +516,17 @@ func (i *Interpreter) VisitListExpr(expr *ast.ListExpr) (value.Value, error) {
 }
 
 func (i *Interpreter) VisitDictExpr(expr *ast.DictExpr) (value.Value, error) {
-	dict := make(map[string]value.Value, len(expr.Pairs))
+	dict := value.NewNiftelDict()
 	for _, pair := range expr.Pairs {
 		keyVal, err := i.Evaluate(pair[0])
 		if err != nil {
 			return value.Null(), err
 		}
-		keyStr, ok := keyVal.Data.(string)
-		if !ok {
-			return value.Null(), fmt.Errorf("dictionary key must be a string")
-		}
-
 		valueVal, err := i.Evaluate(pair[1])
 		if err != nil {
 			return value.Null(), err
 		}
-		dict[keyStr] = valueVal
+		dict.Set(keyVal, valueVal)
 	}
 	return value.Value{
 		Type: value.ValueDict,

@@ -247,18 +247,6 @@ func (p *Parser) equalityExpr() (ast.Expr, error) {
 			Right:    right,
 		}
 	}
-	// for p.match(token.TokenEqality, token.TokenBangEqal) {
-	// 	operator := p.previous()
-	// 	right, err := p.comparissonExpr()
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	left = &ast.BinaryExpr{
-	// 		Left:     left,
-	// 		Operator: operator,
-	// 		Right:    right,
-	// 	}
-	// }
 	return left, nil
 }
 
@@ -290,24 +278,6 @@ func (p *Parser) comparissonExpr() (ast.Expr, error) {
 			Right:    right,
 		}
 	}
-
-	// for p.match(
-	// 	token.TokenLess,
-	// 	token.TokenLessEq,
-	// 	token.TokenGreater,
-	// 	token.TokenGreaterEq,
-	// ) {
-	// 	operator := p.previous()
-	// 	right, err := p.termExpr()
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	left = &ast.BinaryExpr{
-	// 		Left:     left,
-	// 		Operator: operator,
-	// 		Right:    right,
-	// 	}
-	// }
 
 	return left, nil
 }

@@ -135,16 +135,6 @@ func (l *Lexer) advance() rune {
 	return r
 }
 
-// func (l *Lexer) addToken(tt token.TokenType) {
-// 	lexeme := l.source[l.start:l.current]
-// 	l.tokens = append(l.tokens, token.Token{
-// 		Type:   tt,
-// 		Lexeme: lexeme,
-// 		Line:   l.line,
-// 		Column: l.column,
-// 	})
-// }
-
 func (l *Lexer) match(expected rune) bool {
 	if l.isAtEnd() {
 		return false
@@ -222,26 +212,7 @@ func (l *Lexer) string(quote rune) (token.Token, error) {
 			l.advance()
 		}
 		l.advance()
-		// r, _ := utf8.DecodeRuneInString(l.source[l.current:])
-		// if r == quote {
-		// 	l.advance()
-		// 	lexeme := l.source[l.start:l.current]
-		// 	l.tokens = append(l.tokens, token.Token{
-		// 		Type:   token.TokenString,
-		// 		Lexeme: lexeme,
-		// 		Line:   l.line,
-		// 		Column: l.column,
-		// 	})
-		// 	return
-		// }
-		// if r == '\n' {
-		// 	l.line++
-		// 	l.column = 0
-		// }
-		// if r == '\\' {
-		// 	l.advance()
-		// }
-		// l.advance()
+
 	}
 	return token.Token{}, fmt.Errorf("unterminated string literal")
 }
@@ -290,20 +261,6 @@ func (l *Lexer) identifier() (token.Token, error) {
 		Line:   l.line,
 		Column: l.column,
 	}, nil
-	// 	r, _ := utf8.DecodeRuneInString(l.source[l.current:])
-	// 	if !(unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_') {
-	// 		break
-	// 	}
-	// 	l.advance()
-	// }
-	// lexeme := l.source[l.start:l.current]
-	// tt := lookupIdentifier(lexeme)
-	// l.tokens = append(l.tokens, token.Token{
-	// 	Type:   tt,
-	// 	Lexeme: lexeme,
-	// 	Line:   l.line,
-	// 	Column: l.column,
-	// })
 }
 
 func lookupIdentifier(lexeme string) token.TokenType {
