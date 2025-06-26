@@ -1061,24 +1061,28 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 				Name: fieldName,
 				Type: fieldType,
 			})
-			err = p.skipnewLines()
+			// 		err = p.skipnewLines()
+			// 		if err != nil {
+			// 			return nil, err
+			// 		}
+			continue
+			// 	}
+			// 	return nil, fmt.Errorf("unexepcted token in struct body: '%s' at line %d", p.curr.Lexeme, p.curr.Line)
+			// }
+		}
+		if p.check(token.TokenNewLine) {
+			err := p.advance()
 			if err != nil {
 				return nil, err
 			}
 			continue
 		}
-		return nil, fmt.Errorf("unexepcted token in struct body: '%s' at line %d", p.curr.Lexeme, p.curr.Line)
+		// _, err = p.consume(token.TokenRBrace, "expected '}' after struct body")
+		// if err != nil {
+		// 	return nil, err
+		// }
 	}
-	_, err = p.consume(token.TokenRBrace, "expected '}' after struct body")
-	if err != nil {
-		return nil, err
-	}
-	return &ast.StructStmt{
-		Name:    name,
-		Fields:  fields,
-		Methods: methods,
-		Struct:  structTok,
-	}, nil
+	return nil, fmt.Errorf("unexpected token in struct body '%s' at line %d", p.curr.Lexeme, p.curr.Line)
 }
 
 func (p *Parser) forStatement() (ast.Stmt, error) {
