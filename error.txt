@@ -1,4 +1,15 @@
->>> if x > y {
+Niftel REPL v0
+>>> var x: int = 10
+>>> var y: int = 5    
+>>> if x+y == 15 {
 ...print("yes")
+...}
 IN PRINT STMT!
 "yes"
+>>> if x > y {
+...print("no")
+...} else {
+...print("yes")
+...}
+IN PRINT STMT!
+"no"

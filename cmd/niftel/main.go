@@ -24,14 +24,16 @@ func main() {
 		if err != nil {
 			break
 		}
-		line = strings.TrimSpace(line)
-		if line == "" {
+		if strings.TrimSpace(line) == "" {
 			continue
 		}
+		// if line == "" {
+		// 	continue
+		// }
 
 		buffer.WriteString(line)
 
-		lex := lexer.New(line)
+		lex := lexer.New(buffer.String())
 		par := parser.New(lex)
 		stmts, err := par.Parse()
 
