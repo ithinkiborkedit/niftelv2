@@ -1008,7 +1008,7 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 func (p *Parser) structDeclartion() (ast.Stmt, error) {
 	structTok := p.previous()
 
-	name, err := p.consume(token.TokenIdentifier, "ecpected a struct name after 'struct'")
+	name, err := p.consume(token.TokenIdentifier, "expected a struct name after 'struct'")
 	if err != nil {
 		return nil, err
 	}
@@ -1022,11 +1022,18 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 	var methods []ast.FuncStmt
 
 	for !p.check(token.TokenRBrace) && !p.isAtEnd() {
+		// Allow and skip any number of blank lines or newlines
 		err = p.skipnewLines()
 		if err != nil {
 			return nil, err
 		}
 
+		// After skipping, if at end of struct, break
+		if p.check(token.TokenRBrace) {
+			break
+		}
+
+		// Parse methods (functions)
 		ok, err := p.match(token.TokenFunc)
 		if err != nil {
 			return nil, err
@@ -1044,6 +1051,7 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 			continue
 		}
 
+		// Parse fields
 		if p.check(token.TokenIdentifier) {
 			fieldName, err := p.consume(token.TokenIdentifier, "expected field name in struct")
 			if err != nil {
@@ -1061,28 +1069,25 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 				Name: fieldName,
 				Type: fieldType,
 			})
-			// 		err = p.skipnewLines()
-			// 		if err != nil {
-			// 			return nil, err
-			// 		}
-			continue
-			// 	}
-			// 	return nil, fmt.Errorf("unexepcted token in struct body: '%s' at line %d", p.curr.Lexeme, p.curr.Line)
-			// }
-		}
-		if p.check(token.TokenNewLine) {
-			err := p.advance()
-			if err != nil {
-				return nil, err
-			}
 			continue
 		}
-		// _, err = p.consume(token.TokenRBrace, "expected '}' after struct body")
-		// if err != nil {
-		// 	return nil, err
-		// }
+
+		// Anything else: error
+		return nil, fmt.Errorf("unexpected token in struct body: '%s' at line %d", p.curr.Lexeme, p.curr.Line)
 	}
-	return nil, fmt.Errorf("unexpected token in struct body '%s' at line %d", p.curr.Lexeme, p.curr.Line)
+
+	// Must see a closing brace
+	_, err = p.consume(token.TokenRBrace, "expected '}' after struct body")
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.StructStmt{
+		Name:    name,
+		Fields:  fields,
+		Methods: methods,
+		Struct:  structTok,
+	}, nil
 }
 
 func (p *Parser) forStatement() (ast.Stmt, error) {
