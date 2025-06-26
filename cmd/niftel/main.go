@@ -86,6 +86,6 @@ func main() {
 			}
 		}
 		buffer.Reset()
-		prompt = "\n>>>"
+		prompt = ">>>"
 	}
 }

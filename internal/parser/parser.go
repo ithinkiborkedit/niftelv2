@@ -1021,6 +1021,11 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 	var fields []ast.VarStmt
 	var methods []ast.FuncStmt
 
+	err = p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
+
 	for !p.check(token.TokenRBrace) && !p.isAtEnd() {
 		fmt.Printf("[DEBUG] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
 		// Allow and skip any number of blank lines or newlines
@@ -1049,6 +1054,10 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 				return nil, fmt.Errorf("expected function statement in struct body")
 			}
 			methods = append(methods, *fn)
+			err = p.skipnewLines()
+			if err != nil {
+				return nil, err
+			}
 			continue
 		}
 
