@@ -74,6 +74,7 @@ func main() {
 					fmt.Printf("Runtime error: %v\n", evalErr)
 					break
 				}
+				fmt.Printf("DEBUG result: %#v\n", result)
 				if !result.IsNull() {
 					fmt.Println(result.String())
 				}
@@ -85,6 +86,6 @@ func main() {
 			}
 		}
 		buffer.Reset()
-		prompt = ">>> "
+		prompt = "\n>>>"
 	}
 }
