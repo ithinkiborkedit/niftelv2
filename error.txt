@@ -1,6 +1,10 @@
 Niftel REPL v0
 >>> func add(a: int, b: int) -> int {
+DEBUG stms: []nifast.Stmt(nil)
 ...return a+b
+DEBUG stms: []nifast.Stmt(nil)
 ...}
+DEBUG stms: []nifast.Stmt{(*nifast.FuncStmt)(0x1400010a4e0)}
 >>> add(1,2)
+DEBUG stms: []nifast.Stmt{(*nifast.ExprStmt)(0x14000092010)}
 ENV LOOKING UP 'add' as type 0Runtime error: undefined variable add
