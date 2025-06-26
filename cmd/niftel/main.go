@@ -10,6 +10,8 @@ import (
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/runtimecontrol"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
 func main() {
@@ -54,12 +56,32 @@ func main() {
 		for _, stmt := range stmts {
 			switch s := stmt.(type) {
 			case *ast.ExprStmt:
-				val, err := interp.Eval(s.Expr)
+				var result value.Value
+				var err error
+				func() {
+					defer func() {
+						if r := recover(); r != nil {
+							if ret, ok := r.(runtimecontrol.ReturnValue); ok {
+								result = ret.Value
+								err = nil
+							} else {
+								panic(r)
+							}
+						}
+					}()
+					result, err = interp.Eval(s.Expr)
+				}()
 				if err != nil {
 					fmt.Printf("Runtime error: %v\n", err)
 					break
 				}
-				fmt.Println(val.String())
+				fmt.Println(result.String())
+				// val, err := interp.Eval(s.Expr)
+				// if err != nil {
+				// 	fmt.Printf("Runtime error: %v\n", err)
+				// 	break
+				// }
+				// fmt.Println(val.String())
 			default:
 				err := interp.Execute(stmt)
 				if err != nil {

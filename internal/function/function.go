@@ -78,6 +78,7 @@ func (f *Function) Call(args []value.Value, interp InterpreterAPI) (value.Value,
 	defer func() {
 		if r := recover(); r != nil {
 			if rv, ok := r.(runtimecontrol.ReturnValue); ok {
+				fmt.Printf("Function returning %v\n", rv.Value)
 				ret = rv.Value
 				err = nil
 			} else {
