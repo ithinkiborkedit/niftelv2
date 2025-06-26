@@ -1,4 +1,7 @@
 Niftel REPL v0
 >>> struct Person {
+[DEBUG] struct body: token 
+ lexem='
+' line='1'
 DEBUG stms: []nifast.Stmt(nil)
 Parser error: unexpected token in struct body: '' at line 2 
