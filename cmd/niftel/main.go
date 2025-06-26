@@ -52,6 +52,7 @@ func main() {
 		}
 
 		for _, stmt := range stmts {
+			fmt.Printf("REPL: STATEMENT type: %T\n", stmt)
 			switch s := stmt.(type) {
 			case *ast.ExprStmt:
 				var result value.Value
