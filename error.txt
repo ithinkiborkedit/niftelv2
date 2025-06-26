@@ -1,6 +1,7 @@
+Niftel REPL v0
 >>> func add(a: int, b: int) -> int {
 ...return a+b
 ...}
 >>> add(1,2)
-Function returning 3
-null
+CALL EXPR DEBUG: [1 2], &{map[add:{8 0x1400011e1e0 <nil>}] <nil>}Function returning 3
+DEBUG result: value.Value{Type:0, Data:interface {}(nil), Meta:(*value.TypeInfo)(nil)}

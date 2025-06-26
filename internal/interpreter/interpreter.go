@@ -421,6 +421,8 @@ func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) (value.Value, error) {
 		}
 	}
 
+	fmt.Printf("CALL EXPR DEBUG: %v, %v", &args, i.env)
+
 	return callable.Call(args, i)
 }
 

@@ -75,7 +75,11 @@ func main() {
 					fmt.Printf("Runtime error: %v\n", err)
 					break
 				}
-				fmt.Println(result.String())
+				fmt.Printf("DEBUG result: %#v\n", result)
+				if !result.IsNull() {
+					fmt.Println(result.String())
+				}
+				// fmt.Println(result.String())
 				// val, err := interp.Eval(s.Expr)
 				// if err != nil {
 				// 	fmt.Printf("Runtime error: %v\n", err)

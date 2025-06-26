@@ -79,6 +79,10 @@ func Null() Value {
 	return Value{Type: ValueNull, Data: nil}
 }
 
+func (v Value) IsNull() bool {
+	return v.Type == ValueNull
+}
+
 func (v Value) Equals(other Value) bool {
 	if v.Type != other.Type {
 		return false
