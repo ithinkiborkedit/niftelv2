@@ -4,7 +4,5 @@ Niftel REPL v0
 [DEBUGG] struct body: token 
  lexem='
 ' line='1'
-[PARSERLOOP] struct body: type=37  lexem='
-' line='1'
 DEBUG stms: []nifast.Stmt(nil)
-Parser error: unexpected token in struct body: '' at line 2 
+Parser error: [Parse error] expected '}' after struct body. Got '' at line 2 
