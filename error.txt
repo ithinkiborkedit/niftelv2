@@ -1,5 +1,6 @@
 Niftel REPL v0
 >>> struct Person {
+[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Person' line='1'
 [DEBUGG] struct body: token 
  lexem='
 ' line='1'

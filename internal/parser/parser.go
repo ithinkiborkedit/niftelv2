@@ -1006,6 +1006,11 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 }
 
 func (p *Parser) structDeclartion() (ast.Stmt, error) {
+	err := p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("[AFTER SKIP NEW LINES] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
 	structTok := p.previous()
 
 	name, err := p.consume(token.TokenIdentifier, "expected a struct name after 'struct'")
@@ -1021,11 +1026,6 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 
 	var fields []ast.VarStmt
 	var methods []ast.FuncStmt
-
-	// err = p.skipnewLines()
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	for !p.check(token.TokenRBrace) && !p.isAtEnd() {
 		fmt.Printf("[PARSERLOOP] struct body: type=%d  lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
