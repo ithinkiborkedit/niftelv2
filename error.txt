@@ -8,3 +8,67 @@ Niftel REPL v0
 ' line='1'
 DEBUG stms: []nifast.Stmt(nil)
 Parser error: unexpected token in struct body: '' at line 2 
+
+	for !p.check(token.TokenRBrace) && !p.isAtEnd() {
+		fmt.Printf("[PARSERLOOP] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
+		// Allow and skip any number of blank lines or newlines
+		err = p.skipnewLines()
+		if err != nil {
+			return nil, err
+		}
+
+		// After skipping, if at end of struct, break
+		if p.check(token.TokenRBrace) {
+			break
+		}
+
+		// Parse methods (functions)
+		ok, err := p.match(token.TokenFunc)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			method, err := p.funcDeclaration()
+			if err != nil {
+				return nil, err
+			}
+			fn, ok := method.(*ast.FuncStmt)
+			if !ok {
+				return nil, fmt.Errorf("expected function statement in struct body")
+			}
+			methods = append(methods, *fn)
+			err = p.skipnewLines()
+			if err != nil {
+				return nil, err
+			}
+			continue
+		}
+
+		// Parse fields
+		if p.check(token.TokenIdentifier) {
+			fieldName, err := p.consume(token.TokenIdentifier, "expected field name in struct")
+			if err != nil {
+				return nil, err
+			}
+			_, err = p.consume(token.TokenColon, "expected ':' after struct field name")
+			if err != nil {
+				return nil, err
+			}
+			fieldType, err := p.consume(token.TokenIdentifier, "expected field type in struct")
+			if err != nil {
+				return nil, err
+			}
+			fields = append(fields, ast.VarStmt{
+				Name: fieldName,
+				Type: fieldType,
+			})
+			err = p.skipnewLines()
+			if err != nil {
+				return nil, err
+			}
+			continue
+		}
+
+		// Anything else: error
+		return nil, fmt.Errorf("unexpected token in struct body: '%s' at line %d", p.curr.Lexeme, p.curr.Line)
+	}
