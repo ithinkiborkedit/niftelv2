@@ -52,3 +52,23 @@ func TestLexer_ScanTokens(t *testing.T) {
 	}
 
 }
+
+func TestLexer_StructTokens(t *testing.T) {
+	source := `
+struct Person {
+    a: int
+    b: int
+}
+`
+	lex := New(source)
+	for {
+		tok, err := lex.NextToken()
+		if err != nil {
+			t.Fatalf("lexer error %v", err)
+		}
+		fmt.Printf("%v (%q) line=%d col=%d\n", tok.Type, tok.Lexeme, tok.Line, tok.Column)
+		if tok.Type == token.TokenEOF {
+			break
+		}
+	}
+}
