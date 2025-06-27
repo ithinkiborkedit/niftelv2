@@ -1,3 +1,35 @@
+package lexer
+
+import (
+	"fmt"
+	"testing"
+
+	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
+)
+
+func TestLexer_StructTokens(t *testing.T) {
+	source := `
+struct Person {
+    a: int
+    b: int
+}
+`
+	lex := New(source)
+	for {
+		tok, err := lex.NextToken()
+		if err != nil {
+			t.Fatalf("lexer error %v", err)
+		}
+		fmt.Printf("%v (%q) line=%d col=%d\n", tok.Type, tok.Lexeme, tok.Line, tok.Column)
+		if tok.Type == token.TokenEOF {
+			break
+		}
+	}
+}
+
+
+
+
 Niftel REPL v0
 >>> struct Person {
 DEBUG stms: []nifast.Stmt(nil)
