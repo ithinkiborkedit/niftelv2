@@ -10,6 +10,7 @@ import (
 )
 
 func TestStructDeclarationAndInstantiation(t *testing.T) {
+	value.BuiltinTypesInit()
 	interp := interpreter.NewInterpreter()
 
 	// 1. Declare struct Point { x: int, y: int }
