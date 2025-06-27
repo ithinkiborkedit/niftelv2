@@ -129,7 +129,7 @@ func TestStructFieldDefaultsAndMissingFields(t *testing.T) {
 	if got := pointInstance.Fields["x"]; got.Data.(float64) != 7 {
 		t.Errorf("expected x=7, got %v", got.Data)
 	}
-	if got := pointInstance.Fields["y"]; !val.IsNull() {
+	if got := pointInstance.Fields["y"]; !got.IsNull() {
 		t.Errorf("expected y=null, got %v", got)
 	}
 }
