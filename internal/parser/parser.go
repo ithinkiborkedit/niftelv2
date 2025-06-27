@@ -1025,6 +1025,11 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 		return nil, err
 	}
 	if ok {
+		for p.check(token.TokenNewLine) {
+			if err := p.advance(); err != nil {
+				return nil, err
+			}
+		}
 		if p.check(token.TokenLParen) {
 			_, err := p.consume(token.TokenLParen, "expected '(' after -> for multiple return types")
 			if err != nil {
@@ -1047,12 +1052,6 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 			_, err = p.consume(token.TokenRParen, "expect ')' after multiple types")
 			if err != nil {
 				return nil, err
-			} else {
-				typ, err := p.consume(token.TokenIdentifier, "expect return type after '->' ")
-				if err != nil {
-					return nil, err
-				}
-				returnTypes = append(returnTypes, typ)
 			}
 		}
 		_, err = p.consume(token.TokenLBrace, "expected '{ before function body")
@@ -1071,12 +1070,6 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 			Return: returnTypes,
 		}, nil
 	}
-	// if ok {
-	// 	returnType, err = p.consume(token.TokenIdentifier, "expect return type after '->'")
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// }
 
 	_, err = p.consume(token.TokenLBrace, "expect '{' before function body")
 	if err != nil {
