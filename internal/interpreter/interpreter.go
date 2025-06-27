@@ -700,7 +700,7 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
 	if len(stmt.Values) == 0 {
 		result = value.Null()
 	} else if len(stmt.Values) == 1 {
-		result, err := i.Evaluate(stmt.Values[0])
+		result, err = i.Evaluate(stmt.Values[0])
 		if err != nil {
 			return err
 		}
@@ -717,7 +717,12 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
 		}
 		tupleType := value.GetOrRegisterTupleType(types)
 		tupleVal := value.NewTupleValue(tupleType, vals)
+		result = value.Value{
+			Type: value.ValueTuple,
+			Data: tupleVal,
+		}
 	}
+	panic(runtimecontrol.ReturnValue{Value: result})
 
 	// for _, expr := range stmt.Values {
 	// 	val, err := i.Evaluate(expr)
