@@ -60,3 +60,45 @@ func TestParser_Parse(t *testing.T) {
 	}
 	_ = printStmt // Can add more assertions if desired
 }
+func TestParseMultipleReturnValues(t *testing.T) {
+	src := `
+func foo() -> (int, int) {
+    return 1, 2
+}
+`
+	lex := lexer.New(src)
+	par := parser.New(lex)
+	stmts, err := par.Parse()
+	if err != nil {
+		t.Fatalf("Parser error: %v", err)
+	}
+	if len(stmts) == 0 {
+		t.Fatalf("No statements parsed")
+	}
+	fn, ok := stmts[0].(*ast.FuncStmt)
+	if !ok {
+		t.Fatalf("First statement is not a FuncStmt")
+	}
+	found := false
+	for _, stmt := range fn.Body.Statements {
+		ret, ok := stmt.(*ast.ReturnStmt)
+		if ok {
+			found = true
+			// --- Updated assertion: ---
+			if len(ret.Values) != 2 {
+				t.Fatalf("Return should have 2 values, got %d", len(ret.Values))
+			}
+			lit1, ok1 := ret.Values[0].(*ast.LiteralExpr)
+			lit2, ok2 := ret.Values[1].(*ast.LiteralExpr)
+			if !ok1 || !ok2 {
+				t.Fatalf("Return values not parsed as literals")
+			}
+			if lit1.Value.Lexeme != "1" || lit2.Value.Lexeme != "2" {
+				t.Fatalf("Return values not correct: got %q, %q", lit1.Value.Lexeme, lit2.Value.Lexeme)
+			}
+		}
+	}
+	if !found {
+		t.Fatalf("Did not find a ReturnStmt in function body")
+	}
+}
