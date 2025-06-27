@@ -1,10 +1,9 @@
-Niftel REPL v0
 >>> struct Person {
 ... a: int
-... b int
+... b: int
 ... }
 [REPL RAW BUFFER]
-"struct Person {\na: int\nb int\n}\n"
+"struct Person {\na: int\nb: int\n}\n"
 000: 's' (115)
 001: 't' (116)
 002: 'r' (114)
@@ -29,13 +28,14 @@ Niftel REPL v0
 021: 't' (116)
 022: '\n' (10)
 023: 'b' (98)
-024: ' ' (32)
-025: 'i' (105)
-026: 'n' (110)
-027: 't' (116)
-028: '\n' (10)
-029: '}' (125)
-030: '\n' (10)
+024: ':' (58)
+025: ' ' (32)
+026: 'i' (105)
+027: 'n' (110)
+028: 't' (116)
+029: '\n' (10)
+030: '}' (125)
+031: '\n' (10)
 [AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Person' line='1'
 [AFTER OPENING '{' ] struct body: token 
  lexem='
@@ -44,5 +44,6 @@ Niftel REPL v0
  after '{' ] struct body: token IDENTIFIER lexem='a' line='2'
 [PARSERLOOP] struct body: type=1  lexem='a' line='2'
 [PARSERLOOP] struct body: type=1  lexem='b' line='3'
-DEBUG stms: []nifast.Stmt(nil)
-Parser error: [Parse error] expected ':' after struct field name. Got 'int' at line 3 
+DEBUG stms: []nifast.Stmt{(*nifast.StructStmt)(0x140001060a0)}
+REPL: STATEMENT type: *nifast.StructStmt
+Runtime error: unknown statement type *nifast.StructStmt
