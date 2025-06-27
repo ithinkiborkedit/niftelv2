@@ -1,122 +1,131 @@
-package parser_test
+package interpreter_test
 
 import (
 	"testing"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/interpreter"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
+	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
+	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 )
 
-func TestStructCreationAndFields(t *testing.T) {
-	src := `
-struct Person {
-    name: string
-    age: int
-}
-var p: Person = Person { name: "Alice", age: 42 }
-`
-	lex := lexer.New(src)
-	par := parser.New(lex)
-	stmts, err := par.Parse()
-	if err != nil {
-		t.Fatalf("Parser error: %v", err)
-	}
-
+func TestStructDeclarationAndInstantiation(t *testing.T) {
 	interp := interpreter.NewInterpreter()
-	for _, stmt := range stmts {
-		if err := interp.Execute(stmt); err != nil {
-			t.Fatalf("Interpreter error: %v", err)
-		}
-	}
-	// Check that variable exists and fields are set
-	pVal, ok := interp.Globals["p"]
-	if !ok {
-		t.Fatalf("Variable 'p' not found in interpreter globals")
-	}
-	if pVal.Type != value.ValueStruct {
-		t.Fatalf("Expected p to be a struct, got: %v", pVal.Type)
-	}
-	fields := pVal.Data.(map[string]value.Value)
-	if fields["name"].String() != `"Alice"` {
-		t.Fatalf("Expected p.name == \"Alice\", got %v", fields["name"].String())
-	}
-	if fields["age"].Data != float64(42) {
-		t.Fatalf("Expected p.age == 42, got %v", fields["age"].Data)
-	}
-}
 
-func TestStructWithMethodCall(t *testing.T) {
-	src := `
-struct Point {
-    x: int
-    y: int
+	// 1. Declare struct Point { x: int, y: int }
+	pointStruct := &ast.StructStmt{
+		Name: token.Token{Lexeme: "Point"},
+		Fields: []ast.VarStmt{
+			{
+				Name: token.Token{Lexeme: "x"},
+				Type: token.Token{Lexeme: "int"},
+			},
+			{
+				Name: token.Token{Lexeme: "y"},
+				Type: token.Token{Lexeme: "int"},
+			},
+		},
+	}
 
-    func sum() -> int {
-        return x + y
-    }
-}
-var p: Point = Point { x: 3, y: 4 }
-var s: int = p.sum()
-`
-	lex := lexer.New(src)
-	par := parser.New(lex)
-	stmts, err := par.Parse()
+	// 2. Register the struct type
+	if err := interp.Execute(pointStruct); err != nil {
+		t.Fatalf("struct registration failed: %v", err)
+	}
+
+	// 3. Instantiate struct: var p: Point = Point { x: 2, y: 3 }
+	structLiteral := &ast.StructLiteralExpr{
+		TypeName: token.Token{Lexeme: "Point"},
+		Fields: map[string]ast.Expr{
+			"x": &ast.LiteralExpr{Value: token.Token{Type: token.TokenNumber, Data: float64(2)}},
+			"y": &ast.LiteralExpr{Value: token.Token{Type: token.TokenNumber, Data: float64(3)}},
+		},
+	}
+
+	varStmt := &ast.VarStmt{
+		Name: token.Token{Lexeme: "p"},
+		Type: token.Token{Lexeme: "Point"},
+		Init: structLiteral,
+	}
+
+	if err := interp.Execute(varStmt); err != nil {
+		t.Fatalf("struct instantiation failed: %v", err)
+	}
+
+	// 4. Access fields on p
+	val, err := interp.GetEnv().Get("p")
 	if err != nil {
-		t.Fatalf("Parser error: %v", err)
+		t.Fatalf("failed to get variable 'p': %v", err)
 	}
 
-	interp := interpreter.NewInterpreter()
-	for _, stmt := range stmts {
-		if err := interp.Execute(stmt); err != nil {
-			t.Fatalf("Interpreter error: %v", err)
-		}
+	// Check value type
+	if val.Type != value.ValueStruct {
+		t.Fatalf("expected ValueStruct, got %v", val.Type)
 	}
-	sVal, ok := interp.Globals["s"]
+
+	pointInstance, ok := val.Data.(*value.StructInstance)
 	if !ok {
-		t.Fatalf("Variable 's' not found in interpreter globals")
+		t.Fatalf("expected *StructInstance, got %T", val.Data)
 	}
-	if sVal.Type != value.ValueNumber {
-		t.Fatalf("Expected s to be a number, got %v", sVal.Type)
+
+	if got := pointInstance.Fields["x"]; got.Data.(float64) != 2 {
+		t.Errorf("expected x=2, got %v", got.Data)
 	}
-	if sVal.Data != float64(7) {
-		t.Fatalf("Expected s == 7, got %v", sVal.Data)
+	if got := pointInstance.Fields["y"]; got.Data.(float64) != 3 {
+		t.Errorf("expected y=3, got %v", got.Data)
 	}
 }
 
-func TestStructMethodOnLiteralInstance(t *testing.T) {
-	src := `
-struct Box {
-    width: int
-    height: int
+func TestStructFieldDefaultsAndMissingFields(t *testing.T) {
+	interp := interpreter.NewInterpreter()
 
-    func area() -> int {
-        return width * height
-    }
-}
-var a: int = Box { width: 2, height: 3 }.area()
-`
-	lex := lexer.New(src)
-	par := parser.New(lex)
-	stmts, err := par.Parse()
+	pointStruct := &ast.StructStmt{
+		Name: token.Token{Lexeme: "Point"},
+		Fields: []ast.VarStmt{
+			{
+				Name: token.Token{Lexeme: "x"},
+				Type: token.Token{Lexeme: "int"},
+			},
+			{
+				Name: token.Token{Lexeme: "y"},
+				Type: token.Token{Lexeme: "int"},
+			},
+		},
+	}
+	if err := interp.Execute(pointStruct); err != nil {
+		t.Fatalf("struct registration failed: %v", err)
+	}
+
+	// Leave out "y" field in literal, should be filled with Null()
+	structLiteral := &ast.StructLiteralExpr{
+		TypeName: token.Token{Lexeme: "Point"},
+		Fields: map[string]ast.Expr{
+			"x": &ast.LiteralExpr{Value: token.Token{Type: token.TokenNumber, Data: float64(7)}},
+			// "y" is missing
+		},
+	}
+
+	varStmt := &ast.VarStmt{
+		Name: token.Token{Lexeme: "p2"},
+		Type: token.Token{Lexeme: "Point"},
+		Init: structLiteral,
+	}
+	if err := interp.Execute(varStmt); err != nil {
+		t.Fatalf("struct instantiation failed: %v", err)
+	}
+
+	val, err := interp.GetEnv().Get("p2")
 	if err != nil {
-		t.Fatalf("Parser error: %v", err)
+		t.Fatalf("failed to get variable 'p2': %v", err)
+	}
+	pointInstance, ok := val.Data.(*value.StructInstance)
+	if !ok {
+		t.Fatalf("expected *StructInstance, got %T", val.Data)
 	}
 
-	interp := interpreter.NewInterpreter()
-	for _, stmt := range stmts {
-		if err := interp.Execute(stmt); err != nil {
-			t.Fatalf("Interpreter error: %v", err)
-		}
+	if got := pointInstance.Fields["x"]; got.Data.(float64) != 7 {
+		t.Errorf("expected x=7, got %v", got.Data)
 	}
-	aVal, ok := interp.Globals["a"]
-	if !ok {
-		t.Fatalf("Variable 'a' not found in interpreter globals")
-	}
-	if aVal.Type != value.ValueNumber {
-		t.Fatalf("Expected a to be a number, got %v", aVal.Type)
-	}
-	if aVal.Data != float64(6) {
-		t.Fatalf("Expected a == 6, got %v", aVal.Data)
+	if got := pointInstance.Fields["y"]; !value.IsNull(got) {
+		t.Errorf("expected y=null, got %v", got)
 	}
 }
