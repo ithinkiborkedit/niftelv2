@@ -113,6 +113,7 @@ func main() {
 	if len(os.Args) > 1 {
 		interp.ShouldPrintResults = false
 		runFile(os.Args[1], interp)
+		return
 	}
 	interp.ShouldPrintResults = true
 	defer func() {
