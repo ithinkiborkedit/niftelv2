@@ -2,11 +2,11 @@ package interpreter_test
 
 import (
 	"testing"
+
 	"github.com/ithinkiborkedit/niftelv2.git/internal/interpreter"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
 func TestStructDeclarationAndInstantiation(t *testing.T) {
@@ -125,7 +125,7 @@ func TestStructFieldDefaultsAndMissingFields(t *testing.T) {
 	if got := pointInstance.Fields["x"]; got.Data.(float64) != 7 {
 		t.Errorf("expected x=7, got %v", got.Data)
 	}
-	if got := pointInstance.Fields["y"]; !value.IsNull(got) {
+	if got := pointInstance.Fields["y"]; !val.IsNull() {
 		t.Errorf("expected y=null, got %v", got)
 	}
 }
