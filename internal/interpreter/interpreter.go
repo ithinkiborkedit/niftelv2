@@ -14,8 +14,9 @@ import (
 
 // Interpreter interprets and executes Niftel code.
 type Interpreter struct {
-	env      *environment.Environment
-	envStack []*environment.Environment
+	env                *environment.Environment
+	envStack           []*environment.Environment
+	ShouldPrintResults bool
 	// Add flags, call stacks, etc. here as needed
 }
 
@@ -338,8 +339,17 @@ func (i *Interpreter) VisitPrintStmt(stmt *ast.PrintStmt) error {
 }
 
 func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) error {
-	_, err := i.Evaluate(stmt.Expr)
-	return err
+	result, err := i.Evaluate(stmt.Expr)
+	if err != nil {
+		return err
+	}
+	if i.ShouldPrintResults && !result.IsNull() {
+		fmt.Println(result.String())
+	}
+
+	return nil
+	// _, err := i.Evaluate(stmt.Expr)
+	// return err
 }
 
 func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) error {

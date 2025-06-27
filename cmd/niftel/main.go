@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -43,8 +44,77 @@ func countBraces(line string) (open, close int) {
 	return
 }
 
+func runFile(path string, interp *interpreter.Interpreter) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Could not read file: %v\n", path)
+		os.Exit(2)
+	}
+	reader := bufio.NewReader(strings.NewReader(string(data)))
+
+	for {
+		var buffer strings.Builder
+		openBraces := 0
+		firstLine := true
+
+		for {
+			line, err := reader.ReadString('\n')
+			if err != nil && err != io.EOF {
+				fmt.Fprintf(os.Stderr, "Read error: %v\n", err)
+				return
+			}
+			if err == io.EOF && line == "" && buffer.Len() == 0 {
+				return
+			}
+			if firstLine && strings.TrimSpace(line) == "" {
+				if err == io.EOF {
+					return
+				}
+				continue
+			}
+			buffer.WriteString(line)
+
+			o, c := countBraces(line)
+			openBraces += o - c
+
+			if openBraces > 0 || (firstLine && strings.Contains(line, "{")) {
+
+			} else {
+				break
+			}
+			firstLine = false
+			if err == io.EOF {
+				break
+			}
+		}
+		if buffer.Len() == 0 {
+			return
+		}
+		lex := lexer.New(buffer.String())
+		par := parser.New(lex)
+		stmts, err := par.Parse()
+		if err == parser.ErrIncomplete {
+			continue
+		} else if err != nil {
+			fmt.Fprintf(os.Stderr, "parser error: %v\n", err)
+			continue
+		}
+		for _, stmt := range stmts {
+			if err := interp.Execute(stmt); err != nil {
+				fmt.Fprintf(os.Stderr, "runtime error: %v", err)
+			}
+		}
+	}
+}
+
 func main() {
 	value.BuiltinTypesInit()
+	interp := interpreter.NewInterpreter()
+	if len(os.Args) > 1 {
+		interp.ShouldPrintResults = false
+		runFile(os.Args[1], interp)
+	}
+	interp.ShouldPrintResults = true
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("TOP-LEVEL PANIC: %#v\n", r)
@@ -52,7 +122,7 @@ func main() {
 		}
 	}()
 
-	interp := interpreter.NewInterpreter()
+	interp.ShouldPrintResults = true
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Niftel REPL v0")
 	prompt := ">>> "
