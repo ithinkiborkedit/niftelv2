@@ -44,6 +44,7 @@ func countBraces(line string) (open, close int) {
 }
 
 func main() {
+	value.BuiltinTypesInit()
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("TOP-LEVEL PANIC: %#v\n", r)
