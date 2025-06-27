@@ -56,6 +56,12 @@ func HasType(name string) bool {
 	return ok
 }
 
+func ResetTypes() {
+	globalRegistry.mu.Lock()
+	defer globalRegistry.mu.Unlock()
+	globalRegistry.types = make(map[string]*TypeInfo)
+}
+
 func ListTypes() []string {
 	globalRegistry.mu.RLock()
 	defer globalRegistry.mu.RUnlock()

@@ -10,6 +10,7 @@ import (
 )
 
 func TestStructDeclarationAndInstantiation(t *testing.T) {
+	value.ResetTypes()
 	value.BuiltinTypesInit()
 	interp := interpreter.NewInterpreter()
 
@@ -77,6 +78,8 @@ func TestStructDeclarationAndInstantiation(t *testing.T) {
 }
 
 func TestStructFieldDefaultsAndMissingFields(t *testing.T) {
+	value.ResetTypes()
+	value.BuiltinTypesInit()
 	interp := interpreter.NewInterpreter()
 
 	pointStruct := &ast.StructStmt{
