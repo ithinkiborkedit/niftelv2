@@ -14,6 +14,35 @@ import (
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
+// Helper: counts '{' and '}' in a line, ignoring those in strings
+func countBraces(line string) (open, close int) {
+	inString := false
+	stringChar := byte(0)
+	for i := 0; i < len(line); i++ {
+		c := line[i]
+		if inString {
+			if c == stringChar {
+				inString = false
+			} else if c == '\\' && i+1 < len(line) {
+				i++ // skip escaped char
+			}
+			continue
+		}
+		if c == '"' || c == '\'' {
+			inString = true
+			stringChar = c
+			continue
+		}
+		if c == '{' {
+			open++
+		}
+		if c == '}' {
+			close++
+		}
+	}
+	return
+}
+
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -21,37 +50,58 @@ func main() {
 			panic(r)
 		}
 	}()
-	var buffer strings.Builder
+
 	interp := interpreter.NewInterpreter()
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Niftel REPL v0")
 	prompt := ">>> "
+
 	for {
-		fmt.Print(prompt)
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			break
-		}
-		if strings.TrimSpace(line) == "" {
-			continue
+		var buffer strings.Builder
+		openBraces := 0
+		firstLine := true
+
+		// Read one or more lines depending on { ... }
+		for {
+			fmt.Print(prompt)
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				return
+			}
+			if firstLine && strings.TrimSpace(line) == "" {
+				// ignore blank lines at start
+				continue
+			}
+			buffer.WriteString(line)
+
+			o, c := countBraces(line)
+			openBraces += o - c
+
+			if openBraces > 0 || (firstLine && strings.Contains(line, "{")) {
+				// inside block: switch to ... prompt
+				prompt = "... "
+			} else {
+				break // block closed or no block at all
+			}
+			firstLine = false
 		}
 
-		buffer.WriteString(line)
-
-		lex := lexer.New(buffer.String())
+		// Debug: show what was read
 		fmt.Printf("[REPL RAW BUFFER]\n%q\n", buffer.String())
 		for i, c := range buffer.String() {
 			fmt.Printf("%03d: %q (%d)\n", i, c, c)
 		}
+
+		lex := lexer.New(buffer.String())
 		par := parser.New(lex)
 		stmts, err := par.Parse()
 		fmt.Printf("DEBUG stms: %#v\n", stmts)
 		if err == parser.ErrIncomplete {
-			prompt = "..."
+			prompt = "... "
 			continue
 		} else if err != nil {
 			fmt.Printf("Parser error: %v \n", err)
-			buffer.Reset()
+			prompt = ">>> "
 			continue
 		}
 
@@ -89,7 +139,7 @@ func main() {
 				}
 			}
 		}
-		buffer.Reset()
-		prompt = ">>>"
+		// Reset prompt for next input
+		prompt = ">>> "
 	}
 }
