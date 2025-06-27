@@ -5,7 +5,7 @@ type NiftelTupleType struct {
 }
 
 type NiftelTupleValue struct {
-	Type     *NiftelTupleType
+	Type     *TypeInfo
 	Elements []Value
 }
 
@@ -13,9 +13,16 @@ func NewTupleType(elemsType []*TypeInfo) *NiftelTupleType {
 	return &NiftelTupleType{ElementTypes: elemsType}
 }
 
-func NewTupleValue(tupleType *NiftelTupleType, elements []Value) *NiftelTupleValue {
+func NewTupleValue(tupleType *TypeInfo, elements []Value) *NiftelTupleValue {
 	return &NiftelTupleValue{
 		Type:     tupleType,
 		Elements: elements,
+	}
+}
+
+func (tt *NiftelTupleType) TypeInfo() *TypeInfo {
+	return &TypeInfo{
+		Name: TupleTypeKey(tt.ElementTypes),
+		Kind: TypeKindTuple,
 	}
 }

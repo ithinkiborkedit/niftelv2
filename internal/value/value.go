@@ -20,6 +20,7 @@ const (
 	ValueDict
 	ValueStruct
 	ValueFunc
+	ValueTuple
 )
 
 type Value struct {
@@ -102,6 +103,45 @@ func (v Value) Equals(other Value) bool {
 		return v.Data == other.Data
 	default:
 		return false
+	}
+}
+
+func (v Value) TypeInfo() *TypeInfo {
+	switch v.Type {
+	case ValueInt:
+		t, _ := GetType("int")
+		return t
+	case ValueFloat:
+		t, _ := GetType("float")
+		return t
+	case ValueString:
+		t, _ := GetType("string")
+		return t
+	case ValueBool:
+		t, _ := GetType("Bool")
+		return t
+	case ValueList:
+		t, _ := GetType("list")
+		return t
+	case ValueDict:
+		t, _ := GetType("Dict")
+		return t
+	case ValueStruct:
+		if s, ok := v.Data.(*StructInstance); ok {
+			t, _ := GetType(s.Type.Name)
+			return t
+		}
+		return nil
+	case ValueNull:
+		t, _ := GetType("null")
+		return t
+	case ValueTuple:
+		if tval, ok := v.Data.(*NiftelTupleValue); ok {
+			return tval.Type.TypeInfo()
+		}
+		return nil
+	default:
+		return nil
 	}
 }
 

@@ -1,9 +1,1 @@
-=== RUN   TestParser_Parse
-    parser_test.go:32: Parse failed: [Parse error] expected '{ before function body. Got 'int' at line 5
---- FAIL: TestParser_Parse (0.00s)
-=== RUN   TestParseMultipleReturnValues
-    parser_test.go:89: Return should have 2 values, got 3
---- FAIL: TestParseMultipleReturnValues (0.00s)
-FAIL
-FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/parser 0.278s
-FAIL
+cannot use tupleType (variable of type *value.TypeInfo) as *value.NiftelTupleType value in argument to value.NewTupleValuecompiler

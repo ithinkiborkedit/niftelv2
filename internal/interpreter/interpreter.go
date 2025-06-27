@@ -694,24 +694,48 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) error {
 }
 
 func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
-	var results []value.Value
-	for _, expr := range stmt.Values {
-		val, err := i.Evaluate(expr)
+	var result value.Value
+	var err error
+
+	if len(stmt.Values) == 0 {
+		result = value.Null()
+	} else if len(stmt.Values) == 1 {
+		result, err := i.Evaluate(stmt.Values[0])
 		if err != nil {
 			return err
 		}
-		results = append(results, val)
-	}
-	if len(results) == 0 {
-		panic(runtimecontrol.ReturnValue{Value: value.Null()})
-	} else if len(results) == 1 {
-		panic(runtimecontrol.ReturnValue{Value: results[0]})
 	} else {
-		panic(runtimecontrol.ReturnValue{Value: value.Value{
-			Type: value.ValueList,
-			Data: results,
-		}})
+		vals := make([]value.Value, len(stmt.Values))
+		types := make([]*value.TypeInfo, len(stmt.Values))
+		for idx, expr := range stmt.Values {
+			val, err := i.Evaluate(expr)
+			if err != nil {
+				return err
+			}
+			vals[idx] = val
+			types[idx] = val.TypeInfo()
+		}
+		tupleType := value.GetOrRegisterTupleType(types)
+		tupleVal := value.NewTupleValue(tupleType, vals)
 	}
+
+	// for _, expr := range stmt.Values {
+	// 	val, err := i.Evaluate(expr)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	results = append(results, val)
+	// }
+	// if len(results) == 0 {
+	// 	panic(runtimecontrol.ReturnValue{Value: value.Null()})
+	// } else if len(results) == 1 {
+	// 	panic(runtimecontrol.ReturnValue{Value: results[0]})
+	// } else {
+	// 	panic(runtimecontrol.ReturnValue{Value: value.Value{
+	// 		Type: value.ValueList,
+	// 		Data: results,
+	// 	}})
+	// }
 	// var retVal value.Value
 	// var err error
 	// if stmt.Value != nil {

@@ -12,6 +12,14 @@ const (
 	TypeKindStruct TypeKind = iota
 	TypeKindEnum
 	TypeKindBuiltin
+	TypeKindTuple
+	TypeKindList
+	TypeKindInt
+	TypeKindFloat
+	TypeKindString
+	TypeKindBool
+	TypeKindNull
+	TypeKindFunc
 )
 
 type TypeInfo struct {
@@ -43,15 +51,23 @@ func TupleTypeKey(elementTypes []*TypeInfo) string {
 	return "(" + strings.Join(parts, ",") + ")"
 }
 
-func GetOrRegisterTupleType(elementTypes []*TypeInfo) *NiftelTupleType {
+func GetOrRegisterTupleType(elementTypes []*TypeInfo) *TypeInfo {
 	key := TupleTypeKey(elementTypes)
-	t, ok := tupleTypes[key]
-	if ok {
+	if t, ok := GetType(key); ok {
 		return t
 	}
-	t = NewTupleType(elementTypes)
-	tupleTypes[key] = t
-	return t
+	tupleType := &TypeInfo{
+		Name:          key,
+		Kind:          TypeKindTuple,
+		Fields:        nil,
+		Methods:       nil,
+		GenericParams: nil,
+	}
+	RegisterType(key, tupleType)
+	// t = NewTupleType(elementTypes)
+	// tupleTypes[key] = t
+	return tupleType
+
 }
 
 var globalRegistry = TypeRegistry{
@@ -96,12 +112,15 @@ func ListTypes() []string {
 }
 
 func BuiltinTypesInit() {
-	RegisterType("int", &TypeInfo{Name: "int", Kind: TypeKindBuiltin})
-	RegisterType("float", &TypeInfo{Name: "float", Kind: TypeKindBuiltin})
-	RegisterType("string", &TypeInfo{Name: "string", Kind: TypeKindBuiltin})
-	RegisterType("bool", &TypeInfo{Name: "bool", Kind: TypeKindBuiltin})
-	RegisterType("null", &TypeInfo{Name: "null", Kind: TypeKindBuiltin})
-	RegisterType("tuple", &TypeInfo{Name: "tuple", Kind: TypeKindBuiltin})
+	RegisterType("int", &TypeInfo{Name: "int", Kind: TypeKindInt})
+	RegisterType("float", &TypeInfo{Name: "float", Kind: TypeKindFloat})
+	RegisterType("string", &TypeInfo{Name: "string", Kind: TypeKindString})
+	RegisterType("bool", &TypeInfo{Name: "bool", Kind: TypeKindBool})
+	RegisterType("null", &TypeInfo{Name: "null", Kind: TypeKindNull})
+	RegisterType("tuple", &TypeInfo{Name: "tuple", Kind: TypeKindTuple})
+	RegisterType("list", &TypeInfo{Name: "list", Kind: TypeKindList})
+	RegisterType("struct", &TypeInfo{Name: "struct", Kind: TypeKindStruct})
+	RegisterType("func", &TypeInfo{Name: "fun", Kind: TypeKindFunc})
 }
 
 func RegisterExampleStruct() {
