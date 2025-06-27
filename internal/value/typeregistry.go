@@ -2,6 +2,7 @@ package value
 
 import (
 	"errors"
+	"strings"
 	"sync"
 )
 
@@ -30,6 +31,27 @@ type FuncInfo struct {
 type TypeRegistry struct {
 	mu    sync.RWMutex
 	types map[string]*TypeInfo
+}
+
+var tupleTypes = map[string]*NiftelTupleType{}
+
+func TupleTypeKey(elementTypes []*TypeInfo) string {
+	var parts []string
+	for _, t := range elementTypes {
+		parts = append(parts, t.Name)
+	}
+	return "(" + strings.Join(parts, ",") + ")"
+}
+
+func GetOrRegisterTupleType(elementTypes []*TypeInfo) *NiftelTupleType {
+	key := TupleTypeKey(elementTypes)
+	t, ok := tupleTypes[key]
+	if ok {
+		return t
+	}
+	t = NewTupleType(elementTypes)
+	tupleTypes[key] = t
+	return t
 }
 
 var globalRegistry = TypeRegistry{
@@ -79,6 +101,7 @@ func BuiltinTypesInit() {
 	RegisterType("string", &TypeInfo{Name: "string", Kind: TypeKindBuiltin})
 	RegisterType("bool", &TypeInfo{Name: "bool", Kind: TypeKindBuiltin})
 	RegisterType("null", &TypeInfo{Name: "null", Kind: TypeKindBuiltin})
+	RegisterType("tuple", &TypeInfo{Name: "tuple", Kind: TypeKindBuiltin})
 }
 
 func RegisterExampleStruct() {

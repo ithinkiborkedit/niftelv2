@@ -18,7 +18,7 @@ func TestParser_Parse(t *testing.T) {
 		var x: int = 42
 		var y: int = x + 1
 
-		func foo() -> int {
+		func foo() -> (int,int) {
 		  return 1
 		}
 		print(x)
