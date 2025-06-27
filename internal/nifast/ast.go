@@ -111,8 +111,8 @@ func (e *FuncExpr) Pos() (int, int) { return e.Func.Line, e.Func.Column }
 //STATEMENTS
 
 type VarStmt struct {
-	Name token.Token
-	Type token.Token
+	Name []token.Token
+	Type []token.Token
 	Init Expr
 }
 
@@ -211,7 +211,7 @@ func (s *StructStmt) Pos() (int, int) { return s.Struct.Line, s.Struct.Column }
 
 type ReturnStmt struct {
 	Keyword token.Token
-	Value   Expr
+	Values  []Expr
 }
 
 func (*ReturnStmt) stmtNode()         {}

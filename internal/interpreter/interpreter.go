@@ -672,18 +672,36 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) error {
 }
 
 func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
-	var retVal value.Value
-	var err error
-	if stmt.Value != nil {
-		retVal, err = i.Evaluate(stmt.Value)
+	var results []value.Value
+	for _, expr := range stmt.Values {
+		val, err := i.Evaluate(expr)
 		if err != nil {
 			return err
 		}
-	} else {
-		retVal = value.Null()
+		results = append(results, val)
 	}
+	if len(results) == 0 {
+		panic(runtimecontrol.ReturnValue{Value: value.Null()})
+	} else if len(results) == 1 {
+		panic(runtimecontrol.ReturnValue{Value: results[0]})
+	} else {
+		panic(runtimecontrol.ReturnValue{Value: value.Value{
+			Type: value.ValueList,
+			Data: results,
+		}})
+	}
+	// var retVal value.Value
+	// var err error
+	// if stmt.Value != nil {
+	// 	retVal, err = i.Evaluate(stmt.Value)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// } else {
+	// 	retVal = value.Null()
+	// }
 	// panic with a special ReturnValue to unwind execution
-	panic(runtimecontrol.ReturnValue{Value: retVal})
+	// panic(runtimecontrol.ReturnValue{Value: retVal})
 }
 
 // VisitBreakStmt handles break statement in loops.

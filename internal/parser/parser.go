@@ -765,14 +765,34 @@ func (p *Parser) printStatement() (ast.Stmt, error) {
 func (p *Parser) returnStatement() (ast.Stmt, error) {
 	keyword := p.previous()
 
-	var value ast.Expr
-
+	var values []ast.Expr
 	if !p.check(token.TokenNewLine) && !p.check(token.TokenRBrace) && !p.isAtEnd() {
-		val, err := p.expression()
+		first, err := p.expression()
 		if err != nil {
 			return nil, err
 		}
-		value = val
+
+		values = append(values, first)
+
+		for {
+			ok, err := p.match(token.TokenComma)
+			if err != nil {
+				return nil, err
+			}
+			if !ok {
+				break
+			}
+			next, err := p.expression()
+			if err != nil {
+				return nil, err
+			}
+			values = append(values, next)
+			if err != nil {
+				return nil, err
+			}
+			values = append(values, next)
+		}
+
 	}
 	err := p.skipnewLines()
 	if err != nil {
@@ -781,8 +801,28 @@ func (p *Parser) returnStatement() (ast.Stmt, error) {
 
 	return &ast.ReturnStmt{
 		Keyword: keyword,
-		Value:   value,
+		Values:  values,
 	}, nil
+	// keyword := p.previous()
+
+	// var value ast.Expr
+
+	// if !p.check(token.TokenNewLine) && !p.check(token.TokenRBrace) && !p.isAtEnd() {
+	// 	val, err := p.expression()
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	value = val
+	// }
+	// err := p.skipnewLines()
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// return &ast.ReturnStmt{
+	// 	Keyword: keyword,
+	// 	Value:   value,
+	// }, nil
 }
 
 func (p *Parser) ifStatement() (ast.Stmt, error) {
