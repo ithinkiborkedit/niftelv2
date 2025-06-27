@@ -371,9 +371,9 @@ func (p *Parser) varDeclaration() (ast.Stmt, error) {
 	}
 
 	return &ast.VarStmt{
-		Name: name,
-		Type: typ,
-		Init: init,
+		Names: []token.Token{name},
+		Type:  typ,
+		Init:  init,
 	}, nil
 }
 
@@ -1197,8 +1197,8 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 				return nil, err
 			}
 			fields = append(fields, ast.VarStmt{
-				Name: fieldName,
-				Type: fieldType,
+				Names: []token.Token{fieldName},
+				Type:  fieldType,
 			})
 			err = p.skipnewLines()
 			if err != nil {

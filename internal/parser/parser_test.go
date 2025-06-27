@@ -17,6 +17,10 @@ func TestParser_Parse(t *testing.T) {
 	source := `
 		var x: int = 42
 		var y: int = x + 1
+
+		func foo() -> (int,int) {
+		  return 1,2
+		}
 		print(x)
 	`
 	// Use the lexer directly as TokenSource
