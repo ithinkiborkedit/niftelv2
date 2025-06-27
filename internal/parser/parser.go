@@ -1028,7 +1028,7 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 	// }
 
 	for !p.check(token.TokenRBrace) && !p.isAtEnd() {
-		fmt.Printf("[PARSERLOOP] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
+		fmt.Printf("[PARSERLOOP] struct body: type=%d  lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
 		// Allow and skip any number of blank lines or newlines
 		err = p.skipnewLines()
 		if err != nil {
