@@ -1006,10 +1006,10 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 }
 
 func (p *Parser) structDeclartion() (ast.Stmt, error) {
-	err := p.skipnewLines()
-	if err != nil {
-		return nil, err
-	}
+	// err := p.skipnewLines()
+	// if err != nil {
+	// 	return nil, err
+	// }
 	fmt.Printf("[AFTER SKIP NEW LINES] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
 	structTok := p.previous()
 
@@ -1023,11 +1023,19 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 
 	var fields []ast.VarStmt
 	var methods []ast.FuncStmt
 
 	for !p.check(token.TokenRBrace) && !p.isAtEnd() {
+		err := p.skipnewLines()
+		if err != nil {
+			return nil, err
+		}
 		fmt.Printf("[PARSERLOOP] struct body: type=%d  lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
 		// Allow and skip any number of blank lines or newlines
 		err = p.skipnewLines()
