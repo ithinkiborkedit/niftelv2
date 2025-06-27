@@ -499,6 +499,60 @@ func (p *Parser) finishCall(callee ast.Expr) (ast.Expr, error) {
 	}, nil
 }
 
+func (p *Parser) structLiteralExpr(typeName token.Token) (ast.Expr, error) {
+	lbrace, err := p.consume(token.TokenLBrace, "expected '{' after struct type name")
+	if err != nil {
+		return nil, err
+	}
+
+	fields := make(map[string]ast.Expr)
+
+	for {
+		err := p.skipnewLines()
+		if err != nil {
+			return nil, err
+		}
+		if p.check(token.TokenRBrace) {
+			break
+		}
+
+		fieldTok, err := p.consume(token.TokenIdentifier, "expected field name in struct literal")
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = p.consume(token.TokenColon, "expected ':' after struct field name")
+		if err != nil {
+			return nil, err
+		}
+
+		valExpr, err := p.expression()
+		if err != nil {
+			return nil, err
+		}
+		fields[fieldTok.Lexeme] = valExpr
+		if ok, _ := p.match(token.TokenComma); ok {
+			continue
+		}
+		_ = p.skipnewLines()
+		if p.check(token.TokenRBrace) {
+			break
+		}
+	}
+
+	_, err = p.consume(token.TokenRBrace, "expected '}' after struct literal fields")
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.StructLiteralExpr{
+		TypeName: typeName,
+		Fields:   fields,
+		LBrace:   lbrace,
+	}, nil
+
+}
+
 func (p *Parser) primaryExpr() (ast.Expr, error) {
 	ok, err := p.match(token.TokenFunc)
 	if err != nil {
@@ -545,6 +599,17 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 	}
 	if ok {
 		return &ast.LiteralExpr{Value: p.prev}, nil
+	}
+	ok, err = p.match(token.TokenIdentifier)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		typeName := p.prev
+		if p.check(token.TokenLBrace) {
+			return p.structLiteralExpr(typeName)
+		}
+		return &ast.VariableExpr{Name: typeName}, nil
 	}
 	ok, err = p.match(token.TokenIdentifier)
 	if err != nil {

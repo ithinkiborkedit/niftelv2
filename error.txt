@@ -1,10 +1,13 @@
-Niftel REPL v0
 >>> struct Person {
 ... name: string
 ... age: int
+... 
+... func greet(greet: string) -> string {
+... return greet
+... }
 ... }
 [REPL RAW BUFFER]
-"struct Person {\nname: string\nage: int\n}\n"
+"struct Person {\nname: string\nage: int\n\nfunc greet(greet: string) -> string {\nreturn greet\n}\n}\n"
 000: 's' (115)
 001: 't' (116)
 002: 'r' (114)
@@ -43,8 +46,62 @@ Niftel REPL v0
 035: 'n' (110)
 036: 't' (116)
 037: '\n' (10)
-038: '}' (125)
-039: '\n' (10)
+038: '\n' (10)
+039: 'f' (102)
+040: 'u' (117)
+041: 'n' (110)
+042: 'c' (99)
+043: ' ' (32)
+044: 'g' (103)
+045: 'r' (114)
+046: 'e' (101)
+047: 'e' (101)
+048: 't' (116)
+049: '(' (40)
+050: 'g' (103)
+051: 'r' (114)
+052: 'e' (101)
+053: 'e' (101)
+054: 't' (116)
+055: ':' (58)
+056: ' ' (32)
+057: 's' (115)
+058: 't' (116)
+059: 'r' (114)
+060: 'i' (105)
+061: 'n' (110)
+062: 'g' (103)
+063: ')' (41)
+064: ' ' (32)
+065: '-' (45)
+066: '>' (62)
+067: ' ' (32)
+068: 's' (115)
+069: 't' (116)
+070: 'r' (114)
+071: 'i' (105)
+072: 'n' (110)
+073: 'g' (103)
+074: ' ' (32)
+075: '{' (123)
+076: '\n' (10)
+077: 'r' (114)
+078: 'e' (101)
+079: 't' (116)
+080: 'u' (117)
+081: 'r' (114)
+082: 'n' (110)
+083: ' ' (32)
+084: 'g' (103)
+085: 'r' (114)
+086: 'e' (101)
+087: 'e' (101)
+088: 't' (116)
+089: '\n' (10)
+090: '}' (125)
+091: '\n' (10)
+092: '}' (125)
+093: '\n' (10)
 [AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Person' line='1'
 [AFTER OPENING '{' ] struct body: token 
  lexem='
@@ -53,6 +110,84 @@ Niftel REPL v0
  after '{' ] struct body: token IDENTIFIER lexem='name' line='2'
 [PARSERLOOP] struct body: type=1  lexem='name' line='2'
 [PARSERLOOP] struct body: type=1  lexem='age' line='3'
-DEBUG stms: []nifast.Stmt{(*nifast.StructStmt)(0x140001060a0)}
+[PARSERLOOP] struct body: type=53  lexem='func' line='5'
+DEBUG stms: []nifast.Stmt{(*nifast.StructStmt)(0x140001aa000)}
 REPL: STATEMENT type: *nifast.StructStmt
-[INFO] REGISTERED struct type: 'Person
+[INFO] REGISTERED struct type: 'Person'
+>>> var p: Person = Person {name: "miles", age: 36}
+... 
+[REPL RAW BUFFER]
+"var p: Person = Person {name: \"miles\", age: 36}\n\n"
+000: 'v' (118)
+001: 'a' (97)
+002: 'r' (114)
+003: ' ' (32)
+004: 'p' (112)
+005: ':' (58)
+006: ' ' (32)
+007: 'P' (80)
+008: 'e' (101)
+009: 'r' (114)
+010: 's' (115)
+011: 'o' (111)
+012: 'n' (110)
+013: ' ' (32)
+014: '=' (61)
+015: ' ' (32)
+016: 'P' (80)
+017: 'e' (101)
+018: 'r' (114)
+019: 's' (115)
+020: 'o' (111)
+021: 'n' (110)
+022: ' ' (32)
+023: '{' (123)
+024: 'n' (110)
+025: 'a' (97)
+026: 'm' (109)
+027: 'e' (101)
+028: ':' (58)
+029: ' ' (32)
+030: '"' (34)
+031: 'm' (109)
+032: 'i' (105)
+033: 'l' (108)
+034: 'e' (101)
+035: 's' (115)
+036: '"' (34)
+037: ',' (44)
+038: ' ' (32)
+039: 'a' (97)
+040: 'g' (103)
+041: 'e' (101)
+042: ':' (58)
+043: ' ' (32)
+044: '3' (51)
+045: '6' (54)
+046: '}' (125)
+047: '\n' (10)
+048: '\n' (10)
+DEBUG stms: []nifast.Stmt{(*nifast.VarStmt)(0x14000198180)}
+REPL: STATEMENT type: *nifast.VarStmt
+ENV DEFINING 'p' as type 7>>> 
+>>> p.greet(hello)
+[REPL RAW BUFFER]
+"p.greet(hello)\n"
+000: 'p' (112)
+001: '.' (46)
+002: 'g' (103)
+003: 'r' (114)
+004: 'e' (101)
+005: 'e' (101)
+006: 't' (116)
+007: '(' (40)
+008: 'h' (104)
+009: 'e' (101)
+010: 'l' (108)
+011: 'l' (108)
+012: 'o' (111)
+013: ')' (41)
+014: '\n' (10)
+DEBUG stms: []nifast.Stmt{(*nifast.ExprStmt)(0x14000182280)}
+REPL: STATEMENT type: *nifast.ExprStmt
+ENV LOOKING UP 'p' as type 7Runtime error: struct field 'greet' not found
