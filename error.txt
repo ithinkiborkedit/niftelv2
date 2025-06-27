@@ -1,1 +1,8 @@
-cannot use tupleType (variable of type *value.TypeInfo) as *value.NiftelTupleType value in argument to value.NewTupleValuecompiler
+=== RUN   TestParser_Parse
+    parser_test.go:35: Expected 3 statements, got 4
+--- FAIL: TestParser_Parse (0.00s)
+=== RUN   TestParseMultipleReturnValues
+--- PASS: TestParseMultipleReturnValues (0.00s)
+FAIL
+FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/parser 0.233s
+FAIL

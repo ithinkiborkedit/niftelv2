@@ -787,10 +787,6 @@ func (p *Parser) returnStatement() (ast.Stmt, error) {
 				return nil, err
 			}
 			values = append(values, next)
-			if err != nil {
-				return nil, err
-			}
-			values = append(values, next)
 		}
 
 	}

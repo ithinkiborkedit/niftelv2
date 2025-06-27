@@ -137,7 +137,7 @@ func (v Value) TypeInfo() *TypeInfo {
 		return t
 	case ValueTuple:
 		if tval, ok := v.Data.(*NiftelTupleValue); ok {
-			return tval.Type.TypeInfo()
+			return tval.Type
 		}
 		return nil
 	default:
