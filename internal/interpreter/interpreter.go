@@ -276,7 +276,10 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) error {
 
 	fields := make(map[string]*value.TypeInfo)
 	for _, field := range stmt.Fields {
-		fieldName := field.Name.Lexeme
+		if len(field.Names) != 1 {
+			return fmt.Errorf("struct field must have exactly one name!")
+		}
+		fieldName := field.Names[0].Lexeme
 		fieldTypeName := field.Type.Lexeme
 		fieldType, ok := value.GetType(fieldTypeName)
 		if !ok {
@@ -307,7 +310,26 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) error {
 	if err != nil {
 		return err
 	}
-	i.env.Define(stmt.Name.Lexeme, val)
+	if len(stmt.Names) == 1 {
+		i.env.Define(stmt.Names[0].Lexeme, val)
+		return nil
+	}
+
+	values, ok := val.Data.([]value.Value)
+	if !ok {
+		return fmt.Errorf("cannot unpack non-tuple value to multiple variables")
+	}
+	if len(values) != len(stmt.Names) {
+		return fmt.Errorf("mismatch: %d variables but %d values returned", len(stmt.Names), len(values))
+	}
+	for idx, name := range stmt.Names {
+		i.env.Define(name.Lexeme, values[idx])
+	}
+	// val, err := i.Evaluate(stmt.Init)
+	// if err != nil {
+	// 	return err
+	// }
+	// i.env.Define(stmt.Name.Lexeme, val)
 	return nil
 }
 

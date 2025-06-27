@@ -111,13 +111,18 @@ func (e *FuncExpr) Pos() (int, int) { return e.Func.Line, e.Func.Column }
 //STATEMENTS
 
 type VarStmt struct {
-	Name []token.Token
-	Type []token.Token
-	Init Expr
+	Names []token.Token
+	Type  token.Token
+	Init  Expr
 }
 
-func (*VarStmt) stmtNode()         {}
-func (s *VarStmt) Pos() (int, int) { return s.Name.Line, s.Name.Column }
+func (*VarStmt) stmtNode() {}
+func (s *VarStmt) Pos() (int, int) {
+	if len(s.Names) > 0 {
+		return s.Names[0].Line, s.Names[0].Column
+	}
+	return 0, 0
+}
 
 type ShortVarStmt struct {
 	Name token.Token
