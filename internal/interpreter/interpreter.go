@@ -71,6 +71,8 @@ func (i *Interpreter) Execute(stmt ast.Stmt) error {
 		return i.VisitPrintStmt(s)
 	case *ast.ExprStmt:
 		return i.VisitExprStmt(s)
+	case *ast.StructStmt:
+		return i.VisitStructStmt(s)
 	case *ast.IfStmt:
 		return i.VisitIfStmt(s)
 	case *ast.WhileStmt:
@@ -263,6 +265,41 @@ func (i *Interpreter) VisitUnaryExpr(expr *ast.UnaryExpr) (value.Value, error) {
 // Implement remaining expression visitors: VisitCallExpr, VisitGetExpr, VisitListExpr, VisitDictExpr, VisitFuncExpr
 
 // --- Statement Visitors ---
+
+func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) error {
+	structName := stmt.Name.Lexeme
+
+	if value.HasType(structName) {
+		return fmt.Errorf("struct %s already defined", structName)
+	}
+
+	fields := make(map[string]*value.TypeInfo)
+	for _, field := range stmt.Fields {
+		fieldName := field.Name.Lexeme
+		fieldTypeName := field.Type.Lexeme
+		fieldType, ok := value.GetType(fieldTypeName)
+		if !ok {
+			return fmt.Errorf("Uknown type '%s' for struct field '%s'", fieldTypeName, fieldName)
+		}
+		fields[fieldName] = fieldType
+	}
+	methods := make(map[string]*value.FuncInfo)
+	for _, method := range stmt.Methods {
+		methods[method.Name.Lexeme] = &value.FuncInfo{
+			Name: method.Name.Lexeme,
+		}
+	}
+
+	typeInfo := &value.TypeInfo{
+		Name:    structName,
+		Kind:    value.TypeKindStruct,
+		Fields:  fields,
+		Methods: methods,
+	}
+	value.RegisterType(structName, typeInfo)
+	fmt.Printf("[INFO] REGISTERED struct type: '%s'\n")
+	return nil
+}
 
 func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) error {
 	val, err := i.Evaluate(stmt.Init)
