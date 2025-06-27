@@ -39,6 +39,10 @@ func main() {
 		buffer.WriteString(line)
 
 		lex := lexer.New(buffer.String())
+		fmt.Printf("[REPL RAW BUFFER]\n%q\n", buffer.String())
+		for i, c := range buffer.String() {
+			fmt.Printf("%03d: %q (%d)\n", i, c, c)
+		}
 		par := parser.New(lex)
 		stmts, err := par.Parse()
 		fmt.Printf("DEBUG stms: %#v\n", stmts)

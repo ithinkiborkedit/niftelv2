@@ -1019,14 +1019,21 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 	}
 
 	_, err = p.consume(token.TokenLBrace, "expected '{' after struct name")
-	fmt.Printf("[DEBUGG] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
+	fmt.Printf("[AFTER OPENING '{' ] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
 	if err != nil {
 		return nil, err
 	}
-	err = p.skipnewLines()
-	if err != nil {
-		return nil, err
+
+	for p.check(token.TokenNewLine) {
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
 	}
+	fmt.Printf("[Trying to check for \n after '{' ] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
+	// err = p.skipnewLines()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	var fields []ast.VarStmt
 	var methods []ast.FuncStmt

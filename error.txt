@@ -1,8 +1,28 @@
 Niftel REPL v0
 >>> struct Person {
+[REPL RAW BUFFER]
+"struct Person {\n"
+000: 's' (115)
+001: 't' (116)
+002: 'r' (114)
+003: 'u' (117)
+004: 'c' (99)
+005: 't' (116)
+006: ' ' (32)
+007: 'P' (80)
+008: 'e' (101)
+009: 'r' (114)
+010: 's' (115)
+011: 'o' (111)
+012: 'n' (110)
+013: ' ' (32)
+014: '{' (123)
+015: '\n' (10)
 [AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Person' line='1'
-[DEBUGG] struct body: token 
+[AFTER OPENING '{' ] struct body: token 
  lexem='
 ' line='1'
+[Trying to check for 
+ after '{' ] struct body: token EOF lexem='' line='2'
 DEBUG stms: []nifast.Stmt(nil)
 Parser error: [Parse error] expected '}' after struct body. Got '' at line 2 
