@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
+	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
 )
 
@@ -36,25 +36,25 @@ func TestParser_Parse(t *testing.T) {
 	}
 
 	// Check first statement: var x: int = 42
-	var1, ok := stmts[0].(*nifast.VarStmt)
+	var1, ok := stmts[0].(*ast.VarStmt)
 	if !ok {
 		t.Fatalf("First stmt is not VarStmt, got %T", stmts[0])
 	}
-	if var1.Name.Lexeme != "x" {
-		t.Errorf("Expected var name 'x', got %q", var1.Name.Lexeme)
+	if var1.Names[0].Lexeme != "x" {
+		t.Errorf("Expected var name 'x', got %q", var1.Names[0].Lexeme)
 	}
 
 	// Check second statement: var y: int = x + 1
-	var2, ok := stmts[1].(*nifast.VarStmt)
+	var2, ok := stmts[1].(*ast.VarStmt)
 	if !ok {
 		t.Fatalf("Second stmt is not VarStmt, got %T", stmts[1])
 	}
-	if var2.Name.Lexeme != "y" {
-		t.Errorf("Expected var name 'y', got %q", var2.Name.Lexeme)
+	if var2.Names[0].Lexeme != "y" {
+		t.Errorf("Expected var name 'y', got %q", var2.Names[0].Lexeme)
 	}
 
 	// Check third statement: print(x)
-	printStmt, ok := stmts[2].(*nifast.PrintStmt)
+	printStmt, ok := stmts[2].(*ast.PrintStmt)
 	if !ok {
 		t.Fatalf("Third stmt is not PrintStmt, got %T", stmts[2])
 	}

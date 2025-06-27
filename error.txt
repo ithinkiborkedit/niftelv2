@@ -1,10 +1,6 @@
-[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Person' line='1'
-[AFTER OPENING '{' ] struct body: token 
- lexem='
-' line='1'
-[Trying to check for 
- after '{' ] struct body: token IDENTIFIER lexem='name' line='2'
-[PARSERLOOP] struct body: type=1  lexem='name' line='2'
-[PARSERLOOP] struct body: type=1  lexem='age' line='3'
-[INFO] REGISTERED struct type: 'Person'
-ENV LOOKING UP 'name' as type 0runtime error: undefined variable nameENV LOOKING UP 'p' as type 0runtime error: undefined variable p%
+=== RUN   TestParser_Parse
+    parser_test.go:32: Parse failed: [Parse error] expect return type after '->' . Got '{' at line 5
+--- FAIL: TestParser_Parse (0.00s)
+=== RUN   TestParseMultipleReturnValues
+    parser_test.go:73: Parser error: [Parse error] expect return type after '->' . Got '{' at line 2
+--- FAIL: TestParseMultipleReturnValues (0.00s)

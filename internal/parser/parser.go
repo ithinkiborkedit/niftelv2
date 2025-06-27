@@ -1019,17 +1019,64 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	var returnType token.Token
+	var returnTypes []token.Token
 	ok, err := p.match(token.TokenArrow)
 	if err != nil {
 		return nil, err
 	}
 	if ok {
-		returnType, err = p.consume(token.TokenIdentifier, "expect return type after '->'")
+		if p.check(token.TokenLParen) {
+			_, err := p.consume(token.TokenLParen, "expected '(' after -> for multiple return types")
+			if err != nil {
+				return nil, err
+			}
+			for {
+				typ, err := p.consume(token.TokenIdentifier, "expect return type in tuple")
+				if err != nil {
+					return nil, err
+				}
+				returnTypes = append(returnTypes, typ)
+				ok, err := p.match(token.TokenComma)
+				if err != nil {
+					return nil, err
+				}
+				if !ok {
+					break
+				}
+			}
+			_, err = p.consume(token.TokenRParen, "expect ')' after multiple types")
+			if err != nil {
+				return nil, err
+			} else {
+				typ, err := p.consume(token.TokenIdentifier, "expect return type after '->' ")
+				if err != nil {
+					return nil, err
+				}
+				returnTypes = append(returnTypes, typ)
+			}
+		}
+		_, err = p.consume(token.TokenLBrace, "expected '{ before function body")
 		if err != nil {
 			return nil, err
 		}
+		body, err := p.blockStatement()
+		if err != nil {
+			return nil, err
+		}
+		return &ast.FuncStmt{
+			Func:   funcTok,
+			Name:   name,
+			Params: params,
+			Body:   body,
+			Return: returnTypes,
+		}, nil
 	}
+	// if ok {
+	// 	returnType, err = p.consume(token.TokenIdentifier, "expect return type after '->'")
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	_, err = p.consume(token.TokenLBrace, "expect '{' before function body")
 	if err != nil {
@@ -1045,7 +1092,7 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 		Name:   name,
 		Params: params,
 		Body:   body,
-		Return: returnType,
+		Return: returnTypes,
 	}, nil
 }
 

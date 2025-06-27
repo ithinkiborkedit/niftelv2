@@ -197,7 +197,7 @@ type FuncStmt struct {
 	Name   token.Token
 	Params []Param
 	Body   *BlockStmt
-	Return token.Token
+	Return []token.Token
 	Func   token.Token
 }
 
