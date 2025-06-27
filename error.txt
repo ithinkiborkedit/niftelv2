@@ -7,8 +7,6 @@
 ENV DEFINING 'p' as type 7ENV LOOKING UP 'p' as type 7--- PASS: TestStructDeclarationAndInstantiation (0.00s)
 === RUN   TestStructFieldDefaultsAndMissingFields
 [INFO] REGISTERED struct type: 'Point'
-ENV DEFINING 'p2' as type 7ENV LOOKING UP 'p2' as type 7    parserstruct_test.go:133: expected y=null, got null
---- FAIL: TestStructFieldDefaultsAndMissingFields (0.00s)
-FAIL
-FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/interpreter    0.236s
-FAIL
+ENV DEFINING 'p2' as type 7ENV LOOKING UP 'p2' as type 7--- PASS: TestStructFieldDefaultsAndMissingFields (0.00s)
+PASS
+ok      github.com/ithinkiborkedit/niftelv2.git/internal/interpreter    0.288s
