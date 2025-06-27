@@ -1022,10 +1022,10 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 	var fields []ast.VarStmt
 	var methods []ast.FuncStmt
 
-	err = p.skipnewLines()
-	if err != nil {
-		return nil, err
-	}
+	// err = p.skipnewLines()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	for !p.check(token.TokenRBrace) && !p.isAtEnd() {
 		fmt.Printf("[PARSERLOOP] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
