@@ -297,7 +297,7 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) error {
 		Methods: methods,
 	}
 	value.RegisterType(structName, typeInfo)
-	fmt.Printf("[INFO] REGISTERED struct type: '%s'\n")
+	fmt.Printf("[INFO] REGISTERED struct type: '%s'\n", stmt.Name.Lexeme)
 	return nil
 }
 

@@ -1,10 +1,10 @@
 Niftel REPL v0
->>> struct Point {
-... x: int
-... y: int
+>>> struct Person {
+... name: string
+... age: int
 ... }
 [REPL RAW BUFFER]
-"struct Point {\nx: int\ny: int\n}\n"
+"struct Person {\nname: string\nage: int\n}\n"
 000: 's' (115)
 001: 't' (116)
 002: 'r' (114)
@@ -13,37 +13,46 @@ Niftel REPL v0
 005: 't' (116)
 006: ' ' (32)
 007: 'P' (80)
-008: 'o' (111)
-009: 'i' (105)
-010: 'n' (110)
-011: 't' (116)
-012: ' ' (32)
-013: '{' (123)
-014: '\n' (10)
-015: 'x' (120)
-016: ':' (58)
-017: ' ' (32)
-018: 'i' (105)
-019: 'n' (110)
-020: 't' (116)
-021: '\n' (10)
-022: 'y' (121)
-023: ':' (58)
-024: ' ' (32)
+008: 'e' (101)
+009: 'r' (114)
+010: 's' (115)
+011: 'o' (111)
+012: 'n' (110)
+013: ' ' (32)
+014: '{' (123)
+015: '\n' (10)
+016: 'n' (110)
+017: 'a' (97)
+018: 'm' (109)
+019: 'e' (101)
+020: ':' (58)
+021: ' ' (32)
+022: 's' (115)
+023: 't' (116)
+024: 'r' (114)
 025: 'i' (105)
 026: 'n' (110)
-027: 't' (116)
+027: 'g' (103)
 028: '\n' (10)
-029: '}' (125)
-030: '\n' (10)
-[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Point' line='1'
+029: 'a' (97)
+030: 'g' (103)
+031: 'e' (101)
+032: ':' (58)
+033: ' ' (32)
+034: 'i' (105)
+035: 'n' (110)
+036: 't' (116)
+037: '\n' (10)
+038: '}' (125)
+039: '\n' (10)
+[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Person' line='1'
 [AFTER OPENING '{' ] struct body: token 
  lexem='
 ' line='1'
 [Trying to check for 
- after '{' ] struct body: token IDENTIFIER lexem='x' line='2'
-[PARSERLOOP] struct body: type=1  lexem='x' line='2'
-[PARSERLOOP] struct body: type=1  lexem='y' line='3'
-DEBUG stms: []nifast.Stmt{(*nifast.StructStmt)(0x140000a40a0)}
+ after '{' ] struct body: token IDENTIFIER lexem='name' line='2'
+[PARSERLOOP] struct body: type=1  lexem='name' line='2'
+[PARSERLOOP] struct body: type=1  lexem='age' line='3'
+DEBUG stms: []nifast.Stmt{(*nifast.StructStmt)(0x140001060a0)}
 REPL: STATEMENT type: *nifast.StructStmt
-[INFO] REGISTERED struct type: '%!s(MISSING)'
+[INFO] REGISTERED struct type: 'Person
