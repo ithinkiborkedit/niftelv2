@@ -1,4 +1,4 @@
-package interpreter
+package controlflow
 
 import "github.com/ithinkiborkedit/niftelv2.git/internal/value"
 

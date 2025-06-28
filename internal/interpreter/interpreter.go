@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/ithinkiborkedit/niftelv2.git/internal/controlflow"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/function"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
@@ -59,7 +60,7 @@ func (i *Interpreter) Evaluate(expr ast.Expr) (value.Value, error) {
 }
 
 // Execute dispatches to the correct Stmt handler.
-func (i *Interpreter) Execute(stmt ast.Stmt) ExecResult {
+func (i *Interpreter) Execute(stmt ast.Stmt) controlflow.ExecResult {
 	switch s := stmt.(type) {
 	case *ast.VarStmt:
 		return i.VisitVarStmt(s)
@@ -90,7 +91,7 @@ func (i *Interpreter) Execute(stmt ast.Stmt) ExecResult {
 	case *ast.BlockStmt:
 		return i.VisitBlockStmt(s)
 	default:
-		return fmt.Errorf("unknown statement type %T", stmt)
+		return controlflow.ExecResult{Err: fmt.Errorf("unknown statement type %T", stmt)}
 	}
 }
 
@@ -266,23 +267,23 @@ func (i *Interpreter) VisitUnaryExpr(expr *ast.UnaryExpr) (value.Value, error) {
 
 // --- Statement Visitors ---
 
-func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) ExecResult {
+func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) controlflow.ExecResult {
 	structName := stmt.Name.Lexeme
 
 	if value.HasType(structName) {
-		return ExecResult{Err: fmt.Errorf("struct '%s' already defined", structName)}
+		return controlflow.ExecResult{Err: fmt.Errorf("struct '%s' already defined", structName)}
 	}
 
 	fields := make(map[string]*value.TypeInfo)
 	for _, field := range stmt.Fields {
 		if len(field.Names) != 1 {
-			return ExecResult{Err: fmt.Errorf("struct field must have exactly one name!")}
+			return controlflow.ExecResult{Err: fmt.Errorf("struct field must have exactly one name!")}
 		}
 		fieldName := field.Names[0].Lexeme
 		fieldTypeName := field.Type.Lexeme
 		fieldType, ok := value.GetType(fieldTypeName)
 		if !ok {
-			return ExecResult{Err: fmt.Errorf("Uknown type '%s' for struct field '%s'", fieldTypeName, fieldName)}
+			return controlflow.ExecResult{Err: fmt.Errorf("Uknown type '%s' for struct field '%s'", fieldTypeName, fieldName)}
 		}
 		fields[fieldName] = fieldType
 	}
@@ -301,109 +302,109 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) ExecResult {
 	}
 	value.RegisterType(structName, typeInfo)
 	fmt.Printf("[INFO] REGISTERED struct type: '%s'\n", stmt.Name.Lexeme)
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) ExecResult {
+func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 	val, err := i.Evaluate(stmt.Init)
 	if err != nil {
-		return ExecResult{Value: value.Null(), Flow: FlowNone}
+		return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 	}
 	if len(stmt.Names) == 1 {
 		i.env.Define(stmt.Names[0].Lexeme, val)
-		return ExecResult{Value: value.Null(), Flow: FlowNone}
+		return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 	}
 
 	values, ok := val.Data.([]value.Value)
 	if !ok {
-		return ExecResult{Err: fmt.Errorf("cannot unpack non-tuple value to multiple variables")}
+		return controlflow.ExecResult{Err: fmt.Errorf("cannot unpack non-tuple value to multiple variables")}
 	}
 	if len(values) != len(stmt.Names) {
-		return ExecResult{Err: fmt.Errorf("mismatch: %d variables but %d values returned", len(stmt.Names), len(values))}
+		return controlflow.ExecResult{Err: fmt.Errorf("mismatch: %d variables but %d values returned", len(stmt.Names), len(values))}
 	}
 	for idx, name := range stmt.Names {
 		i.env.Define(name.Lexeme, values[idx])
 	}
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitShortVarStmt(stmt *ast.ShortVarStmt) ExecResult {
+func (i *Interpreter) VisitShortVarStmt(stmt *ast.ShortVarStmt) controlflow.ExecResult {
 	val, err := i.Evaluate(stmt.Init)
 	if err != nil {
-		return ExecResult{Err: err}
+		return controlflow.ExecResult{Err: err}
 	}
 	i.env.Define(stmt.Name.Lexeme, val)
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitAssignStmt(stmt *ast.AssignStmt) ExecResult {
+func (i *Interpreter) VisitAssignStmt(stmt *ast.AssignStmt) controlflow.ExecResult {
 	val, err := i.Evaluate(stmt.Value)
 	if err != nil {
-		return ExecResult{Err: err}
+		return controlflow.ExecResult{Err: err}
 	}
 	err = i.env.Assign(stmt.Name.Lexeme, val)
 	if err != nil {
-		return ExecResult{Err: err}
+		return controlflow.ExecResult{Err: err}
 	}
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitPrintStmt(stmt *ast.PrintStmt) ExecResult {
+func (i *Interpreter) VisitPrintStmt(stmt *ast.PrintStmt) controlflow.ExecResult {
 	val, err := i.Evaluate(stmt.Expr)
 	if err != nil {
-		return ExecResult{Err: err}
+		return controlflow.ExecResult{Err: err}
 	}
 	fmt.Println(val.String())
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) ExecResult {
+func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) controlflow.ExecResult {
 	result, err := i.Evaluate(stmt.Expr)
 	if err != nil {
-		return ExecResult{Err: err}
+		return controlflow.ExecResult{Err: err}
 	}
 	if i.ShouldPrintResults && !result.IsNull() {
 		fmt.Println(result.String())
 	}
 
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) ExecResult {
+func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) controlflow.ExecResult {
 	cond, err := i.Evaluate(stmt.Conditon)
 	if err != nil {
-		return ExecResult{Err: err}
+		return controlflow.ExecResult{Err: err}
 	}
 	fmt.Printf("If conditon %#v (type=%v)\n", cond, cond.Type)
 	if cond.Type != value.ValueBool {
-		return ExecResult{Err: fmt.Errorf("if condition must evaluate to bool")}
+		return controlflow.ExecResult{Err: fmt.Errorf("if condition must evaluate to bool")}
 	}
 	if cond.Data.(bool) {
 		return i.Execute(stmt.ThenBranch)
 	} else if stmt.ElseBranch != nil {
 		return i.Execute(stmt.ElseBranch)
 	}
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitWhileStmt(stmt *ast.WhileStmt) ExecResult {
+func (i *Interpreter) VisitWhileStmt(stmt *ast.WhileStmt) controlflow.ExecResult {
 	for {
 		cond, err := i.Evaluate(stmt.Conditon)
 		if err != nil {
-			return ExecResult{Err: err}
+			return controlflow.ExecResult{Err: err}
 		}
 		if cond.Type != value.ValueBool {
-			return ExecResult{Err: fmt.Errorf("while condition must evaluate to bool")}
+			return controlflow.ExecResult{Err: fmt.Errorf("while condition must evaluate to bool")}
 		}
 		if !cond.Data.(bool) {
 			break
 		}
 		result := i.Execute(stmt.Body)
-		if result.Flow != FlowNone || result.Err != nil {
+		if result.Flow != controlflow.FlowNone || result.Err != nil {
 			return result
 		}
 	}
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
 func (i *Interpreter) PushEnv(env *environment.Environment) {
@@ -424,7 +425,7 @@ func (i *Interpreter) GetEnv() *environment.Environment {
 	return i.env
 }
 
-func (i *Interpreter) ExecuteBlock(block *ast.BlockStmt, env *environment.Environment) ExecResult {
+func (i *Interpreter) ExecuteBlock(block *ast.BlockStmt, env *environment.Environment) controlflow.ExecResult {
 	previous := i.env
 	i.env = env
 
@@ -434,33 +435,33 @@ func (i *Interpreter) ExecuteBlock(block *ast.BlockStmt, env *environment.Enviro
 
 	for _, stmt := range block.Statements {
 		result := i.Execute(stmt)
-		if result.Flow != FlowNone {
+		if result.Flow != controlflow.FlowNone {
 			return result
 		}
 
 	}
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) ExecResult {
+func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) controlflow.ExecResult {
 	blockEnv := environment.NewEnvironment(i.env)
 	i.PushEnv(blockEnv)
 	defer i.PopEnv()
 	for _, s := range stmt.Statements {
 		result := i.Execute(s)
-		if result.Flow != FlowNone {
+		if result.Flow != controlflow.FlowNone {
 			return result
 		}
-		if result.Flow != FlowNone {
+		if result.Flow != controlflow.FlowNone {
 			return result
 		}
 	}
 
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
 // VisitForStmt executes a for loop.
-func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) ExecResult {
+func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) controlflow.ExecResult {
 	forEnv := environment.NewEnvironment(i.env)
 	i.PushEnv(forEnv)
 	defer i.PopEnv()
@@ -468,7 +469,7 @@ func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) ExecResult {
 	// Init statement
 	if stmt.Init != nil {
 		result := i.Execute(stmt.Init)
-		if result.Flow != FlowNone || result.Err != nil {
+		if result.Flow != controlflow.FlowNone || result.Err != nil {
 			return result
 		}
 	}
@@ -478,10 +479,10 @@ func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) ExecResult {
 		if stmt.CondExpr != nil {
 			condVal, err := i.Evaluate(stmt.CondExpr)
 			if err != nil {
-				return ExecResult{Err: err}
+				return controlflow.ExecResult{Err: err}
 			}
 			if condVal.Type != value.ValueBool {
-				return ExecResult{Err: fmt.Errorf("for loop condition must evaluate to bool")}
+				return controlflow.ExecResult{Err: fmt.Errorf("for loop condition must evaluate to bool")}
 			}
 			if !condVal.Data.(bool) {
 				break
@@ -490,20 +491,20 @@ func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) ExecResult {
 
 		// Execute body
 		result := i.Execute(stmt.BodyStmt)
-		if result.Flow != FlowNone || result.Err != nil {
+		if result.Flow != controlflow.FlowNone || result.Err != nil {
 			return result
 		}
 
 		// Update statement
 		if stmt.Update != nil {
 			result := i.Execute(stmt.Update)
-			if result.Flow != FlowNone || result.Err != nil {
+			if result.Flow != controlflow.FlowNone || result.Err != nil {
 				return result
 			}
 		}
 	}
 
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
 func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) (value.Value, error) {
@@ -668,7 +669,7 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) (value.Value, error) {
 }
 
 // VisitFuncStmt defines a function in the environment.
-func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) ExecResult {
+func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 	fmt.Printf("Defining function: %s\n", stmt.Name.Lexeme)
 	fn := function.NewUserFunc(
 		stmt.Name.Lexeme,
@@ -681,10 +682,10 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) ExecResult {
 		Type: value.ValueFunc,
 		Data: fn,
 	})
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) ExecResult {
+func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) controlflow.ExecResult {
 	var result value.Value
 	var err error
 
@@ -693,7 +694,7 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) ExecResult {
 	} else if len(stmt.Values) == 1 {
 		result, err = i.Evaluate(stmt.Values[0])
 		if err != nil {
-			return ExecResult{Value: value.Null(), Flow: FlowNone}
+			return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 		}
 	} else {
 		vals := make([]value.Value, len(stmt.Values))
@@ -701,7 +702,7 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) ExecResult {
 		for idx, expr := range stmt.Values {
 			val, err := i.Evaluate(expr)
 			if err != nil {
-				return ExecResult{Value: value.Null(), Flow: FlowNone}
+				return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 			}
 			vals[idx] = val
 			types[idx] = val.TypeInfo()
@@ -713,7 +714,7 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) ExecResult {
 			Data: tupleVal,
 		}
 	}
-	return ExecResult{Value: result, Flow: FlowReturn}
+	return controlflow.ExecResult{Value: result, Flow: controlflow.FlowReturn}
 	// panic(runtimecontrol.ReturnValue{Value: result})
 
 	// for _, expr := range stmt.Values {
@@ -748,11 +749,11 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) ExecResult {
 }
 
 // VisitBreakStmt handles break statement in loops.
-func (i *Interpreter) VisitBreakStmt(stmt *ast.BreakStmt) ExecResult {
-	return ExecResult{Value: value.Null(), Flow: FlowBreak}
+func (i *Interpreter) VisitBreakStmt(stmt *ast.BreakStmt) controlflow.ExecResult {
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowBreak}
 }
 
 // VisitContinueStmt handles continue statement in loops.
-func (i *Interpreter) VisitContinueStmt(stmt *ast.ContinueStmt) ExecResult {
-	return ExecResult{Value: value.Null(), Flow: FlowContinue}
+func (i *Interpreter) VisitContinueStmt(stmt *ast.ContinueStmt) controlflow.ExecResult {
+	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowContinue}
 }
