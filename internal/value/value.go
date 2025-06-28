@@ -48,6 +48,15 @@ func (v Value) String() string {
 			return "{" + strings.Join(items, ", ") + "}"
 		}
 		return "<dict>"
+	case ValueTuple:
+		if tuple, ok := v.Data.(*NiftelTupleValue); ok {
+			elems := make([]string, len(tuple.Elements))
+			for i, e := range tuple.Elements {
+				elems[i] = e.String()
+			}
+			return "(" + strings.Join(elems, ", ") + ")"
+		}
+		return "<tuple-corrupt>"
 	case ValueStruct:
 		inst, ok := v.Data.(*StructInstance)
 		if !ok {
