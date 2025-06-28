@@ -267,23 +267,23 @@ func (i *Interpreter) VisitUnaryExpr(expr *ast.UnaryExpr) (value.Value, error) {
 
 // --- Statement Visitors ---
 
-func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) error {
+func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) ExecResult {
 	structName := stmt.Name.Lexeme
 
 	if value.HasType(structName) {
-		return fmt.Errorf("struct %s already defined", structName)
+		return ExecResult{Err: fmt.Errorf("struct '%s' already defined", structName)}
 	}
 
 	fields := make(map[string]*value.TypeInfo)
 	for _, field := range stmt.Fields {
 		if len(field.Names) != 1 {
-			return fmt.Errorf("struct field must have exactly one name!")
+			return ExecResult{Err: fmt.Errorf("struct field must have exactly one name!")}
 		}
 		fieldName := field.Names[0].Lexeme
 		fieldTypeName := field.Type.Lexeme
 		fieldType, ok := value.GetType(fieldTypeName)
 		if !ok {
-			return fmt.Errorf("Uknown type '%s' for struct field '%s'", fieldTypeName, fieldName)
+			return ExecResult{Err: fmt.Errorf("Uknown type '%s' for struct field '%s'", fieldTypeName, fieldName)}
 		}
 		fields[fieldName] = fieldType
 	}
@@ -302,112 +302,109 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) error {
 	}
 	value.RegisterType(structName, typeInfo)
 	fmt.Printf("[INFO] REGISTERED struct type: '%s'\n", stmt.Name.Lexeme)
-	return nil
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
-func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) error {
+func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) ExecResult {
 	val, err := i.Evaluate(stmt.Init)
 	if err != nil {
-		return err
+		return ExecResult{Value: value.Null(), Flow: FlowNone}
 	}
 	if len(stmt.Names) == 1 {
 		i.env.Define(stmt.Names[0].Lexeme, val)
-		return nil
+		return ExecResult{Value: value.Null(), Flow: FlowNone}
 	}
 
 	values, ok := val.Data.([]value.Value)
 	if !ok {
-		return fmt.Errorf("cannot unpack non-tuple value to multiple variables")
+		return ExecResult{Err: fmt.Errorf("cannot unpack non-tuple value to multiple variables")}
 	}
 	if len(values) != len(stmt.Names) {
-		return fmt.Errorf("mismatch: %d variables but %d values returned", len(stmt.Names), len(values))
+		return ExecResult{Err: fmt.Errorf("mismatch: %d variables but %d values returned", len(stmt.Names), len(values))}
 	}
 	for idx, name := range stmt.Names {
 		i.env.Define(name.Lexeme, values[idx])
 	}
-	// val, err := i.Evaluate(stmt.Init)
-	// if err != nil {
-	// 	return err
-	// }
-	// i.env.Define(stmt.Name.Lexeme, val)
-	return nil
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
-func (i *Interpreter) VisitShortVarStmt(stmt *ast.ShortVarStmt) error {
+func (i *Interpreter) VisitShortVarStmt(stmt *ast.ShortVarStmt) ExecResult {
 	val, err := i.Evaluate(stmt.Init)
 	if err != nil {
-		return err
+		return ExecResult{Err: err}
 	}
 	i.env.Define(stmt.Name.Lexeme, val)
-	return nil
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
-func (i *Interpreter) VisitAssignStmt(stmt *ast.AssignStmt) error {
+func (i *Interpreter) VisitAssignStmt(stmt *ast.AssignStmt) ExecResult {
 	val, err := i.Evaluate(stmt.Value)
 	if err != nil {
-		return err
+		return ExecResult{Err: err}
 	}
-	return i.env.Assign(stmt.Name.Lexeme, val)
+	err = i.env.Assign(stmt.Name.Lexeme, val)
+	if err != nil {
+		return ExecResult{Err: err}
+	}
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
-func (i *Interpreter) VisitPrintStmt(stmt *ast.PrintStmt) error {
+func (i *Interpreter) VisitPrintStmt(stmt *ast.PrintStmt) ExecResult {
 	val, err := i.Evaluate(stmt.Expr)
 	if err != nil {
-		return err
+		return ExecResult{Err: err}
 	}
-	fmt.Println("IN PRINT STMT!")
 	fmt.Println(val.String())
-	return nil
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
-func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) error {
+func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) ExecResult {
 	result, err := i.Evaluate(stmt.Expr)
 	if err != nil {
-		return err
+		return ExecResult{Err: err}
 	}
 	if i.ShouldPrintResults && !result.IsNull() {
 		fmt.Println(result.String())
 	}
 
-	return nil
-	// _, err := i.Evaluate(stmt.Expr)
-	// return err
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
-func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) error {
+func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) ExecResult {
 	cond, err := i.Evaluate(stmt.Conditon)
 	if err != nil {
-		return err
+		return ExecResult{Err: err}
 	}
 	fmt.Printf("If conditon %#v (type=%v)\n", cond, cond.Type)
 	if cond.Type != value.ValueBool {
-		return fmt.Errorf("if condition must evaluate to bool")
+		return ExecResult{Err: fmt.Errorf("if condition must evaluate to bool")}
 	}
 	if cond.Data.(bool) {
 		return i.Execute(stmt.ThenBranch)
 	} else if stmt.ElseBranch != nil {
 		return i.Execute(stmt.ElseBranch)
 	}
-	return nil
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
-func (i *Interpreter) VisitWhileStmt(stmt *ast.WhileStmt) error {
+func (i *Interpreter) VisitWhileStmt(stmt *ast.WhileStmt) ExecResult {
 	for {
 		cond, err := i.Evaluate(stmt.Conditon)
 		if err != nil {
-			return err
+			return ExecResult{Err: err}
 		}
 		if cond.Type != value.ValueBool {
-			return fmt.Errorf("while condition must evaluate to bool")
+			return ExecResult{Err: fmt.Errorf("while condition must evaluate to bool")}
 		}
 		if !cond.Data.(bool) {
 			break
 		}
-		if err := i.Execute(stmt.Body); err != nil {
-			return err
+		result := i.Execute(stmt.Body)
+		if result.Flow != FlowNone || result.Err != nil {
+			return result
 		}
 	}
-	return nil
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
 func (i *Interpreter) PushEnv(env *environment.Environment) {
@@ -457,20 +454,12 @@ func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) ExecResult {
 		if result.Flow != FlowNone {
 			return result
 		}
-
+		if result.Flow != FlowNone {
+			return result
 		}
-	return ExecResult{Value: value.Null(), Flow: FlowNone}
 	}
-	// previousEnv := i.env
-	// i.env = environment.NewEnvironment(previousEnv)
-	// defer func() { i.env = previousEnv }()
 
-	// for _, s := range stmt.Statements {
-	// 	if err := i.Execute(s); err != nil {
-	// 		return err
-	// 	}
-	// }
-	return nil
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
 // VisitForStmt executes a for loop.
