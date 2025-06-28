@@ -341,21 +341,40 @@ func (p *Parser) UnaryExpr() (ast.Expr, error) {
 }
 
 func (p *Parser) varDeclaration() (ast.Stmt, error) {
-	// p.consume(token.TokenVar, "Expect 'var' keyword")
-	name, err := p.consume(token.TokenIdentifier, "expect variable name after var")
+	var names []token.Token
+	name, err := p.consume(token.TokenIdentifier, "expect variables name after var")
 	if err != nil {
 		return nil, err
 	}
-	_, err = p.consume(token.TokenColon, "expected ':' after variable name")
-	if err != nil {
-		return nil, err
+	names = append(names, name)
+	for {
+		ok, err := p.match(token.TokenComma)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			break
+		}
+		next, err := p.consume(token.TokenIdentifier, "expected varibal name after ','")
+		if err != nil {
+			return nil, err
+		}
+		names = append(names, next)
 	}
-	typ, err := p.consume(token.TokenIdentifier, "expect type after variable name")
-	if err != nil {
-		return nil, err
-	}
+	var typ token.Token
+	if len(names) == 1 && p.check(token.TokenColon) {
 
-	_, err = p.consume(token.TokenAssign, "expect '=' after variable type")
+		_, err = p.consume(token.TokenColon, "expected ':' after variable name")
+		if err != nil {
+			return nil, err
+		}
+		typ, err = p.consume(token.TokenIdentifier, "expect type after ':'")
+		if err != nil {
+			return nil, err
+		}
+
+	}
+	_, err = p.consume(token.TokenAssign, "expect '=' after variable(s)")
 	if err != nil {
 		return nil, err
 	}
@@ -364,17 +383,45 @@ func (p *Parser) varDeclaration() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	err = p.skipnewLines()
-	if err != nil {
-		return nil, err
-	}
-
 	return &ast.VarStmt{
-		Names: []token.Token{name},
+		Names: names,
 		Type:  typ,
 		Init:  init,
 	}, nil
+	// p.consume(token.TokenVar, "Expect 'var' keyword")
+	// name, err := p.consume(token.TokenIdentifier, "expect variable name after var")
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// _, err = p.consume(token.TokenColon, "expected ':' after variable name")
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// typ, err := p.consume(token.TokenIdentifier, "expect type after variable name")
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// _, err = p.consume(token.TokenAssign, "expect '=' after variable type")
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// init, err := p.expression()
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// err = p.skipnewLines()
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// return &ast.VarStmt{
+	// 	Names: []token.Token{name},
+	// 	Type:  typ,
+	// 	Init:  init,
+	// }, nil
 }
 
 func (p *Parser) shortVarDeclaration() (ast.Stmt, error) {

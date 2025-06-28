@@ -4,5 +4,5 @@
 === RUN   TestParseMultipleReturnValues
 --- PASS: TestParseMultipleReturnValues (0.00s)
 FAIL
-FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/parser 0.233s
+FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/parser 0.326s
 FAIL
