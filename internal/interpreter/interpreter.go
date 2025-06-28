@@ -433,8 +433,6 @@ func (i *Interpreter) ExecuteBlock(block *ast.BlockStmt, env *environment.Enviro
 		i.env = previous
 	}()
 
-	// var result value.Value
-
 	for _, stmt := range block.Statements {
 		result := i.Execute(stmt)
 		if result.Flow != FlowNone {
@@ -463,16 +461,16 @@ func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) ExecResult {
 }
 
 // VisitForStmt executes a for loop.
-func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) error {
-	// previousEnv := i.env
-	// i.env = environment.NewEnvironment(previousEnv)
+func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) ExecResult {
 	forEnv := environment.NewEnvironment(i.env)
-	defer i.PushEnv(forEnv)
+	i.PushEnv(forEnv)
+	defer i.PopEnv()
 
 	// Init statement
 	if stmt.Init != nil {
-		if err := i.Execute(stmt.Init); err != nil {
-			return err
+		result := i.Execute(stmt.Init)
+		if result.Flow != FlowNone || result.Err != nil {
+			return result
 		}
 	}
 
@@ -481,10 +479,10 @@ func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) error {
 		if stmt.CondExpr != nil {
 			condVal, err := i.Evaluate(stmt.CondExpr)
 			if err != nil {
-				return err
+				return ExecResult{Err: err}
 			}
 			if condVal.Type != value.ValueBool {
-				return fmt.Errorf("for loop condition must evaluate to bool")
+				return ExecResult{Err: fmt.Errorf("for loop condition must evaluate to bool")}
 			}
 			if !condVal.Data.(bool) {
 				break
@@ -492,21 +490,21 @@ func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) error {
 		}
 
 		// Execute body
-		err := i.Execute(stmt.BodyStmt)
-		if err != nil {
-			// Implement break/continue handling here if you add flags or custom errors
-			return err
+		result := i.Execute(stmt.BodyStmt)
+		if result.Flow != FlowNone || result.Err != nil {
+			return result
 		}
 
 		// Update statement
 		if stmt.Update != nil {
-			if err := i.Execute(stmt.Update); err != nil {
-				return err
+			result := i.Execute(stmt.Update)
+			if result.Flow != FlowNone || result.Err != nil {
+				return result
 			}
 		}
 	}
 
-	return nil
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
 func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) (value.Value, error) {
