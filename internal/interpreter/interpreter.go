@@ -60,7 +60,7 @@ func (i *Interpreter) Evaluate(expr ast.Expr) (value.Value, error) {
 }
 
 // Execute dispatches to the correct Stmt handler.
-func (i *Interpreter) Execute(stmt ast.Stmt) error {
+func (i *Interpreter) Execute(stmt ast.Stmt) ExecResult {
 	switch s := stmt.(type) {
 	case *ast.VarStmt:
 		return i.VisitVarStmt(s)
@@ -428,7 +428,7 @@ func (i *Interpreter) GetEnv() *environment.Environment {
 	return i.env
 }
 
-func (i *Interpreter) ExecuteBlock(block *ast.BlockStmt, env *environment.Environment) (value.Value, error) {
+func (i *Interpreter) ExecuteBlock(block *ast.BlockStmt, env *environment.Environment) ExecResult {
 	previous := i.env
 	i.env = env
 
@@ -436,25 +436,30 @@ func (i *Interpreter) ExecuteBlock(block *ast.BlockStmt, env *environment.Enviro
 		i.env = previous
 	}()
 
-	var result value.Value
+	// var result value.Value
 
 	for _, stmt := range block.Statements {
-		err := i.Execute(stmt)
-		if err != nil {
-			return result, err
+		result := i.Execute(stmt)
+		if result.Flow != FlowNone {
+			return result
 		}
+
 	}
-	return result, nil
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
-func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) error {
+func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) ExecResult {
 	blockEnv := environment.NewEnvironment(i.env)
 	i.PushEnv(blockEnv)
 	defer i.PopEnv()
 	for _, s := range stmt.Statements {
-		if err := i.Execute(s); err != nil {
-			return err
+		result := i.Execute(s)
+		if result.Flow != FlowNone {
+			return result
 		}
+
+		}
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 	}
 	// previousEnv := i.env
 	// i.env = environment.NewEnvironment(previousEnv)
@@ -693,7 +698,7 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) error {
 	return nil
 }
 
-func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
+func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) ExecResult {
 	var result value.Value
 	var err error
 
@@ -702,7 +707,7 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
 	} else if len(stmt.Values) == 1 {
 		result, err = i.Evaluate(stmt.Values[0])
 		if err != nil {
-			return err
+			return ExecResult{Value: value.Null(), Flow: FlowNone}
 		}
 	} else {
 		vals := make([]value.Value, len(stmt.Values))
@@ -710,7 +715,7 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
 		for idx, expr := range stmt.Values {
 			val, err := i.Evaluate(expr)
 			if err != nil {
-				return err
+				return ExecResult{Value: value.Null(), Flow: FlowNone}
 			}
 			vals[idx] = val
 			types[idx] = val.TypeInfo()
@@ -722,7 +727,8 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) error {
 			Data: tupleVal,
 		}
 	}
-	panic(runtimecontrol.ReturnValue{Value: result})
+	return ExecResult{Value: result, Flow: FlowReturn}
+	// panic(runtimecontrol.ReturnValue{Value: result})
 
 	// for _, expr := range stmt.Values {
 	// 	val, err := i.Evaluate(expr)
