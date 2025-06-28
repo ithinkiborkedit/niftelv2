@@ -8,7 +8,6 @@ import (
 	"github.com/ithinkiborkedit/niftelv2.git/internal/function"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/runtimecontrol"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
@@ -669,7 +668,7 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) (value.Value, error) {
 }
 
 // VisitFuncStmt defines a function in the environment.
-func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) error {
+func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) ExecResult {
 	fmt.Printf("Defining function: %s\n", stmt.Name.Lexeme)
 	fn := function.NewUserFunc(
 		stmt.Name.Lexeme,
@@ -682,7 +681,7 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) error {
 		Type: value.ValueFunc,
 		Data: fn,
 	})
-	return nil
+	return ExecResult{Value: value.Null(), Flow: FlowNone}
 }
 
 func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) ExecResult {
@@ -749,11 +748,11 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) ExecResult {
 }
 
 // VisitBreakStmt handles break statement in loops.
-func (i *Interpreter) VisitBreakStmt(stmt *ast.BreakStmt) error {
-	panic(runtimecontrol.BreakSignal{})
+func (i *Interpreter) VisitBreakStmt(stmt *ast.BreakStmt) ExecResult {
+	return ExecResult{Value: value.Null(), Flow: FlowBreak}
 }
 
 // VisitContinueStmt handles continue statement in loops.
-func (i *Interpreter) VisitContinueStmt(stmt *ast.ContinueStmt) error {
-	panic(runtimecontrol.ContinueSignal{})
+func (i *Interpreter) VisitContinueStmt(stmt *ast.ContinueStmt) ExecResult {
+	return ExecResult{Value: value.Null(), Flow: FlowContinue}
 }
