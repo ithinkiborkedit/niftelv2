@@ -1,18 +1,22 @@
 package parser_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
-	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
 )
 
+// Helper: returns a TokenSource from a string source.
+func tokenSourceFromString(source string) lexer.TokenSource {
+	return lexer.New(source)
+}
 func TestParser_MultipleVarDeclaration(t *testing.T) {
+	tokSrc := tokenSourceFromString(source)
+	p := parser.New(tokSrc)
 	src := "var a, b = pair(1, 2)"
-	lex := lexer.NewLexer(strings.NewReader(src))
+	lex := lexer.New(tokSrc)
 	p := parser.New(lex)
 
 	stmts, err := p.Parse()

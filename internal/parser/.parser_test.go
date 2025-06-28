@@ -9,9 +9,9 @@ import (
 )
 
 // Helper: returns a TokenSource from a string source.
-func tokenSourceFromString(source string) lexer.TokenSource {
-	return lexer.New(source)
-}
+// func tokenSourceFromString(source string) lexer.TokenSource {
+// 	return lexer.New(source)
+// }
 
 func TestParser_Parse(t *testing.T) {
 	source := `
