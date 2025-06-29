@@ -1,11 +1,4 @@
-[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Person' line='1'
-[AFTER OPENING '{' ] struct body: token 
- lexem='
-' line='1'
-[Trying to check for 
- after '{' ] struct body: token IDENTIFIER lexem='name' line='2'
-[PARSERLOOP] struct body: type=1  lexem='name' line='2'
-[PARSERLOOP] struct body: type=1  lexem='age' line='3'
-[INFO] REGISTERED struct type: 'Person'
-Defining function: greet
-ENV DEFINING 'greet' as type 8ENV DEFINING 'p' as type 7ENV LOOKING UP 'greet' as type 8CALL EXPR DEBUG: ["hello" "goodbye"], &{map[greet:{8 0x14000100240 <nil>} p:{7 0x1400013c0d0 0x14000122300}] <nil> map[]}CALLING Function: greet, args: [{{IDENTIFIER hello <nil> 1 16} {IDENTIFIER string <nil> 1 24}} {{IDENTIFIER goodbye <nil> 1 33} {IDENTIFIER string <nil> 1 41}}]ENV DEFINING 'hello' as type 3ENV DEFINING 'goodbye' as type 3ENV LOOKING UP 'hello' as type 3ENV LOOKING UP 'goodbye' as type 3panic: return: '("hello", "goodbye")'
+not enough return values
+	have (controlflow.ExecResult)
+	want (value.Value, error)compilerWrongResultCount
+func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) controlflow.ExecResult

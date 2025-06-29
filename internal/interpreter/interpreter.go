@@ -507,22 +507,22 @@ func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) controlflow.ExecResult {
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) (value.Value, error) {
+func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) controlflow.ExecResult {
 	// Evaluate the callee expression (should be a function)
 	calleeVal, err := i.Evaluate(expr.Callee)
 	if err != nil {
-		return value.Null(), err
+		return controlflow.ExecResult{Err: err}
 	}
 
 	callable, ok := calleeVal.Data.(function.Callable)
 	if !ok {
-		return value.Null(), fmt.Errorf("attempt to call non-function value")
+		return controlflow.ExecResult{Err: fmt.Errorf("attempt to call non-function value")}
 	}
 	args := make([]value.Value, len(expr.Arguments))
 	for idx, argExpr := range expr.Arguments {
 		args[idx], err = i.Evaluate(argExpr)
 		if err != nil {
-			return value.Null(), err
+			return controlflow.ExecResult{Err: err}
 		}
 	}
 

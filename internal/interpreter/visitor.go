@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"github.com/ithinkiborkedit/niftelv2.git/internal/controlflow"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
@@ -10,7 +11,7 @@ type ExprVisitor interface {
 	VisitUnaryExpr(expr *ast.UnaryExpr) (value.Value, error)
 	VisitLiteralExpr(expr *ast.LiteralExpr) (value.Value, error)
 	VisitVariableExpr(expr *ast.VariableExpr) (value.Value, error)
-	VisitCallExpr(expr *ast.CallExpr) (value.Value, error)
+	VisitCallExpr(expr *ast.CallExpr) controlflow.ExecResult
 	VisitIndexExpr(expr *ast.IndexExpr) (value.Value, error)
 	VisitGetExpr(expr *ast.GetExpr) (value.Value, error)
 	VisitListExpr(expr *ast.ListExpr) (value.Value, error)

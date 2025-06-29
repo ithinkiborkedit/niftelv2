@@ -3,6 +3,7 @@ package function
 import (
 	"fmt"
 
+	"github.com/ithinkiborkedit/niftelv2.git/internal/controlflow"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
@@ -16,18 +17,19 @@ type Function struct {
 	isNative   bool
 	sourceLine int
 	sourceCol  int
-	nativeFunc func([]value.Value, InterpreterAPI) (value.Value, error)
+	nativeFunc func([]value.Value, InterpreterAPI) controlflow.ExecResult
 }
 
 type InterpreterAPI interface {
 	PushEnv(*environment.Environment)
 	PopEnv()
 	GetEnv() *environment.Environment
-	ExecuteBlock(*ast.BlockStmt, *environment.Environment) (ret value.Value, err error)
+	ExecuteBlock(*ast.BlockStmt, *environment.Environment) controlflow.ExecResult
+	// ExecuteBlock(*ast.BlockStmt, *environment.Environment) (ret value.Value, err error)
 }
 
 type Callable interface {
-	Call(args []value.Value, interp InterpreterAPI) (value.Value, error)
+	Call(args []value.Value, interp InterpreterAPI) controlflow.ExecResult
 	Arity() int
 	Name() string
 	IsNative() bool
@@ -47,7 +49,7 @@ func NewUserFunc(name string, params []ast.Param, body *ast.BlockStmt, env *envi
 
 }
 
-func NewNativeFunc(name string, fn func([]value.Value, InterpreterAPI) (value.Value, error)) *Function {
+func NewNativeFunc(name string, fn func([]value.Value, InterpreterAPI) controlflow.ExecResult) *Function {
 	return &Function{
 		name:       name,
 		isNative:   true,
@@ -55,13 +57,13 @@ func NewNativeFunc(name string, fn func([]value.Value, InterpreterAPI) (value.Va
 	}
 }
 
-func (f *Function) Call(args []value.Value, interp InterpreterAPI) (value.Value, error) {
+func (f *Function) Call(args []value.Value, interp InterpreterAPI) controlflow.ExecResult {
 	fmt.Printf("CALLING Function: %v, args: %v", f.name, f.params)
 	if f.isNative {
 		return f.nativeFunc(args, interp)
 	}
 	if len(args) != len(f.params) {
-		return value.Null(), fmt.Errorf("function '%s': expected %d parameters got %d", f.name, len(f.params), len(args))
+		return controlflow.ExecResult{Err: fmt.Errorf("function '%s': expected %d parameters got %d", f.name, len(f.params), len(args))}
 	}
 
 	callEnv := environment.NewEnvironment(f.env)
@@ -71,9 +73,12 @@ func (f *Function) Call(args []value.Value, interp InterpreterAPI) (value.Value,
 
 	interp.PushEnv(callEnv)
 	defer interp.PopEnv()
+	// fmt.Printf("RETURNING from function.Call: %#v, err: %v\n", controlflow.ExecResult{Value: })
+	execResult := interp.ExecuteBlock(f.body, callEnv)
+	return execResult
 
-	var ret value.Value = value.Null()
-	var err error
+	// var ret value.Value = value.Null()
+	// var err error
 
 	// defer func() {
 	// 	if r := recover(); r != nil {
@@ -89,13 +94,12 @@ func (f *Function) Call(args []value.Value, interp InterpreterAPI) (value.Value,
 
 	// }()
 	// ret, err = interp.ExecuteBlock(f.body, callEnv)
-	_, execErr := interp.ExecuteBlock(f.body, callEnv)
-	if execErr != nil {
-		return value.Null(), execErr
-	}
-	fmt.Printf("RETURNING from function.Call: %#v, err: %v\n", ret, err)
-	return value.Null(), nil
+	// _, execErr := interp.ExecuteBlock(f.body, callEnv)
+	// if execErr != nil {
+	// 	return value.Null(), execErr
 }
+
+// return value.Null(), nil
 
 func (f *Function) Arity() int            { return len(f.params) }
 func (f *Function) Name() string          { return f.name }
