@@ -270,21 +270,28 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) controlflow.ExecResu
 }
 
 func (i *Interpreter) VisitUnaryExpr(expr *ast.UnaryExpr) controlflow.ExecResult {
-	right, err := i.Evaluate(expr.Right)
-	if err != nil {
-		return value.Null(), err
+	rightRes := i.Evaluate(expr.Right)
+	if rightRes.Err != nil {
+		return controlflow.ExecResult{Err: rightRes.Err}
 	}
+	right := rightRes.Value
 	switch expr.Operator.Type {
 	case token.TokenBang:
 		if right.Type != value.ValueBool {
 			return controlflow.ExecResult{Err: fmt.Errorf("operator ! requires boolean operand")}
 		}
-		return value.Value{Type: value.ValueBool, Data: !right.Data.(bool)}
+		return controlflow.ExecResult{
+			Value: value.Value{Type: value.ValueBool, Data: !right.Data.(bool)},
+			Flow:  controlflow.FlowNone,
+		}
 	case token.TokenMinus:
 		if right.Type != value.ValueInt {
 			return controlflow.ExecResult{Err: fmt.Errorf("operator - requires int operand")}
 		}
-		return value.Value{Type: value.ValueInt, Data: -right.Data.(float64)}
+		return controlflow.ExecResult{
+			Value: value.Value{Type: value.ValueInt, Data: -right.Data.(float64)},
+			Flow:  controlflow.FlowNone,
+		}
 	default:
 		return controlflow.ExecResult{Err: fmt.Errorf("unsupported unary operator %v", expr.Operator.Lexeme)}
 	}
@@ -536,11 +543,11 @@ func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) controlflow.ExecResult {
 
 func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) controlflow.ExecResult {
 	// Evaluate the callee expression (should be a function)
-	calleeVal, err := i.Evaluate(expr.Callee)
-	if err != nil {
-		return controlflow.ExecResult{Err: err}
+	calleeRes := i.Evaluate(expr.Callee)
+	if calleeRes.Err != nil {
+		return controlflow.ExecResult{Err: calleeRes.Err}
 	}
-
+	calleeVal := calleeRes.Value
 	callable, ok := calleeVal.Data.(function.Callable)
 	if !ok {
 		return controlflow.ExecResult{Err: fmt.Errorf("attempt to call non-function value")}
@@ -558,86 +565,83 @@ func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) controlflow.ExecResult {
 	return callable.Call(args, i)
 }
 
-func (i *Interpreter) VisitIndexExpr(expr *ast.IndexExpr) (value.Value, error) {
+func (i *Interpreter) VisitIndexExpr(expr *ast.IndexExpr) controlflow.ExecResult {
 	// Evaluate the collection expression
-	collectionVal, err := i.Evaluate(expr.Collection)
-	if err != nil {
-		return value.Null(), err
+	collectionRes := i.Evaluate(expr.Collection)
+	if collectionRes.Err != nil {
+		return controlflow.ExecResult{Err: collectionRes.Err}
 	}
+	collectionVal := collectionRes.Value
 
 	// Evaluate the index/key expression
-	indexVal, err := i.Evaluate(expr.Index)
-	if err != nil {
-		return value.Null(), err
+	indexRes := i.Evaluate(expr.Index)
+	if indexRes.Err != nil {
+		return controlflow.ExecResult{Err: collectionRes.Err}
 	}
+
+	indexVal := indexRes.Value
 
 	switch collectionVal.Type {
 	case value.ValueList:
 		list, ok := collectionVal.Data.([]value.Value)
 		if !ok {
-			return value.Null(), fmt.Errorf("list data is corrupted")
+			return controlflow.ExecResult{Err: fmt.Errorf("list data is corrupted")}
 		}
 		idxFloat, ok := indexVal.Data.(float64)
 		idx := int(idxFloat)
 		if !ok || float64(idx) != idxFloat {
-			return value.Null(), fmt.Errorf("list index must be integer")
+			return controlflow.ExecResult{Err: fmt.Errorf("list index must be integer")}
 		}
 		if idx < 0 || idx >= len(list) {
-			return value.Null(), fmt.Errorf("list index out of range")
+			return controlflow.ExecResult{Err: fmt.Errorf("list index out of range")}
 		}
-		return list[idx], nil
+		return controlflow.ExecResult{Value: list[idx], Flow: controlflow.FlowNone}
 
 	case value.ValueDict:
 		dict, ok := collectionVal.Data.(map[string]value.Value)
 		if !ok {
-			return value.Null(), fmt.Errorf("dict data is corrupted")
+			return controlflow.ExecResult{Err: fmt.Errorf("dict data is corrupted")}
 		}
 		keyStr, ok := indexVal.Data.(string)
 		if !ok {
-			return value.Null(), fmt.Errorf("dict key must be string")
+			return controlflow.ExecResult{Err: fmt.Errorf("dict key must be string")}
 		}
 		val, exists := dict[keyStr]
 		if !exists {
-			return value.Null(), fmt.Errorf("dict key not found: %s", keyStr)
+			return controlflow.ExecResult{Err: fmt.Errorf("dict key not found: %s", keyStr)}
 		}
-		return val, nil
+		return controlflow.ExecResult{Value: val, Flow: controlflow.FlowNone}
 
 	default:
-		return value.Null(), fmt.Errorf("indexing unsupported on type %v", collectionVal.Type)
+		return controlflow.ExecResult{Err: fmt.Errorf("indexing unsupported on type %v", collectionVal.Type)}
 	}
 }
 
-func (i *Interpreter) VisitGetExpr(expr *ast.GetExpr) (value.Value, error) {
+func (i *Interpreter) VisitGetExpr(expr *ast.GetExpr) controlflow.ExecResult {
 	// Evaluate object expression
-	objectVal, err := i.Evaluate(expr.Object)
-	if err != nil {
-		return value.Null(), err
+	objectRes := i.Evaluate(expr.Object)
+	if objectRes.Err != nil {
+		return controlflow.ExecResult{Err: objectRes.Err}
 	}
 
-	// Only structs support property access
+	objectVal := objectRes.Value
+
 	if objectVal.Type != value.ValueStruct {
-		return value.Null(), fmt.Errorf("attempt to get property on non-struct type")
+		return controlflow.ExecResult{Err: fmt.Errorf("attempt to get property on non-struct type")}
 	}
 
 	inst, ok := objectVal.Data.(*value.StructInstance)
 	if !ok || inst == nil {
-		return value.Null(), fmt.Errorf("struct instance is corrupt")
+		return controlflow.ExecResult{Err: fmt.Errorf("struct instance is corrupt")}
 	}
 
-	// Access struct field by name (string from token)
 	fieldName := expr.Name.Lexeme
-
-	// Assume struct data stored as map[string]value.Value
-	// fields, ok := objectVal.Data.(map[string]value.Value)
-	// if !ok {
-	// 	return value.Null(), fmt.Errorf("struct data corrupted")
-	// }
 
 	val, exists := inst.Fields[fieldName]
 	if !exists {
-		return value.Null(), fmt.Errorf("struct field '%s' not found", fieldName)
+		return controlflow.ExecResult{Err: fmt.Errorf("struct field '%s' not found", fieldName)}
 	}
-	return val, nil
+	return controlflow.ExecResult{Value: val, Flow: controlflow.FlowNone}
 }
 
 func (i *Interpreter) VisitListExpr(expr *ast.ListExpr) (value.Value, error) {
