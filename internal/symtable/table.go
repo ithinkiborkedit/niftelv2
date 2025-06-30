@@ -37,7 +37,7 @@ func (s *SymbolTable) namespace(kind SymbolKind) map[string]Symbol {
 func (s *SymbolTable) DefineValue(sym Symbol) error {
 	ns := s.namespace(sym.Kind())
 	if _, exists := ns[sym.Name()]; exists {
-		return fmt.Errorf("%s '%s' already defined in this scope", kindString(sym.Kind()))
+		return fmt.Errorf("%s already defined in this scope", kindString(sym.Kind()))
 	}
 	ns[sym.Name()] = sym
 	return nil

@@ -25,7 +25,7 @@ type TypeSymbol struct {
 }
 
 type TypeParamSymbol struct {
-	Symnam string
+	SymNam string
 }
 
 type VarSymbol struct {
@@ -67,7 +67,7 @@ func (t *TypeSymbol) String() string {
 }
 
 func (f *FuncSymbol) Name() string {
-	return f.Name()
+	return f.SymName
 }
 
 func (f *FuncSymbol) Kind() SymbolKind {
@@ -79,7 +79,7 @@ func (f *FuncSymbol) String() string {
 }
 
 func (tp *TypeParamSymbol) Name() string {
-	return tp.Name()
+	return tp.SymNam
 }
 
 func (tp *TypeParamSymbol) Kind() SymbolKind {
@@ -87,5 +87,5 @@ func (tp *TypeParamSymbol) Kind() SymbolKind {
 }
 
 func (tp *TypeParamSymbol) String() string {
-	return fmt.Sprintf("typeparam %s", tp.Symnam)
+	return fmt.Sprintf("typeparam %s", tp.SymNam)
 }
