@@ -8,6 +8,7 @@ import (
 
 type Environment struct {
 	variables map[string]value.Value
+	values    map[string]value.Value
 	enclosing *Environment
 	types     map[string]*value.StructType
 }
@@ -49,4 +50,9 @@ func (e *Environment) Get(name string) (value.Value, error) {
 	}
 
 	return value.Null(), fmt.Errorf("undefined variable '%s'", name)
+}
+
+func (e *Environment) HasLocal(name string) bool {
+	_, exists := e.values[name]
+	return exists
 }

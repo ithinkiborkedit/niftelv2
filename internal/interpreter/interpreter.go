@@ -345,7 +345,7 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) controlflow.ExecResu
 func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 	valRes := i.Evaluate(stmt.Init)
 	if valRes.Err != nil {
-		return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
+		return controlflow.ExecResult{Err: valRes.Err}
 	}
 	val := valRes.Value
 	if len(stmt.Names) == 1 {
@@ -718,6 +718,11 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) controlflow.ExecResult {
 
 // VisitFuncStmt defines a function in the environment.
 func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
+	if i.env.HasLocal(stmt.Name.Lexeme) {
+		return controlflow.ExecResult{
+			Err: fmt.Errorf("function '%s' already defined in this scope", stmt.Name.Lexeme),
+		}
+	}
 	fmt.Printf("Defining function: %s\n", stmt.Name.Lexeme)
 	fn := function.NewUserFunc(
 		stmt.Name.Lexeme,
