@@ -1,4 +1,8 @@
-not enough return values
-	have (controlflow.ExecResult)
-	want (value.Value, error)compilerWrongResultCount
-func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) controlflow.ExecResult
+=== RUN   TestFuncStmtDuplicateError
+Defining function: foo
+ENV DEFINING 'foo' as type 8Defining function: foo
+ENV DEFINING 'foo' as type 8    newinterptest_test.go:36: expected error for duplicate function, got nil
+--- FAIL: TestFuncStmtDuplicateError (0.00s)
+FAIL
+FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/interpreter    0.223s
+FAIL
