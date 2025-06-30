@@ -27,12 +27,12 @@ func NewInterpreter() *Interpreter {
 	}
 }
 
-func (i *Interpreter) Eval(expr ast.Expr) (value.Value, error) {
+func (i *Interpreter) Eval(expr ast.Expr) controlflow.ExecResult {
 	return i.Evaluate(expr)
 }
 
 // Evaluate dispatches to the correct Expr handler.
-func (i *Interpreter) Evaluate(expr ast.Expr) (value.Value, error) {
+func (i *Interpreter) Evaluate(expr ast.Expr) controlflow.ExecResult {
 	switch e := expr.(type) {
 	case *ast.LiteralExpr:
 		return i.VisitLiteralExpr(e)
@@ -55,7 +55,7 @@ func (i *Interpreter) Evaluate(expr ast.Expr) (value.Value, error) {
 	case *ast.FuncExpr:
 		return i.VisitFuncExpr(e)
 	default:
-		return value.Null(), fmt.Errorf("unknown expression type %T", expr)
+		return controlflow.ExecResult{Err: fmt.Errorf("unknown expression type %T", expr)}
 	}
 }
 
@@ -139,110 +139,137 @@ func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) (value
 	}, nil
 }
 
-func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) (value.Value, error) {
+func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) controlflow.ExecResult {
 	tok := expr.Value
 	switch tok.Type {
 	case token.TokenNumber:
 		switch val := tok.Data.(type) {
 		case int:
-			return value.Value{Type: value.ValueInt, Data: float64(val)}, nil
+			return controlflow.ExecResult{Value: value.Value{Type: value.ValueInt, Data: float64(val)}, Flow: controlflow.FlowNone}
 		case int64:
-			return value.Value{Type: value.ValueInt, Data: float64(val)}, nil
+			return controlflow.ExecResult{Value: value.Value{Type: value.ValueInt, Data: float64(val)}, Flow: controlflow.FlowNone}
 		case float64:
-			return value.Value{Type: value.ValueInt, Data: val}, nil
+			return controlflow.ExecResult{Value: value.Value{Type: value.ValueInt, Data: float64(val)}, Flow: controlflow.FlowNone}
 		default:
-			return value.Null(), errors.New("invalid int literal token data")
+			return controlflow.ExecResult{Err: errors.New("invalid int literal token data")}
 
 		}
 
 	case token.TokenString:
-		return value.Value{Type: value.ValueString, Data: tok.Lexeme}, nil
+		return controlflow.ExecResult{Value: value.Value{Type: value.ValueString, Data: tok.Lexeme}, Flow: controlflow.FlowNone}
 	case token.TokenBool:
 		switch tok.Lexeme {
 		case "true":
-			return value.Value{Type: value.ValueBool, Data: true}, nil
+			return controlflow.ExecResult{Value: value.Value{Type: value.ValueBool, Data: true}, Flow: controlflow.FlowNone}
 		case "false":
-			return value.Value{Type: value.ValueBool, Data: false}, nil
+			return controlflow.ExecResult{Value: value.Value{Type: value.ValueBool, Data: false}, Flow: controlflow.FlowNone}
 		}
-		return value.Null(), errors.New("invalid bool literal token")
+		return controlflow.ExecResult{Err: errors.New("invalid bool literal token")}
 	case token.TokenNull:
-		return value.Null(), nil
+		return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 	default:
-		return value.Null(), fmt.Errorf("unsupported literal token type %v", tok.Type)
+		return controlflow.ExecResult{Err: fmt.Errorf("unsupported literal token type %v", tok.Type)}
 	}
 }
 
-func (i *Interpreter) VisitVariableExpr(expr *ast.VariableExpr) (value.Value, error) {
+func (i *Interpreter) VisitVariableExpr(expr *ast.VariableExpr) controlflow.ExecResult {
 	val, err := i.env.Get(expr.Name.Lexeme)
 	if err != nil {
-		return value.Null(), fmt.Errorf("undefined variable %s", expr.Name.Lexeme)
+		return controlflow.ExecResult{Err: fmt.Errorf("undefined variable %s", expr.Name.Lexeme)}
 	}
-	return val, nil
+	return controlflow.ExecResult{Value: val, Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) (value.Value, error) {
-	left, err := i.Evaluate(expr.Left)
-	if err != nil {
-		return value.Null(), err
-	}
-	right, err := i.Evaluate(expr.Right)
-	if err != nil {
-		return value.Null(), err
-	}
+/*
+return controlflow.ExecResult{
 
+	Value: value.Value{
+		Type: value.ValueInt, Data: left.Data.(float64) + right.Data.(float64)},
+
+Flow: controlflow.FlowNone}}
+*/
+func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) controlflow.ExecResult {
+	leftRes := i.Evaluate(expr.Left)
+	if leftRes.Err != nil {
+		return controlflow.ExecResult{Err: leftRes.Err}
+	}
+	left := leftRes.Value
+	rightRes := i.Evaluate(expr.Right)
+	if rightRes.Err != nil {
+		return controlflow.ExecResult{Err: rightRes.Err}
+	}
+	right := rightRes.Value
 	switch expr.Operator.Type {
 	case token.TokenPlus:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			return value.Value{Type: value.ValueInt, Data: left.Data.(float64) + right.Data.(float64)}, nil
+			return controlflow.ExecResult{Value: value.Value{
+				Type: value.ValueString, Data: left.Data.(float64) + right.Data.(float64)},
+				Flow: controlflow.FlowNone}
 		}
 		if left.Type == value.ValueString && right.Type == value.ValueString {
-			return value.Value{Type: value.ValueString, Data: left.Data.(string) + right.Data.(string)}, nil
+			return controlflow.ExecResult{Value: value.Value{
+				Type: value.ValueString, Data: left.Data.(string) + right.Data.(string)},
+				Flow: controlflow.FlowNone}
 		}
-		return value.Null(), fmt.Errorf("unsupported operand types for +: %v and %v", left.Type, right.Type)
+		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for +: %v and %v", left.Type, right.Type)}
 	case token.TokenMinus:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			return value.Value{Type: value.ValueInt, Data: left.Data.(float64) - right.Data.(float64)}, nil
+			return controlflow.ExecResult{Value: value.Value{
+				Type: value.ValueString, Data: left.Data.(float64) - right.Data.(float64)},
+				Flow: controlflow.FlowNone}
 		}
-		return value.Null(), fmt.Errorf("unsupported operand types for -: %v and %v", left.Type, right.Type)
+		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for '-': %v and %v", left.Type, right.Type)}
 	case token.TokenStar:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			return value.Value{Type: value.ValueInt, Data: left.Data.(float64) * right.Data.(float64)}, nil
+			return controlflow.ExecResult{Value: value.Value{
+				Type: value.ValueString, Data: left.Data.(float64) * right.Data.(float64)},
+				Flow: controlflow.FlowNone}
 		}
-		return value.Null(), fmt.Errorf("unsupported operand types for *: %v and %v", left.Type, right.Type)
+		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for *: %v and %v", left.Type, right.Type)}
 	case token.TokenFWDSlash:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
 			if right.Data.(float64) == 0 {
-				return value.Null(), fmt.Errorf("division by zero")
+				return controlflow.ExecResult{Err: fmt.Errorf("division by zero")}
 			}
-			return value.Value{Type: value.ValueInt, Data: left.Data.(float64) / right.Data.(float64)}, nil
+			return controlflow.ExecResult{Value: value.Value{
+				Type: value.ValueString, Data: left.Data.(float64) / right.Data.(float64)},
+				Flow: controlflow.FlowNone}
 		}
-		return value.Null(), fmt.Errorf("unsupported operand types for /: %v and %v", left.Type, right.Type)
+		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for /: %v and %v", left.Type, right.Type)}
 	case token.TokenGreater:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			return value.Value{Type: value.ValueBool, Data: left.Data.(float64) > right.Data.(float64)}, nil
+			return controlflow.ExecResult{Value: value.Value{
+				Type: value.ValueString, Data: left.Data.(float64) > right.Data.(float64)},
+				Flow: controlflow.FlowNone}
 		}
-		return value.Null(), fmt.Errorf("unsupported operand types for >: %v and %v", left.Type, right.Type)
+		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for >: %v and %v", left.Type, right.Type)}
 	case token.TokenLess:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
-			return value.Value{Type: value.ValueBool, Data: left.Data.(float64) < right.Data.(float64)}, nil
+			return controlflow.ExecResult{Value: value.Value{
+				Type: value.ValueString, Data: left.Data.(float64) < right.Data.(float64)},
+				Flow: controlflow.FlowNone}
 		}
-		return value.Null(), fmt.Errorf("unsupported operand types for <: %v and %v", left.Type, right.Type)
+		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for <: %v and %v", left.Type, right.Type)}
 	case token.TokenEqality:
 		if left.Type != right.Type {
-			return value.Value{Type: value.ValueBool, Data: false}, nil
+			return controlflow.ExecResult{Value: value.Value{
+				Type: value.ValueBool, Data: false},
+				Flow: controlflow.FlowNone}
 		}
-		return value.Value{Type: value.ValueBool, Data: left.Data == right.Data}, nil
+		return controlflow.ExecResult{Value: value.Value{Type: value.ValueBool, Data: left.Data == right.Data}, Flow: controlflow.FlowNone}
 	case token.TokenBangEqal:
 		if left.Type != right.Type {
-			return value.Value{Type: value.ValueBool, Data: true}, nil
+			return controlflow.ExecResult{Value: value.Value{
+				Type: value.ValueBool, Data: true},
+				Flow: controlflow.FlowNone}
 		}
-		return value.Value{Type: value.ValueBool, Data: left.Data != right.Data}, nil
+		return controlflow.ExecResult{Value: value.Value{Type: value.ValueBool, Data: left.Data != right.Data}}
 	default:
-		return value.Null(), fmt.Errorf("unsupported binary operator %v", expr.Operator.Lexeme)
+		return controlflow.ExecResult{Err: fmt.Errorf("unsupported binary operator %v", expr.Operator.Lexeme)}
 	}
 }
 
-func (i *Interpreter) VisitUnaryExpr(expr *ast.UnaryExpr) (value.Value, error) {
+func (i *Interpreter) VisitUnaryExpr(expr *ast.UnaryExpr) controlflow.ExecResult {
 	right, err := i.Evaluate(expr.Right)
 	if err != nil {
 		return value.Null(), err
@@ -250,16 +277,16 @@ func (i *Interpreter) VisitUnaryExpr(expr *ast.UnaryExpr) (value.Value, error) {
 	switch expr.Operator.Type {
 	case token.TokenBang:
 		if right.Type != value.ValueBool {
-			return value.Null(), fmt.Errorf("operator ! requires boolean operand")
+			return controlflow.ExecResult{Err: fmt.Errorf("operator ! requires boolean operand")}
 		}
-		return value.Value{Type: value.ValueBool, Data: !right.Data.(bool)}, nil
+		return value.Value{Type: value.ValueBool, Data: !right.Data.(bool)}
 	case token.TokenMinus:
 		if right.Type != value.ValueInt {
-			return value.Null(), fmt.Errorf("operator - requires int operand")
+			return controlflow.ExecResult{Err: fmt.Errorf("operator - requires int operand")}
 		}
-		return value.Value{Type: value.ValueInt, Data: -right.Data.(float64)}, nil
+		return value.Value{Type: value.ValueInt, Data: -right.Data.(float64)}
 	default:
-		return value.Null(), fmt.Errorf("unsupported unary operator %v", expr.Operator.Lexeme)
+		return controlflow.ExecResult{Err: fmt.Errorf("unsupported unary operator %v", expr.Operator.Lexeme)}
 	}
 }
 
