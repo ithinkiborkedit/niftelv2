@@ -9,6 +9,7 @@ import (
 	"github.com/ithinkiborkedit/niftelv2.git/internal/function"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
@@ -176,21 +177,13 @@ func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) controlflow.ExecRe
 }
 
 func (i *Interpreter) VisitVariableExpr(expr *ast.VariableExpr) controlflow.ExecResult {
-	val, err := i.env.Get(expr.Name.Lexeme)
+	val, err := i.env.GetVar(expr.Name.Lexeme)
 	if err != nil {
 		return controlflow.ExecResult{Err: fmt.Errorf("undefined variable %s", expr.Name.Lexeme)}
 	}
 	return controlflow.ExecResult{Value: val, Flow: controlflow.FlowNone}
 }
 
-/*
-return controlflow.ExecResult{
-
-	Value: value.Value{
-		Type: value.ValueInt, Data: left.Data.(float64) + right.Data.(float64)},
-
-Flow: controlflow.FlowNone}}
-*/
 func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) controlflow.ExecResult {
 	leftRes := i.Evaluate(expr.Left)
 	if leftRes.Err != nil {
@@ -307,18 +300,18 @@ func (i *Interpreter) VisitUnaryExpr(expr *ast.UnaryExpr) controlflow.ExecResult
 func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) controlflow.ExecResult {
 	structName := stmt.Name.Lexeme
 
-	if value.HasType(structName) {
+	if i.env.HasLocalType(structName) {
 		return controlflow.ExecResult{Err: fmt.Errorf("struct '%s' already defined", structName)}
 	}
 
-	fields := make(map[string]*value.TypeInfo)
+	fields := make(map[string]*symtable.TypeSymbol)
 	for _, field := range stmt.Fields {
 		if len(field.Names) != 1 {
 			return controlflow.ExecResult{Err: fmt.Errorf("struct field must have exactly one name!")}
 		}
 		fieldName := field.Names[0].Lexeme
 		fieldTypeName := field.Type.Lexeme
-		fieldType, ok := value.GetType(fieldTypeName)
+		fieldType, ok := i.env.LookupType(fieldTypeName)
 		if !ok {
 			return controlflow.ExecResult{Err: fmt.Errorf("Uknown type '%s' for struct field '%s'", fieldTypeName, fieldName)}
 		}
@@ -331,13 +324,15 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) controlflow.ExecResu
 		}
 	}
 
-	typeInfo := &value.TypeInfo{
-		Name:    structName,
-		Kind:    value.TypeKindStruct,
+	structSym := &symtable.TypeSymbol{
+		SymName: structName,
+		SymKind: symtable.SymbolTypes,
 		Fields:  fields,
-		Methods: methods,
 	}
-	value.RegisterType(structName, typeInfo)
+
+	if err := i.env.DefineType(structSym); err != nil {
+		return controlflow.ExecResult{Err: err}
+	}
 	fmt.Printf("[INFO] REGISTERED struct type: '%s'\n", stmt.Name.Lexeme)
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
@@ -349,7 +344,28 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 	}
 	val := valRes.Value
 	if len(stmt.Names) == 1 {
-		i.env.Define(stmt.Names[0].Lexeme, val)
+		name := stmt.Names[0].Lexeme
+		var varTypeSym *symtable.TypeSymbol = nil
+		if stmt.Type.Lexeme != "" {
+			typeSym, ok := i.env.LookupType(stmt.Type.Lexeme)
+			if !ok {
+				return controlflow.ExecResult{Err: fmt.Errorf("unknown type '%s'", stmt.Type.Lexeme)}
+			}
+			varTypeSym = typeSym
+		}
+		varSym := &symtable.VarSymbol{
+			SymName: name,
+			SymKind: symtable.SymbolVar,
+			Type:    varTypeSym,
+			Mutable: true,
+		}
+		if err := i.env.DefineVar(varSym); err != nil {
+			return controlflow.ExecResult{Err: err}
+		}
+		if err := i.env.AssignVar(name, val); err != nil {
+			return controlflow.ExecResult{Err: err}
+		}
+
 		return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 	}
 
@@ -361,7 +377,19 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 		return controlflow.ExecResult{Err: fmt.Errorf("mismatch: %d variables but %d values returned", len(stmt.Names), len(values))}
 	}
 	for idx, name := range stmt.Names {
-		i.env.Define(name.Lexeme, values[idx])
+		name := name.Lexeme
+		varSym := &symtable.VarSymbol{
+			SymName: name,
+			SymKind: symtable.SymbolVar,
+			Mutable: true,
+		}
+		if err := i.env.DefineVar(varSym); err != nil {
+			return controlflow.ExecResult{Err: err}
+
+		}
+		if err := i.env.AssignVar(name, values[idx]); err != nil {
+			return controlflow.ExecResult{Err: err}
+		}
 	}
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
@@ -372,7 +400,21 @@ func (i *Interpreter) VisitShortVarStmt(stmt *ast.ShortVarStmt) controlflow.Exec
 		return controlflow.ExecResult{Err: valRes.Err}
 	}
 	val := valRes.Value
-	i.env.Define(stmt.Name.Lexeme, val)
+	name := stmt.Name.Lexeme
+
+	varSym := &symtable.VarSymbol{
+		SymName: name,
+		SymKind: symtable.SymbolVar,
+		Type:    nil,
+		Mutable: true,
+	}
+	if err := i.env.DefineVar(varSym); err != nil {
+		return controlflow.ExecResult{Err: err}
+	}
+	if err := i.env.AssignVar(name, val); err != nil {
+		return controlflow.ExecResult{Err: err}
+
+	}
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
@@ -382,8 +424,7 @@ func (i *Interpreter) VisitAssignStmt(stmt *ast.AssignStmt) controlflow.ExecResu
 		return controlflow.ExecResult{Err: valRes.Err}
 	}
 	val := valRes.Value
-	err := i.env.Assign(stmt.Name.Lexeme, val)
-	if err != nil {
+	if err := i.env.AssignVar(stmt.Name.Lexeme, val); err != nil {
 		return controlflow.ExecResult{Err: err}
 	}
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
@@ -718,12 +759,21 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) controlflow.ExecResult {
 
 // VisitFuncStmt defines a function in the environment.
 func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
-	if i.env.HasLocal(stmt.Name.Lexeme) {
+	name := stmt.Name.Lexeme
+
+	if i.env.HasLocalFunc(name) {
 		return controlflow.ExecResult{
 			Err: fmt.Errorf("function '%s' already defined in this scope", stmt.Name.Lexeme),
 		}
 	}
 	fmt.Printf("Defining function: %s\n", stmt.Name.Lexeme)
+	funcSym := &symtable.FuncSymbol{
+		SymName: name,
+		Params:  nil,
+	}
+	if err := i.env.DefineFunc(funcSym); err != nil {
+		return controlflow.ExecResult{Err: err}
+	}
 	fn := function.NewUserFunc(
 		stmt.Name.Lexeme,
 		stmt.Params,
@@ -731,10 +781,13 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 		i.env,
 		stmt.Func.Line,
 		stmt.Func.Column)
-	i.env.Define(stmt.Name.Lexeme, value.Value{
+
+	if err := i.env.AssignVar(stmt.Name.Lexeme, value.Value{
 		Type: value.ValueFunc,
 		Data: fn,
-	})
+	}); err != nil {
+		return controlflow.ExecResult{Err: err}
+	}
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 

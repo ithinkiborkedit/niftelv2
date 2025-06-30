@@ -6,6 +6,7 @@ import (
 	"github.com/ithinkiborkedit/niftelv2.git/internal/controlflow"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
@@ -68,7 +69,18 @@ func (f *Function) Call(args []value.Value, interp InterpreterAPI) controlflow.E
 
 	callEnv := environment.NewEnvironment(f.env)
 	for i, param := range f.params {
-		callEnv.Define(param.Name.Lexeme, args[i])
+		paramSym := &symtable.VarSymbol{
+			SymName: param.Name.Lexeme,
+			SymKind: symtable.SymbolVar,
+			Mutable: true,
+		}
+		if err := callEnv.DefineVar(paramSym); err != nil {
+			return controlflow.ExecResult{Err: fmt.Errorf("parameter '%s' already defied: %w", param.Name.Lexeme, err)}
+		}
+		if err := callEnv.AssignVar(param.Name.Lexeme, args[i]); err != nil {
+			return controlflow.ExecResult{Err: err}
+		}
+		// callEnv.Define(param.Name.Lexeme, args[i])
 	}
 
 	interp.PushEnv(callEnv)
