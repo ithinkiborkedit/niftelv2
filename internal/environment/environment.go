@@ -1,10 +1,7 @@
 package environment
 
 import (
-	"fmt"
-
 	"github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
 type Environment struct {
@@ -14,41 +11,102 @@ type Environment struct {
 	// types     map[string]*value.StructType
 }
 
-func NewEnvironment(enclosing *Environment) *Environment {
+func NewEnvironment(parent *Environment) *Environment {
+	var parentTable *symtable.SymbolTable
+	if parent != nil {
+		parentTable = parent.symbols
+
+	}
+	// return &Environment{
+	// variables: make(map[string]value.Value),
+	// 	enclosing: enclosing,
+	// 	types:     make(map[string]*value.StructType),
+	// }
 	return &Environment{
-		variables: make(map[string]value.Value),
-		enclosing: enclosing,
-		types:     make(map[string]*value.StructType),
+		symbols:   symtable.NewSymbolTable(parentTable),
+		enclosing: parent,
 	}
 }
 
-func (e *Environment) Define(name string, val value.Value) {
-	fmt.Printf("ENV DEFINING '%s' as type %v", name, val.Type)
-	e.variables[name] = val
-}
-func (e *Environment) Assign(name string, val value.Value) error {
-
-	if _, ok := e.variables[name]; ok {
-		e.variables[name] = val
-		return nil
-	}
-	if e.enclosing != nil {
-		return e.enclosing.Assign(name, val)
-	}
-
-	return fmt.Errorf("undefined variable '%s'", name)
+func (e *Environment) DefineVar(sym *symtable.VarSymbol) error {
+	return e.symbols.DefineValue(sym)
 }
 
-func (e *Environment) Get(name string) (value.Value, error) {
-	val, ok := e.variables[name]
-	fmt.Printf("ENV LOOKING UP '%s' as type %v", name, val.Type)
+func (e *Environment) DefineFunc(sym *symtable.FuncSymbol) error {
+	return e.symbols.DefineValue(sym)
+}
+
+func (e *Environment) DefineType(sym *symtable.TypeSymbol) error {
+	return e.symbols.DefineValue(sym)
+}
+
+func (e *Environment) DefineTypeParam(sym *symtable.TypeParamSymbol) error {
+	return e.symbols.DefineValue(sym)
+}
+
+func (e *Environment) LookupVar(name string) (*symtable.VarSymbol, bool) {
+	sym, ok := e.symbols.Lookup(symtable.SymbolVar, name)
 	if ok {
-		return val, nil
+		return nil, false
 	}
-
-	if e.enclosing != nil {
-		return e.enclosing.Get(name)
-	}
-
-	return value.Null(), fmt.Errorf("undefined variable '%s'", name)
+	varSym, ok := sym.(*symtable.VarSymbol)
+	return varSym, ok
 }
+
+func (e *Environment) LookupFunc(name string) (*symtable.FuncSymbol, bool) {
+	sym, ok := e.symbols.Lookup(symtable.SymbolFuncs, name)
+	if ok {
+		return nil, false
+	}
+	funcSym, ok := sym.(*symtable.FuncSymbol)
+	return funcSym, ok
+}
+
+func (e *Environment) LookupType(name string) (*symtable.TypeSymbol, bool) {
+	sym, ok := e.symbols.Lookup(symtable.SymbolTypes, name)
+	if ok {
+		return nil, false
+	}
+	typeSym, ok := sym.(*symtable.TypeSymbol)
+	return typeSym, ok
+}
+
+func (e *Environment) LookupTypeParam(name string) (*symtable.TypeParamSymbol, bool) {
+	sym, ok := e.symbols.Lookup(symtable.SymbolTypeParams, name)
+	if ok {
+		return nil, false
+	}
+	typeparamSym, ok := sym.(*symtable.TypeParamSymbol)
+	return typeparamSym, ok
+}
+
+//	func (e *Environment) Define(name string, val value.Value) {
+//		fmt.Printf("ENV DEFINING '%s' as type %v", name, val.Type)
+//		e.variables[name] = val
+//	}
+// func (e *Environment) Assign(name string, val value.Value) error {
+
+// 	if _, ok := e.variables[name]; ok {
+// 		e.variables[name] = val
+// 		return nil
+// 	}
+// 	if e.enclosing != nil {
+// 		return e.enclosing.Assign(name, val)
+// 	}
+
+// 	return fmt.Errorf("undefined variable '%s'", name)
+// }
+
+// func (e *Environment) Get(name string) (value.Value, error) {
+// 	val, ok := e.variables[name]
+// 	fmt.Printf("ENV LOOKING UP '%s' as type %v", name, val.Type)
+// 	if ok {
+// 		return val, nil
+// 	}
+
+// 	if e.enclosing != nil {
+// 		return e.enclosing.Get(name)
+// 	}
+
+// 	return value.Null(), fmt.Errorf("undefined variable '%s'", name)
+// }

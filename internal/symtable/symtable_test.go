@@ -77,7 +77,7 @@ func TestSymbolTable_ParentLookup(t *testing.T) {
 
 func TestSymbolTable_TypeParams(t *testing.T) {
 	root := symtable.NewSymbolTable(nil)
-	tp := &symtable.TypeParamSymbol{Symnam: "T"}
+	tp := &symtable.TypeParamSymbol{SymNam: "T"}
 	if err := root.DefineValue(tp); err != nil {
 		t.Fatalf("Failed to define type param: %v", err)
 	}
