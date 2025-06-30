@@ -1,12 +1,14 @@
 package symtable
 
+import "fmt"
+
 type SymbolKind int
 
 const (
 	SymbolVar SymbolKind = iota
-	SymbolFunc
-	SymbolType
-	SymbolTypeParam
+	SymbolFuncs
+	SymbolTypes
+	SymbolTypeParams
 )
 
 type Symbol interface {
@@ -22,11 +24,22 @@ type TypeSymbol struct {
 	TypeParams []string
 }
 
+type TypeParamSymbol struct {
+	Symnam string
+}
+
 type VarSymbol struct {
 	SymName string
 	SymKind SymbolKind
 	Type    *TypeSymbol
 	Mutable bool
+}
+
+type FuncSymbol struct {
+	SymName    string
+	Params     []VarSymbol
+	ReturnType *TypeSymbol
+	TypeParams []string
 }
 
 func (v *VarSymbol) Name() string {
@@ -53,27 +66,26 @@ func (t *TypeSymbol) String() string {
 	return t.SymName
 }
 
-// type TypeSymbol struct {
-// 	Name string
-// }
+func (f *FuncSymbol) Name() string {
+	return f.Name()
+}
 
-// type VarSymbol struct {
-// 	Name string
-// 	Kind SymbolKind
-// 	Type *TypeSymbol
-// }
+func (f *FuncSymbol) Kind() SymbolKind {
+	return SymbolFuncs
+}
 
-// type SymbolTable struct {
-// 	values map[string]*VarSymbol
-// 	types  map[string]*TypeSymbol
-// 	parent *SymbolTable
-// }
+func (f *FuncSymbol) String() string {
+	return fmt.Sprintf("func %s", f.SymName)
+}
 
-// type Scope struct {
-// 	Vars       map[string]*Symbol
-// 	Funcs      map[string]*Symbol
-// 	Types      map[string]*Symbol
-// 	TypeParams map[string]*Symbol
-// 	Parent     *Scope
-// 	Level      int
-// }
+func (tp *TypeParamSymbol) Name() string {
+	return tp.Name()
+}
+
+func (tp *TypeParamSymbol) Kind() SymbolKind {
+	return SymbolTypeParams
+}
+
+func (tp *TypeParamSymbol) String() string {
+	return fmt.Sprintf("typeparam %s", tp.Symnam)
+}

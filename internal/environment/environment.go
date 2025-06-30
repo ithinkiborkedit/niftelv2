@@ -3,13 +3,15 @@ package environment
 import (
 	"fmt"
 
+	"github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
 type Environment struct {
-	variables map[string]value.Value
+	symbols *symtable.SymbolTable
+	// variables map[string]value.Value
 	enclosing *Environment
-	types     map[string]*value.StructType
+	// types     map[string]*value.StructType
 }
 
 func NewEnvironment(enclosing *Environment) *Environment {
