@@ -203,7 +203,7 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) controlflow.ExecResu
 	case token.TokenPlus:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
 			return controlflow.ExecResult{Value: value.Value{
-				Type: value.ValueString, Data: left.Data.(float64) + right.Data.(float64)},
+				Type: value.ValueInt, Data: left.Data.(float64) + right.Data.(float64)},
 				Flow: controlflow.FlowNone}
 		}
 		if left.Type == value.ValueString && right.Type == value.ValueString {
@@ -215,14 +215,14 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) controlflow.ExecResu
 	case token.TokenMinus:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
 			return controlflow.ExecResult{Value: value.Value{
-				Type: value.ValueString, Data: left.Data.(float64) - right.Data.(float64)},
+				Type: value.ValueInt, Data: left.Data.(float64) - right.Data.(float64)},
 				Flow: controlflow.FlowNone}
 		}
 		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for '-': %v and %v", left.Type, right.Type)}
 	case token.TokenStar:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
 			return controlflow.ExecResult{Value: value.Value{
-				Type: value.ValueString, Data: left.Data.(float64) * right.Data.(float64)},
+				Type: value.ValueInt, Data: left.Data.(float64) * right.Data.(float64)},
 				Flow: controlflow.FlowNone}
 		}
 		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for *: %v and %v", left.Type, right.Type)}
@@ -232,21 +232,21 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) controlflow.ExecResu
 				return controlflow.ExecResult{Err: fmt.Errorf("division by zero")}
 			}
 			return controlflow.ExecResult{Value: value.Value{
-				Type: value.ValueString, Data: left.Data.(float64) / right.Data.(float64)},
+				Type: value.ValueInt, Data: left.Data.(float64) / right.Data.(float64)},
 				Flow: controlflow.FlowNone}
 		}
 		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for /: %v and %v", left.Type, right.Type)}
 	case token.TokenGreater:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
 			return controlflow.ExecResult{Value: value.Value{
-				Type: value.ValueString, Data: left.Data.(float64) > right.Data.(float64)},
+				Type: value.ValueInt, Data: left.Data.(float64) > right.Data.(float64)},
 				Flow: controlflow.FlowNone}
 		}
 		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for >: %v and %v", left.Type, right.Type)}
 	case token.TokenLess:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
 			return controlflow.ExecResult{Value: value.Value{
-				Type: value.ValueString, Data: left.Data.(float64) < right.Data.(float64)},
+				Type: value.ValueInt, Data: left.Data.(float64) < right.Data.(float64)},
 				Flow: controlflow.FlowNone}
 		}
 		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for <: %v and %v", left.Type, right.Type)}
