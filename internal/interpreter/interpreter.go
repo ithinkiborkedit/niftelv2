@@ -97,12 +97,12 @@ func (i *Interpreter) Execute(stmt ast.Stmt) controlflow.ExecResult {
 
 // --- Expression Visitors ---
 
-func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) (value.Value, error) {
+func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) controlflow.ExecResult {
 	structName := expr.TypeName.Lexeme
 
 	typeInfo, ok := value.GetType(structName)
 	if !ok || typeInfo.Kind != value.TypeKindStruct {
-		return value.Null(), fmt.Errorf("struct tpye '%s' not found", structName)
+		return controlflow.ExecResult{Value: value.Null(), Err: fmt.Errorf("struct tpye '%s' not found", structName)}
 	}
 
 	structType := &value.StructType{
@@ -119,11 +119,11 @@ func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) (value
 	}
 
 	for fname, exprval := range expr.Fields {
-		val, err := i.Evaluate(exprval)
-		if err != nil {
-			return value.Null(), fmt.Errorf("error in field '%s': %w", fname, err)
+		valRes := i.Evaluate(exprval)
+		if valRes.Err != nil {
+			return controlflow.ExecResult{Value: value.Null(), Err: fmt.Errorf("error in field '%s': %w", fname, valRes.Err)}
 		}
-		instance.Fields[fname] = val
+		instance.Fields[fname] = valRes.Value
 	}
 
 	for fname := range typeInfo.Fields {
@@ -132,11 +132,20 @@ func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) (value
 		}
 	}
 
-	return value.Value{
-		Type: value.ValueStruct,
-		Data: instance,
-		Meta: typeInfo,
-	}, nil
+	return controlflow.ExecResult{
+		Value: value.Value{
+			Type: value.ValueStruct,
+			Data: instance,
+			Meta: typeInfo,
+		},
+		Flow: controlflow.FlowNone,
+	}
+
+	// return value.Value{
+	// 	Type: value.ValueStruct,
+	// 	Data: instance,
+	// 	Meta: typeInfo,
+	// }, nil
 }
 
 func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) controlflow.ExecResult {
@@ -378,7 +387,8 @@ func (i *Interpreter) VisitAssignStmt(stmt *ast.AssignStmt) controlflow.ExecResu
 	if valRes.Err != nil {
 		return controlflow.ExecResult{Err: valRes.Err}
 	}
-	err = i.env.Assign(stmt.Name.Lexeme, val)
+	val := valRes.Value
+	err := i.env.Assign(stmt.Name.Lexeme, val)
 	if err != nil {
 		return controlflow.ExecResult{Err: err}
 	}
@@ -386,19 +396,21 @@ func (i *Interpreter) VisitAssignStmt(stmt *ast.AssignStmt) controlflow.ExecResu
 }
 
 func (i *Interpreter) VisitPrintStmt(stmt *ast.PrintStmt) controlflow.ExecResult {
-	val, err := i.Evaluate(stmt.Expr)
-	if err != nil {
-		return controlflow.ExecResult{Err: err}
+	valRes := i.Evaluate(stmt.Expr)
+	if valRes.Err != nil {
+		return controlflow.ExecResult{Err: valRes.Err}
 	}
+	val := valRes.Value
 	fmt.Println(val.String())
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
 func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) controlflow.ExecResult {
-	result, err := i.Evaluate(stmt.Expr)
-	if err != nil {
-		return controlflow.ExecResult{Err: err}
+	resultRes := i.Evaluate(stmt.Expr)
+	if resultRes.Err != nil {
+		return controlflow.ExecResult{Err: resultRes.Err}
 	}
+	result := resultRes.Value
 	if i.ShouldPrintResults && !result.IsNull() {
 		fmt.Println(result.String())
 	}
@@ -407,10 +419,11 @@ func (i *Interpreter) VisitExprStmt(stmt *ast.ExprStmt) controlflow.ExecResult {
 }
 
 func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) controlflow.ExecResult {
-	cond, err := i.Evaluate(stmt.Conditon)
-	if err != nil {
-		return controlflow.ExecResult{Err: err}
+	condRes := i.Evaluate(stmt.Conditon)
+	if condRes.Err != nil {
+		return controlflow.ExecResult{Err: condRes.Err}
 	}
+	cond := condRes.Value
 	fmt.Printf("If conditon %#v (type=%v)\n", cond, cond.Type)
 	if cond.Type != value.ValueBool {
 		return controlflow.ExecResult{Err: fmt.Errorf("if condition must evaluate to bool")}
@@ -425,10 +438,11 @@ func (i *Interpreter) VisitIfStmt(stmt *ast.IfStmt) controlflow.ExecResult {
 
 func (i *Interpreter) VisitWhileStmt(stmt *ast.WhileStmt) controlflow.ExecResult {
 	for {
-		cond, err := i.Evaluate(stmt.Conditon)
-		if err != nil {
-			return controlflow.ExecResult{Err: err}
+		condRes := i.Evaluate(stmt.Conditon)
+		if condRes.Err != nil {
+			return controlflow.ExecResult{Err: condRes.Err}
 		}
+		cond := condRes.Value
 		if cond.Type != value.ValueBool {
 			return controlflow.ExecResult{Err: fmt.Errorf("while condition must evaluate to bool")}
 		}
@@ -513,10 +527,11 @@ func (i *Interpreter) VisitForStmt(stmt *ast.ForStmt) controlflow.ExecResult {
 	for {
 		// Condition expression
 		if stmt.CondExpr != nil {
-			condVal, err := i.Evaluate(stmt.CondExpr)
-			if err != nil {
-				return controlflow.ExecResult{Err: err}
+			condRes := i.Evaluate(stmt.CondExpr)
+			if condRes.Err != nil {
+				return controlflow.ExecResult{Err: condRes.Err}
 			}
+			condVal := condRes.Value
 			if condVal.Type != value.ValueBool {
 				return controlflow.ExecResult{Err: fmt.Errorf("for loop condition must evaluate to bool")}
 			}
@@ -729,25 +744,25 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 
 func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) controlflow.ExecResult {
 	var result value.Value
-	var err error
 
 	if len(stmt.Values) == 0 {
 		result = value.Null()
 	} else if len(stmt.Values) == 1 {
-		result, err = i.Evaluate(stmt.Values[0])
-		if err != nil {
+		valRes := i.Evaluate(stmt.Values[0])
+		if valRes.Err != nil {
 			return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 		}
+		result = valRes.Value
 	} else {
 		vals := make([]value.Value, len(stmt.Values))
 		types := make([]*value.TypeInfo, len(stmt.Values))
 		for idx, expr := range stmt.Values {
-			val, err := i.Evaluate(expr)
-			if err != nil {
+			valRes := i.Evaluate(expr)
+			if valRes.Err != nil {
 				return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 			}
-			vals[idx] = val
-			types[idx] = val.TypeInfo()
+			vals[idx] = valRes.Value
+			types[idx] = valRes.Value.TypeInfo()
 		}
 		tupleType := value.GetOrRegisterTupleType(types)
 		tupleVal := value.NewTupleValue(tupleType, vals)
