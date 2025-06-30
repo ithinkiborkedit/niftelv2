@@ -46,7 +46,7 @@ func (e *Environment) DefineTypeParam(sym *symtable.TypeParamSymbol) error {
 
 func (e *Environment) LookupVar(name string) (*symtable.VarSymbol, bool) {
 	sym, ok := e.symbols.Lookup(symtable.SymbolVar, name)
-	if ok {
+	if !ok {
 		return nil, false
 	}
 	varSym, ok := sym.(*symtable.VarSymbol)
@@ -55,7 +55,7 @@ func (e *Environment) LookupVar(name string) (*symtable.VarSymbol, bool) {
 
 func (e *Environment) LookupFunc(name string) (*symtable.FuncSymbol, bool) {
 	sym, ok := e.symbols.Lookup(symtable.SymbolFuncs, name)
-	if ok {
+	if !ok {
 		return nil, false
 	}
 	funcSym, ok := sym.(*symtable.FuncSymbol)
@@ -64,7 +64,7 @@ func (e *Environment) LookupFunc(name string) (*symtable.FuncSymbol, bool) {
 
 func (e *Environment) LookupType(name string) (*symtable.TypeSymbol, bool) {
 	sym, ok := e.symbols.Lookup(symtable.SymbolTypes, name)
-	if ok {
+	if !ok {
 		return nil, false
 	}
 	typeSym, ok := sym.(*symtable.TypeSymbol)
@@ -73,7 +73,7 @@ func (e *Environment) LookupType(name string) (*symtable.TypeSymbol, bool) {
 
 func (e *Environment) LookupTypeParam(name string) (*symtable.TypeParamSymbol, bool) {
 	sym, ok := e.symbols.Lookup(symtable.SymbolTypeParams, name)
-	if ok {
+	if !ok {
 		return nil, false
 	}
 	typeparamSym, ok := sym.(*symtable.TypeParamSymbol)
