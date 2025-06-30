@@ -239,14 +239,14 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) controlflow.ExecResu
 	case token.TokenGreater:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
 			return controlflow.ExecResult{Value: value.Value{
-				Type: value.ValueInt, Data: left.Data.(float64) > right.Data.(float64)},
+				Type: value.ValueBool, Data: left.Data.(float64) > right.Data.(float64)},
 				Flow: controlflow.FlowNone}
 		}
 		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for >: %v and %v", left.Type, right.Type)}
 	case token.TokenLess:
 		if left.Type == value.ValueInt && right.Type == value.ValueInt {
 			return controlflow.ExecResult{Value: value.Value{
-				Type: value.ValueInt, Data: left.Data.(float64) < right.Data.(float64)},
+				Type: value.ValueBool, Data: left.Data.(float64) < right.Data.(float64)},
 				Flow: controlflow.FlowNone}
 		}
 		return controlflow.ExecResult{Err: fmt.Errorf("unsupported operand types for <: %v and %v", left.Type, right.Type)}
