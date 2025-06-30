@@ -496,9 +496,6 @@ func (i *Interpreter) VisitBlockStmt(stmt *ast.BlockStmt) controlflow.ExecResult
 		if result.Flow != controlflow.FlowNone {
 			return result
 		}
-		if result.Flow != controlflow.FlowNone {
-			return result
-		}
 	}
 
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
@@ -586,7 +583,7 @@ func (i *Interpreter) VisitIndexExpr(expr *ast.IndexExpr) controlflow.ExecResult
 	// Evaluate the index/key expression
 	indexRes := i.Evaluate(expr.Index)
 	if indexRes.Err != nil {
-		return controlflow.ExecResult{Err: collectionRes.Err}
+		return controlflow.ExecResult{Err: indexRes.Err}
 	}
 
 	indexVal := indexRes.Value
