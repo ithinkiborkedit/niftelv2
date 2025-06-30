@@ -63,7 +63,7 @@ func TestEnvironmentDefineAndLookup(t *testing.T) {
 
 func TestEnvironmentDefineTypeParam(t *testing.T) {
 	env := environment.NewEnvironment(nil)
-	tp := &symtable.TypeParamSymbol{Symnam: "T"}
+	tp := &symtable.TypeParamSymbol{SymNam: "T"}
 	if err := env.DefineTypeParam(tp); err != nil {
 		t.Fatalf("unexpected error defining type param: %v", err)
 	}

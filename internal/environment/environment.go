@@ -1,11 +1,15 @@
 package environment
 
 import (
+	"fmt"
+
 	"github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
 type Environment struct {
 	symbols *symtable.SymbolTable
+	values  map[string]value.Value
 	// variables map[string]value.Value
 	enclosing *Environment
 	// types     map[string]*value.StructType
@@ -17,15 +21,43 @@ func NewEnvironment(parent *Environment) *Environment {
 		parentTable = parent.symbols
 
 	}
-	// return &Environment{
-	// variables: make(map[string]value.Value),
-	// 	enclosing: enclosing,
-	// 	types:     make(map[string]*value.StructType),
-	// }
+
 	return &Environment{
 		symbols:   symtable.NewSymbolTable(parentTable),
 		enclosing: parent,
 	}
+}
+
+func (e *Environment) envForSymbol(kind symtable.SymbolKind, name string) *Environment {
+	if e.symbols.HasLocal(kind, name) {
+		return e
+	}
+	if e.enclosing != nil {
+		return e.enclosing.envForSymbol(kind, name)
+
+	}
+	return nil
+}
+
+func (e *Environment) Parent() *Environment {
+	return e.enclosing
+}
+
+func (e *Environment) SymbolTable() *symtable.SymbolTable {
+	return e.symbols
+}
+
+func (e *Environment) Values() map[string]value.Value {
+	return e.Values()
+}
+
+func (e *Environment) AssignVar(name string, val value.Value) error {
+	env := e.envForSymbol(symtable.SymbolVar, name)
+	if env == nil {
+		return fmt.Errorf("undefined  variable '%s'", name)
+	}
+	env.values[name] = val
+	return nil
 }
 
 func (e *Environment) DefineVar(sym *symtable.VarSymbol) error {
@@ -44,10 +76,25 @@ func (e *Environment) DefineTypeParam(sym *symtable.TypeParamSymbol) error {
 	return e.symbols.DefineValue(sym)
 }
 
+func (e *Environment) GetVar(name string) (value.Value, error) {
+	env := e.envForSymbol(symtable.SymbolVar, name)
+	if env == nil {
+		return value.Null(), fmt.Errorf("undefined variable '%s'", name)
+	}
+	val, ok := env.values[name]
+	if !ok {
+		return value.Null(), fmt.Errorf("uninitialised variable '%s'", name)
+	}
+	return val, nil
+}
+
 func (e *Environment) LookupVar(name string) (*symtable.VarSymbol, bool) {
 	sym, ok := e.symbols.Lookup(symtable.SymbolVar, name)
 	if !ok {
 		return nil, false
+	}
+	if e.enclosing != nil {
+		return e.enclosing.AssignVar
 	}
 	varSym, ok := sym.(*symtable.VarSymbol)
 	return varSym, ok
@@ -95,34 +142,3 @@ func (e *Environment) HasLocalType(name string) bool {
 func (e *Environment) HasLocalTypeparam(name string) bool {
 	return e.symbols.HasLocal(symtable.SymbolTypeParams, name)
 }
-
-//	func (e *Environment) Define(name string, val value.Value) {
-//		fmt.Printf("ENV DEFINING '%s' as type %v", name, val.Type)
-//		e.variables[name] = val
-//	}
-// func (e *Environment) Assign(name string, val value.Value) error {
-
-// 	if _, ok := e.variables[name]; ok {
-// 		e.variables[name] = val
-// 		return nil
-// 	}
-// 	if e.enclosing != nil {
-// 		return e.enclosing.Assign(name, val)
-// 	}
-
-// 	return fmt.Errorf("undefined variable '%s'", name)
-// }
-
-// func (e *Environment) Get(name string) (value.Value, error) {
-// 	val, ok := e.variables[name]
-// 	fmt.Printf("ENV LOOKING UP '%s' as type %v", name, val.Type)
-// 	if ok {
-// 		return val, nil
-// 	}
-
-// 	if e.enclosing != nil {
-// 		return e.enclosing.Get(name)
-// 	}
-
-// 	return value.Null(), fmt.Errorf("undefined variable '%s'", name)
-// }
