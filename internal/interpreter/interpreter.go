@@ -741,7 +741,7 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) controlflow.ExecResu
 	} else if len(stmt.Values) == 1 {
 		valRes := i.Evaluate(stmt.Values[0])
 		if valRes.Err != nil {
-			return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
+			return controlflow.ExecResult{Err: valRes.Err}
 		}
 		result = valRes.Value
 	} else {
@@ -750,7 +750,7 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) controlflow.ExecResu
 		for idx, expr := range stmt.Values {
 			valRes := i.Evaluate(expr)
 			if valRes.Err != nil {
-				return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
+				return controlflow.ExecResult{Err: valRes.Err}
 			}
 			vals[idx] = valRes.Value
 			types[idx] = valRes.Value.TypeInfo()
