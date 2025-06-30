@@ -80,6 +80,22 @@ func (e *Environment) LookupTypeParam(name string) (*symtable.TypeParamSymbol, b
 	return typeparamSym, ok
 }
 
+func (e *Environment) HasLocalVar(name string) bool {
+	return e.symbols.HasLocal(symtable.SymbolVar, name)
+}
+
+func (e *Environment) HasLocalFunc(name string) bool {
+	return e.symbols.HasLocal(symtable.SymbolFuncs, name)
+}
+
+func (e *Environment) HasLocalType(name string) bool {
+	return e.symbols.HasLocal(symtable.SymbolTypes, name)
+}
+
+func (e *Environment) HasLocalTypeparam(name string) bool {
+	return e.symbols.HasLocal(symtable.SymbolTypeParams, name)
+}
+
 //	func (e *Environment) Define(name string, val value.Value) {
 //		fmt.Printf("ENV DEFINING '%s' as type %v", name, val.Type)
 //		e.variables[name] = val
