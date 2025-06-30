@@ -263,7 +263,7 @@ func (i *Interpreter) VisitBinaryExpr(expr *ast.BinaryExpr) controlflow.ExecResu
 				Type: value.ValueBool, Data: true},
 				Flow: controlflow.FlowNone}
 		}
-		return controlflow.ExecResult{Value: value.Value{Type: value.ValueBool, Data: left.Data != right.Data}}
+		return controlflow.ExecResult{Value: value.Value{Type: value.ValueBool, Data: left.Data != right.Data}, Flow: controlflow.FlowNone}
 	default:
 		return controlflow.ExecResult{Err: fmt.Errorf("unsupported binary operator %v", expr.Operator.Lexeme)}
 	}
