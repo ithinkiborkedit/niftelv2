@@ -1,8 +1,7 @@
-=== RUN   TestFuncStmtDuplicateError
+=== RUN   TestInterpreter_VarDeclareAssignAndFuncCall
 Defining function: foo
-ENV DEFINING 'foo' as type 8Defining function: foo
-ENV DEFINING 'foo' as type 8    newinterptest_test.go:36: expected error for duplicate function, got nil
---- FAIL: TestFuncStmtDuplicateError (0.00s)
+    newinterptest_test.go:63: func definition failed: undefined  variable 'foo'
+--- FAIL: TestInterpreter_VarDeclareAssignAndFuncCall (0.00s)
 FAIL
-FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/interpreter    0.223s
+FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/interpreter    0.279s
 FAIL

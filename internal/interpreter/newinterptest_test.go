@@ -3,12 +3,11 @@ package interpreter_test
 import (
 	"testing"
 
-	"github.com/ithinkiborkedit/niftelv2.git/internal/controlflow"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/environment"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/interpreter"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
 )
 
 func TestInterpreter_VarDeclareAssignAndFuncCall(t *testing.T) {
@@ -47,7 +46,7 @@ func TestInterpreter_VarDeclareAssignAndFuncCall(t *testing.T) {
 
 	// 3. func foo() { x = 42 }
 	stmtFunc := &ast.FuncStmt{
-		Name: token.Token{Lexeme: "foo"},
+		Name:   token.Token{Lexeme: "foo"},
 		Params: nil,
 		Body: &ast.BlockStmt{
 			Statements: []ast.Stmt{
