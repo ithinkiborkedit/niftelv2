@@ -340,10 +340,11 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) controlflow.ExecResu
 }
 
 func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
-	val, err := i.Evaluate(stmt.Init)
-	if err != nil {
+	valRes := i.Evaluate(stmt.Init)
+	if valRes.Err != nil {
 		return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 	}
+	val := valRes.Value
 	if len(stmt.Names) == 1 {
 		i.env.Define(stmt.Names[0].Lexeme, val)
 		return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
@@ -363,18 +364,19 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 }
 
 func (i *Interpreter) VisitShortVarStmt(stmt *ast.ShortVarStmt) controlflow.ExecResult {
-	val, err := i.Evaluate(stmt.Init)
-	if err != nil {
-		return controlflow.ExecResult{Err: err}
+	valRes := i.Evaluate(stmt.Init)
+	if valRes.Err != nil {
+		return controlflow.ExecResult{Err: valRes.Err}
 	}
+	val := valRes.Value
 	i.env.Define(stmt.Name.Lexeme, val)
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
 func (i *Interpreter) VisitAssignStmt(stmt *ast.AssignStmt) controlflow.ExecResult {
-	val, err := i.Evaluate(stmt.Value)
-	if err != nil {
-		return controlflow.ExecResult{Err: err}
+	valRes := i.Evaluate(stmt.Value)
+	if valRes.Err != nil {
+		return controlflow.ExecResult{Err: valRes.Err}
 	}
 	err = i.env.Assign(stmt.Name.Lexeme, val)
 	if err != nil {
@@ -554,13 +556,12 @@ func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) controlflow.ExecResult {
 	}
 	args := make([]value.Value, len(expr.Arguments))
 	for idx, argExpr := range expr.Arguments {
-		args[idx], err = i.Evaluate(argExpr)
-		if err != nil {
-			return controlflow.ExecResult{Err: err}
+		argRes := i.Evaluate(argExpr)
+		if argRes.Err != nil {
+			return controlflow.ExecResult{Err: argRes.Err}
 		}
+		args[idx] = argRes.Value
 	}
-
-	fmt.Printf("CALL EXPR DEBUG: %v, %v", args, i.env)
 
 	return callable.Call(args, i)
 }
@@ -644,41 +645,48 @@ func (i *Interpreter) VisitGetExpr(expr *ast.GetExpr) controlflow.ExecResult {
 	return controlflow.ExecResult{Value: val, Flow: controlflow.FlowNone}
 }
 
-func (i *Interpreter) VisitListExpr(expr *ast.ListExpr) (value.Value, error) {
+func (i *Interpreter) VisitListExpr(expr *ast.ListExpr) controlflow.ExecResult {
 	elements := make([]value.Value, 0, len(expr.Elements))
 	for _, elementExpr := range expr.Elements {
-		val, err := i.Evaluate(elementExpr)
-		if err != nil {
-			return value.Null(), err
+		elemRes := i.Evaluate(elementExpr)
+		if elemRes.Err != nil {
+			return controlflow.ExecResult{Err: elemRes.Err}
 		}
-		elements = append(elements, val)
+		elements = append(elements, elemRes.Value)
 	}
-	return value.Value{
-		Type: value.ValueList,
-		Data: elements,
-	}, nil
+	return controlflow.ExecResult{
+		Value: value.Value{
+			Type: value.ValueList,
+			Data: elements,
+		},
+		Flow: controlflow.FlowNone,
+	}
 }
 
-func (i *Interpreter) VisitDictExpr(expr *ast.DictExpr) (value.Value, error) {
+func (i *Interpreter) VisitDictExpr(expr *ast.DictExpr) controlflow.ExecResult {
 	dict := value.NewNiftelDict()
 	for _, pair := range expr.Pairs {
-		keyVal, err := i.Evaluate(pair[0])
-		if err != nil {
-			return value.Null(), err
+		keyRes := i.Evaluate(pair[0])
+		if keyRes.Err != nil {
+			return controlflow.ExecResult{Err: keyRes.Err}
 		}
-		valueVal, err := i.Evaluate(pair[1])
-		if err != nil {
-			return value.Null(), err
+		valueRes := i.Evaluate(pair[1])
+		// valueVal, err := i.Evaluate(pair[1])
+		if valueRes.Err != nil {
+			return controlflow.ExecResult{Err: valueRes.Err}
 		}
-		dict.Set(keyVal, valueVal)
+		dict.Set(keyRes.Value, valueRes.Value)
 	}
-	return value.Value{
-		Type: value.ValueDict,
-		Data: dict,
-	}, nil
+	return controlflow.ExecResult{
+		Value: value.Value{
+			Type: value.ValueDict,
+			Data: dict,
+		},
+		Flow: controlflow.FlowNone,
+	}
 }
 
-func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) (value.Value, error) {
+func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) controlflow.ExecResult {
 	// Create a callable function closure value from this FuncExpr AST node
 
 	// For now, pack the FuncExpr itself as data and keep meta for type info
@@ -692,11 +700,14 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) (value.Value, error) {
 		expr.Func.Line,
 		expr.Func.Column)
 
-	return value.Value{
-		Type: value.ValueFunc, // Or a dedicated ValueFunc type if you have one
-		Data: fn,
-		// Meta: nil, // Optional: assign Func type info if available
-	}, nil
+	return controlflow.ExecResult{
+		Value: value.Value{
+			Type: value.ValueFunc, // Or a dedicated ValueFunc type if you have one
+			Data: fn,
+			// Meta: nil, // Optional: assign Func type info if available
+		},
+		Flow: controlflow.FlowNone,
+	}
 }
 
 // VisitFuncStmt defines a function in the environment.
