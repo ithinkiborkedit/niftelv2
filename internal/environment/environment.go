@@ -24,6 +24,7 @@ func NewEnvironment(parent *Environment) *Environment {
 
 	return &Environment{
 		symbols:   symtable.NewSymbolTable(parentTable),
+		values:    make(map[string]value.Value),
 		enclosing: parent,
 	}
 }
@@ -45,10 +46,6 @@ func (e *Environment) Parent() *Environment {
 
 func (e *Environment) SymbolTable() *symtable.SymbolTable {
 	return e.symbols
-}
-
-func (e *Environment) Values() map[string]value.Value {
-	return e.Values()
 }
 
 func (e *Environment) AssignVar(name string, val value.Value) error {
@@ -92,9 +89,6 @@ func (e *Environment) LookupVar(name string) (*symtable.VarSymbol, bool) {
 	sym, ok := e.symbols.Lookup(symtable.SymbolVar, name)
 	if !ok {
 		return nil, false
-	}
-	if e.enclosing != nil {
-		return e.enclosing.AssignVar
 	}
 	varSym, ok := sym.(*symtable.VarSymbol)
 	return varSym, ok
