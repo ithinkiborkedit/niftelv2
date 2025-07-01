@@ -1,21 +1,21 @@
-=== RUN   TestValueTypeRegistry
-    registry_test.go:13: builtin type int inof incorrect
---- FAIL: TestValueTypeRegistry (0.00s)
-FAIL
-FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/value  0.345s
-FAIL
-
-func RegisterExampleStruct() {
-	myStruct := &TypeInfo{
-		Name: "Mystruct",
-		Kind: TypeKindStruct,
-		Fields: map[string]*TypeInfo{
-			"foo": {Name: "int", Kind: TypeKindBuiltin},
-			"bar": {Name: "string", Kind: TypeKindBuiltin},
-		},
-		Methods:       make(map[string]*FuncInfo),
-		GenericParams: nil,
-	}
-
-	RegisterType(myStruct.Name, myStruct)
-}
+>>> var x:int = 10
+[REPL RAW BUFFER]
+"var x:int = 10\n"
+000: 'v' (118)
+001: 'a' (97)
+002: 'r' (114)
+003: ' ' (32)
+004: 'x' (120)
+005: ':' (58)
+006: 'i' (105)
+007: 'n' (110)
+008: 't' (116)
+009: ' ' (32)
+010: '=' (61)
+011: ' ' (32)
+012: '1' (49)
+013: '0' (48)
+014: '\n' (10)
+DEBUG stms: []nifast.Stmt{(*nifast.VarStmt)(0x14000100180)}
+REPL: STATEMENT type: *nifast.VarStmt
+Runtime Error %!v(MISSING)
