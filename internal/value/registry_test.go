@@ -9,7 +9,7 @@ func TestValueTypeRegistry(t *testing.T) {
 
 	if typ, ok := GetType("int"); !ok {
 		t.Fatal("builtin type int not found")
-	} else if typ.Name != "int" || typ.Kind != TypeKindBuiltin {
+	} else if typ.Name != "int" || typ.Kind != TypeKindInt {
 		t.Fatal("builtin type int inof incorrect")
 	}
 
@@ -17,8 +17,8 @@ func TestValueTypeRegistry(t *testing.T) {
 		Name: "MyStruct",
 		Kind: TypeKindStruct,
 		Fields: map[string]*TypeInfo{
-			"foo": {Name: "int", Kind: TypeKindBuiltin},
-			"bar": {Name: "string", Kind: TypeKindBuiltin},
+			"foo": {Name: "int", Kind: TypeKindString},
+			"bar": {Name: "string", Kind: TypeKindInt},
 		},
 		Methods:       make(map[string]*FuncInfo),
 		GenericParams: []string{"T"},

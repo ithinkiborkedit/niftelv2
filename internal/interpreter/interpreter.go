@@ -103,7 +103,7 @@ func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) contro
 
 	typeInfo, ok := value.GetType(structName)
 	if !ok || typeInfo.Kind != value.TypeKindStruct {
-		return controlflow.ExecResult{Value: value.Null(), Err: fmt.Errorf("struct tpye '%s' not found", structName)}
+		return controlflow.ExecResult{Value: value.Null(), Err: fmt.Errorf("struct type '%s' not found", structName)}
 	}
 
 	structType := &value.StructType{

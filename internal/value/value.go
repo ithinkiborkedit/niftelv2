@@ -127,7 +127,7 @@ func (v Value) TypeInfo() *TypeInfo {
 		t, _ := GetType("string")
 		return t
 	case ValueBool:
-		t, _ := GetType("Bool")
+		t, _ := GetType("bool")
 		return t
 	case ValueList:
 		t, _ := GetType("list")
