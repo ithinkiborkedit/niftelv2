@@ -1073,7 +1073,13 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 				return nil, err
 			}
 		}
-		if p.check(token.TokenLParen) {
+		if p.check(token.TokenIdentifier) {
+			typ, err := p.consume(token.TokenIdentifier, "expected return type after '->'")
+			if err != nil {
+				return nil, err
+			}
+			returnTypes = append(returnTypes, typ)
+		} else if p.check(token.TokenLParen) {
 			_, err := p.consume(token.TokenLParen, "expected '(' after -> for multiple return types")
 			if err != nil {
 				return nil, err
@@ -1092,12 +1098,17 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 					break
 				}
 			}
-			_, err = p.consume(token.TokenRParen, "expect ')' after multiple types")
+			_, err = p.consume(token.TokenRParen, "expected ')' after multple return types")
 			if err != nil {
 				return nil, err
 			}
 		}
-		_, err = p.consume(token.TokenLBrace, "expected '{ before function body")
+		for p.check(token.TokenNewLine) {
+			if err := p.advance(); err != nil {
+				return nil, err
+			}
+		}
+		_, err = p.consume(token.TokenLBrace, "expected '{' before function body")
 		if err != nil {
 			return nil, err
 		}
@@ -1112,6 +1123,45 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 			Body:   body,
 			Return: returnTypes,
 		}, nil
+		// if p.check(token.TokenLParen) {
+		// 	_, err := p.consume(token.TokenLParen, "expected '(' after -> for multiple return types")
+		// 	if err != nil {
+		// 		return nil, err
+		// 	}
+		// 	for {
+		// 		typ, err := p.consume(token.TokenIdentifier, "expect return type in tuple")
+		// 		if err != nil {
+		// 			return nil, err
+		// 		}
+		// 		returnTypes = append(returnTypes, typ)
+		// 		ok, err := p.match(token.TokenComma)
+		// 		if err != nil {
+		// 			return nil, err
+		// 		}
+		// 		if !ok {
+		// 			break
+		// 		}
+		// 	}
+		// 	_, err = p.consume(token.TokenRParen, "expect ')' after multiple types")
+		// 	if err != nil {
+		// 		return nil, err
+		// 	}
+		// }
+		// _, err = p.consume(token.TokenLBrace, "expected '{ before function body")
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// body, err := p.blockStatement()
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// return &ast.FuncStmt{
+		// 	Func:   funcTok,
+		// 	Name:   name,
+		// 	Params: params,
+		// 	Body:   body,
+		// 	Return: returnTypes,
+		// }, nil
 	}
 
 	_, err = p.consume(token.TokenLBrace, "expect '{' before function body")
