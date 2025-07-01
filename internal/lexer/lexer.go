@@ -380,15 +380,15 @@ func (l *Lexer) scanToken() (token.Token, error) {
 		return l.string(ch)
 	case '\n':
 		// tok := l.makeToken(token.TokenNewLine)
-		tok := token.Token{
-			Type:   token.TokenNewLine,
-			Lexeme: "\n",
-			Line:   l.line,
-			Column: l.column,
-		}
+		// tok := token.Token{
+		// 	Type:   token.TokenNewLine,
+		// 	Lexeme: "\n",
+		// 	Line:   l.line,
+		// 	Column: l.column,
+		// }
 		l.line++
 		l.column = 0
-		return tok, nil
+		return l.scanToken()
 	default:
 		if unicode.IsDigit(ch) {
 			l.start = l.current - utf8.RuneLen(ch)
