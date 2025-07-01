@@ -814,6 +814,13 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 		if param.Type.Lexeme != "" {
 			ts, ok := i.env.LookupType(param.Type.Lexeme)
 			if !ok {
+				fmt.Println("DEBUG: KNOWN TYPES IN INTERPRETER ENV:", func() []string {
+					names := []string{}
+					for name := range i.env.SymbolTable().Types {
+						names = append(names, name)
+					}
+					return names
+				}())
 				return controlflow.ExecResult{Err: fmt.Errorf("unknown parameter type '%s'", param.Type.Lexeme)}
 			}
 			typeSym = ts

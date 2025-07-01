@@ -1,9 +1,8 @@
-Niftel REPL v0
->>> func greet(hi: string){
-... print(hi)
+>>> func greet(hi: string) -> string {
+... return hi
 ... }
 [REPL RAW BUFFER]
-"func greet(hi: string){\nprint(hi)\n}\n"
+"func greet(hi: string) -> string {\nreturn hi\n}\n"
 000: 'f' (102)
 001: 'u' (117)
 002: 'n' (110)
@@ -26,20 +25,31 @@ Niftel REPL v0
 019: 'n' (110)
 020: 'g' (103)
 021: ')' (41)
-022: '{' (123)
-023: '\n' (10)
-024: 'p' (112)
-025: 'r' (114)
-026: 'i' (105)
-027: 'n' (110)
-028: 't' (116)
-029: '(' (40)
-030: 'h' (104)
-031: 'i' (105)
-032: ')' (41)
-033: '\n' (10)
-034: '}' (125)
-035: '\n' (10)
-DEBUG stms: []nifast.Stmt{(*nifast.FuncStmt)(0x14000120000)}
+022: ' ' (32)
+023: '-' (45)
+024: '>' (62)
+025: ' ' (32)
+026: 's' (115)
+027: 't' (116)
+028: 'r' (114)
+029: 'i' (105)
+030: 'n' (110)
+031: 'g' (103)
+032: ' ' (32)
+033: '{' (123)
+034: '\n' (10)
+035: 'r' (114)
+036: 'e' (101)
+037: 't' (116)
+038: 'u' (117)
+039: 'r' (114)
+040: 'n' (110)
+041: ' ' (32)
+042: 'h' (104)
+043: 'i' (105)
+044: '\n' (10)
+045: '}' (125)
+046: '\n' (10)
+DEBUG stms: []nifast.Stmt{(*nifast.FuncStmt)(0x140000a8000)}
 REPL: STATEMENT type: *nifast.FuncStmt
-Runtime Error unknown parameter type 'string'
+Runtime Error unkown type 'string' for function 'greet'
