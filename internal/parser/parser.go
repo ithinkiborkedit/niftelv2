@@ -228,6 +228,44 @@ func (p *Parser) equalityExpr() (ast.Expr, error) {
 	return left, nil
 }
 
+func (p *Parser) parseTypeExpr() (*ast.TypeExpr, error) {
+	name, err := p.consume(token.TokenIdentifier, "expected type name")
+	if err != nil {
+		return nil, err
+	}
+	typeExpr := &ast.TypeExpr{
+		Name:     name,
+		TypeArgs: nil,
+	}
+	if p.check(token.TokenLBracket) {
+		_, err := p.consume(token.TokenLBracket, "expected '[' after type name for type arguments")
+		if err != nil {
+			return nil, err
+		}
+		var args []ast.TypeExpr
+		for {
+			arg, err := p.parseTypeExpr()
+			if err != nil {
+				return nil, err
+			}
+			args = append(args, *arg)
+			ok, err := p.match(token.TokenComma)
+			if err != nil {
+				return nil, err
+			}
+			if !ok {
+				break
+			}
+		}
+		_, err = p.consume(token.TokenRBracket, "expected ']' afte type arguments")
+		if err != nil {
+			return nil, err
+		}
+		typeExpr.TypeArgs = args
+	}
+	return typeExpr, nil
+}
+
 func (p *Parser) comparissonExpr() (ast.Expr, error) {
 	left, err := p.termExpr()
 	if err != nil {
@@ -1038,7 +1076,7 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 			if err != nil {
 				return nil, err
 			}
-			paramType, err := p.consume(token.TokenIdentifier, "expected ':' after parameter name")
+			paramType, err := p.parseTypeExpr()
 			if err != nil {
 				return nil, err
 			}
@@ -1203,7 +1241,7 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 			if err != nil {
 				return nil, err
 			}
-			paramType, err := p.consume(token.TokenIdentifier, "expected parameter type")
+			paramType, err := p.parseTypeExpr()
 			if err != nil {
 				return nil, err
 			}
