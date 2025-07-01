@@ -181,7 +181,6 @@ func main() {
 			fmt.Printf("REPL: STATEMENT type: %T\n", stmt)
 			switch s := stmt.(type) {
 			case *ast.ExprStmt:
-				var result value.Value
 				// func() {
 				// 	defer func() {
 				// 		if r := recover(); r != nil {
@@ -200,6 +199,7 @@ func main() {
 					fmt.Printf("Runtime error: %v\n", res.Err)
 					break
 				}
+				result := res.Value
 				// if evalErr != nil {
 				// 	fmt.Printf("Runtime error: %v\n", evalErr)
 				// 	break
