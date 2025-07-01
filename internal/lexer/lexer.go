@@ -388,6 +388,7 @@ func (l *Lexer) scanToken() (token.Token, error) {
 		// }
 		l.line++
 		l.column = 0
+		l.start = l.current
 		return l.scanToken()
 	default:
 		if unicode.IsDigit(ch) {
