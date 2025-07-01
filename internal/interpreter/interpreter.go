@@ -455,6 +455,7 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 		varSym := &symtable.VarSymbol{
 			SymName: name,
 			SymKind: symtable.SymbolVar,
+			Type:    varTypeSym,
 			Mutable: true,
 		}
 		if err := i.env.DefineVar(varSym); err != nil {
