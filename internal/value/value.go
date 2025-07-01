@@ -6,6 +6,8 @@ import (
 	"math"
 	"reflect"
 	"strings"
+
+	"github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
 )
 
 type ValueType int
@@ -88,6 +90,13 @@ func formatList(data interface{}) string {
 	}
 	sb.WriteString("]")
 	return sb.String()
+}
+
+var BuiltInTypes = map[string]*symtable.TypeSymbol{}
+
+func LookupType(name string) (*symtable.TypeSymbol, bool) {
+	typ, ok := BuiltInTypes[name]
+	return typ, ok
 }
 
 // func formatDict(data interface{}) string {

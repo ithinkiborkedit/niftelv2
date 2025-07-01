@@ -23,13 +23,31 @@ type Interpreter struct {
 
 // NewInterpreter returns a fresh Interpreter with a global environment.
 func NewInterpreter() *Interpreter {
-	return &Interpreter{
+	interp := &Interpreter{
 		env: environment.NewEnvironment(nil),
 	}
+	if err := interp.RegisterBuiltInTypes(); err != nil {
+		panic(fmt.Sprintf("Interpreter failed to register builtin types: %v", err))
+	}
+
+	return interp
 }
 
 func (i *Interpreter) Eval(expr ast.Expr) controlflow.ExecResult {
 	return i.Evaluate(expr)
+}
+
+func (i *Interpreter) RegisterBuiltInTypes() error {
+	for _, name := range value.ListTypes() {
+		typ, ok := value.LookupType(name)
+		if !ok {
+			return fmt.Errorf("missing builtint type %q", name)
+		}
+		if err := i.env.DefineType(typ); err != nil {
+			return fmt.Errorf("failed to register type %q: %w", name, err)
+		}
+	}
+	return nil
 }
 
 // Evaluate dispatches to the correct Expr handler.
