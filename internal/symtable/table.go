@@ -69,12 +69,11 @@ func InstantiateGenericType(gen *TypeSymbol, typeArgs []*TypeSymbol) *TypeSymbol
 }
 
 func substituteTypeParams(typ *TypeSymbol, paramMap map[string]*TypeSymbol) *TypeSymbol {
-	for pname, concrete := range paramMap {
-		if typ.SymName == pname {
-			return concrete
-		}
+	if concrete, ok := paramMap[typ.SymName]; ok {
+		return concrete
 	}
-	if typ.TypeArgs != nil && len(typ.TypeArgs) > 0 {
+
+	if typ.TypeArgs != nil && typ.Origin != nil {
 		newArgs := make([]*TypeSymbol, len(typ.TypeArgs))
 		for i, arg := range typ.TypeArgs {
 			newArgs[i] = substituteTypeParams(arg, paramMap)
