@@ -1635,13 +1635,6 @@ func (p *Parser) statement() (ast.Stmt, error) {
 	if ok {
 		return p.expressionStatement()
 	}
-	if p.check(token.TokenRBrace) || p.isAtEnd() {
-		fmt.Println("[STATEMENT] RBRACE or EOF, returning nil")
-		return nil, nil
-	}
-	// if p.check(token.TokenRBrace) || p.isAtEnd() {
-	// 	return nil, nil
-	// }
 
 	return p.expressionStatement()
 }
