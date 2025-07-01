@@ -1627,6 +1627,9 @@ func (p *Parser) statement() (ast.Stmt, error) {
 	if ok {
 		return p.expressionStatement()
 	}
+	if p.check(token.TokenRBrace) || p.isAtEnd() {
+		return nil, nil
+	}
 
 	return p.expressionStatement()
 }
