@@ -1,2 +1,3 @@
+DEBUG LIST TYPES: []
 DEBUG: env.Types after RegisterBuiltInTypes:[
 Niftel REPL v0

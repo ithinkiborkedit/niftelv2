@@ -38,6 +38,7 @@ func (i *Interpreter) Eval(expr ast.Expr) controlflow.ExecResult {
 }
 
 func (i *Interpreter) RegisterBuiltInTypes() error {
+	fmt.Println("DEBUG LIST TYPES:", value.ListTypes())
 	for _, name := range value.ListTypes() {
 		typ, ok := value.LookupType(name)
 		if !ok {

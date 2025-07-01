@@ -37,9 +37,11 @@ func (s *SymbolTable) namespace(kind SymbolKind) map[string]Symbol {
 func (s *SymbolTable) DefineValue(sym Symbol) error {
 	ns := s.namespace(sym.Kind())
 	if _, exists := ns[sym.Name()]; exists {
+		fmt.Printf("DEBUG: DefineValue Skipped duplicate: %q kind=%v\n", sym.Name(), sym.Kind())
 		return fmt.Errorf("%s already defined in this scope", kindString(sym.Kind()))
 	}
 	ns[sym.Name()] = sym
+	fmt.Printf("DEBUG: DefineValue ADDED: %q kind=%v\n", sym.Name(), sym.Kind())
 	return nil
 }
 
