@@ -48,6 +48,10 @@ func (i *Interpreter) RegisterBuiltInTypes() error {
 		}
 		fmt.Println(name)
 	}
+	fmt.Print("DEBUG: env.Types after RegisterBuiltInTypes:[\n")
+	for name := range i.env.SymbolTable().Types {
+		fmt.Printf("%q ", name)
+	}
 	return nil
 }
 
