@@ -995,7 +995,10 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 		if err != nil {
 			return nil, err
 		}
-
+		fmt.Printf("[BLOCK] Next token: type=%v lexeme=%q line=%d\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
+		if p.check(token.TokenRBrace) || p.isAtEnd() {
+			break
+		}
 		if p.check(token.TokenRBrace) || p.isAtEnd() {
 			break
 		}
@@ -1019,10 +1022,12 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 		}
 		return nil, err
 	}
+
 	return &ast.BlockStmt{
 		Statements: statements,
 		LBrace:     lbrace,
 	}, nil
+
 }
 
 func (p *Parser) continueStatement() (ast.Stmt, error) {
