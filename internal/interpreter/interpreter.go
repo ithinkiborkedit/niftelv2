@@ -338,6 +338,9 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) controlflow.ExecResu
 }
 
 func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
+	if stmt.Type.Lexeme == "" {
+		return controlflow.ExecResult{Err: fmt.Errorf("var declarations require a type")}
+	}
 	valRes := i.Evaluate(stmt.Init)
 	if valRes.Err != nil {
 		return controlflow.ExecResult{Err: valRes.Err}
@@ -346,13 +349,18 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 	if len(stmt.Names) == 1 {
 		name := stmt.Names[0].Lexeme
 		var varTypeSym *symtable.TypeSymbol = nil
-		if stmt.Type.Lexeme != "" {
-			typeSym, ok := i.env.LookupType(stmt.Type.Lexeme)
-			if !ok {
-				return controlflow.ExecResult{Err: fmt.Errorf("unknown type '%s'", stmt.Type.Lexeme)}
-			}
-			varTypeSym = typeSym
+		valRes := i.Evaluate(stmt.Init)
+		if valRes.Err != nil {
+			return controlflow.ExecResult{Err: valRes.Err}
 		}
+		val := valRes.Value
+		// if stmt.Type.Lexeme != "" {
+		// 	typeSym, ok := i.env.LookupType(stmt.Type.Lexeme)
+		// 	if !ok {
+		// 		return controlflow.ExecResult{Err: fmt.Errorf("unknown type '%s'", stmt.Type.Lexeme)}
+		// 	}
+		// 	varTypeSym = typeSym
+		// }
 		varSym := &symtable.VarSymbol{
 			SymName: name,
 			SymKind: symtable.SymbolVar,
@@ -378,6 +386,9 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 	}
 	for idx, name := range stmt.Names {
 		name := name.Lexeme
+		if stmt.Type.Lexeme == "" {
+			return controlflow.ExecResult{Err: fmt.Errorf("var declarations require a type")}
+		}
 		varSym := &symtable.VarSymbol{
 			SymName: name,
 			SymKind: symtable.SymbolVar,
@@ -779,6 +790,24 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 	}
 	var params []symtable.VarSymbol
 
+	for _, param := range stmt.Params {
+		var typeSym *symtable.TypeSymbol
+		if param.Type.Lexeme != "" {
+			ts, ok := i.env.LookupType(param.Type.Lexeme)
+			if !ok {
+				return controlflow.ExecResult{Err: fmt.Errorf("unknown parameter type '%s'", param.Type.Lexeme)}
+			}
+			typeSym = ts
+		}
+		params = append(params, symtable.VarSymbol{
+			SymName: param.Name.Lexeme,
+			SymKind: symtable.SymbolVar,
+			Type:    typeSym,
+			Mutable: false,
+		})
+
+	}
+
 	fmt.Printf("Defining function: %s\n", stmt.Name.Lexeme)
 	funcSym := &symtable.FuncSymbol{
 		SymName:    name,
@@ -811,12 +840,6 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 		return controlflow.ExecResult{Err: err}
 	}
 
-	// if err := i.env.AssignVar(stmt.Name.Lexeme, value.Value{
-	// 	Type: value.ValueFunc,
-	// 	Data: fn,
-	// }); err != nil {
-	// 	return controlflow.ExecResult{Err: err}
-	// }
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 

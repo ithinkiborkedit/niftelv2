@@ -1,14 +1,3 @@
-struct Person {
-    name: string
-    age: int
+func greet(greet: string) -> string {
+    return greet
 }
-
-func greet(hello: string, goodbye: string) -> (string,string) {
-    return hello,goodbye
-}
-
-var p: Person = Person{name:  'Jesus', age: 340}
-
-greet("hello","goodbye")
-
-print(p)
