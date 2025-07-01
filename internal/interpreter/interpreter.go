@@ -789,6 +789,14 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 	if err := i.env.DefineFunc(funcSym); err != nil {
 		return controlflow.ExecResult{Err: err}
 	}
+	varSym := &symtable.VarSymbol{
+		SymName: name,
+		SymKind: symtable.SymbolVar,
+		Mutable: false,
+	}
+	if err := i.env.DefineVar(varSym); err != nil {
+		return controlflow.ExecResult{Err: err}
+	}
 	fn := function.NewUserFunc(
 		stmt.Name.Lexeme,
 		stmt.Params,
