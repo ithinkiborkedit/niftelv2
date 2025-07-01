@@ -853,7 +853,7 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 
 	for _, param := range stmt.Params {
 		var typeSym *symtable.TypeSymbol
-		if param.Type != nil && param.Name.Lexeme != "" {
+		if param.Type != nil && param.Type.Name.Lexeme != "" {
 			ts, err := i.resolveTypeExpr(param.Type)
 			if err != nil {
 				fmt.Println("DEBUG: KNOWN TYPES IN INTERPRETER ENV:", func() []string {
@@ -863,7 +863,7 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 					}
 					return names
 				}())
-				return controlflow.ExecResult{Err: fmt.Errorf("unknown parameter type '%s' in function '%s': %w", param.Name.Lexeme, name, err)}
+				return controlflow.ExecResult{Err: fmt.Errorf("unknown parameter type '%s' in function '%s': %w", param.Type.Name.Lexeme, name, err)}
 			}
 			typeSym = ts
 		}
