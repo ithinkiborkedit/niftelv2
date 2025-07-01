@@ -38,9 +38,9 @@ func (i *Interpreter) Eval(expr ast.Expr) controlflow.ExecResult {
 }
 
 func (i *Interpreter) RegisterBuiltInTypes() error {
-	for name, typ := range value.BuiltInTypes {
+	for _, typ := range value.BuiltInTypes {
 		if err := i.env.DefineType(typ); err != nil {
-			fmt.Printf("SKIP DEBUG TYPE %q already defined", name)
+			// fmt.Printf("SKIP DEBUG TYPE %q already defined", name)
 			continue
 		}
 	}

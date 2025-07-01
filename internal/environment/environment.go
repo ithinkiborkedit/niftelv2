@@ -66,7 +66,7 @@ func (e *Environment) DefineFunc(sym *symtable.FuncSymbol) error {
 }
 
 func (e *Environment) DefineType(sym *symtable.TypeSymbol) error {
-	fmt.Printf("DEBUG DefineValue SKIPPED duplicate: %q, kind=%v\n", sym.Name(), sym.Kind())
+	// fmt.Printf("DEBUG DefineValue SKIPPED duplicate: %q, kind=%v\n", sym.Name(), sym.Kind())
 	return e.symbols.DefineValue(sym)
 }
 

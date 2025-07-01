@@ -1,3 +1,5 @@
 func greet(greet: string) -> string {
     return greet
 }
+
+greet("hello!")

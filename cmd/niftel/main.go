@@ -110,7 +110,7 @@ func runFile(path string, interp *interpreter.Interpreter) {
 func main() {
 	value.BuiltinTypesInit()
 	interp := interpreter.NewInterpreter()
-	value.BuiltinTypesInit()
+	// value.BuiltinTypesInit()
 	if len(os.Args) > 1 {
 		interp.ShouldPrintResults = false
 		runFile(os.Args[1], interp)
@@ -160,7 +160,7 @@ func main() {
 		}
 
 		// Debug: show what was read
-		fmt.Printf("[REPL RAW BUFFER]\n%q\n", buffer.String())
+		// fmt.Printf("[REPL RAW BUFFER]\n%q\n", buffer.String())
 		for i, c := range buffer.String() {
 			fmt.Printf("%03d: %q (%d)\n", i, c, c)
 		}
@@ -168,7 +168,7 @@ func main() {
 		lex := lexer.New(buffer.String())
 		par := parser.New(lex)
 		stmts, err := par.Parse()
-		fmt.Printf("DEBUG stms: %#v\n", stmts)
+		// fmt.Printf("DEBUG stms: %#v\n", stmts)
 		if err == parser.ErrIncomplete {
 			prompt = "... "
 			continue
@@ -179,33 +179,16 @@ func main() {
 		}
 
 		for _, stmt := range stmts {
-			fmt.Printf("REPL: STATEMENT type: %T\n", stmt)
+			// fmt.Printf("REPL: STATEMENT type: %T\n", stmt)
 			switch s := stmt.(type) {
 			case *ast.ExprStmt:
-				// func() {
-				// 	defer func() {
-				// 		if r := recover(); r != nil {
-				// 			if ret, ok := r.(runtimecontrol.ReturnValue); ok {
-				// 				result = ret.Value
-				// 				evalErr = nil
-				// 			} else {
-				// 				panic(r)
-				// 			}
-				// 		}
-				// 	}()
-				// 	result, evalErr = interp.Eval(s.Expr)
-				// }()
 				res := interp.Eval(s.Expr)
 				if res.Err != nil {
 					fmt.Printf("Runtime error: %v\n", res.Err)
 					break
 				}
 				result := res.Value
-				// if evalErr != nil {
-				// 	fmt.Printf("Runtime error: %v\n", evalErr)
-				// 	break
-				// }
-				fmt.Printf("DEBUG result: %#v\n", result)
+
 				if !result.IsNull() {
 					fmt.Println(result.String())
 				}
