@@ -109,6 +109,7 @@ func runFile(path string, interp *interpreter.Interpreter) {
 
 func main() {
 	value.BuiltinTypesInit()
+	fmt.Println("Types registered:", value.ListTypes())
 	interp := interpreter.NewInterpreter()
 	if len(os.Args) > 1 {
 		interp.ShouldPrintResults = false
