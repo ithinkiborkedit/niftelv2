@@ -40,12 +40,12 @@ func (i *Interpreter) Eval(expr ast.Expr) controlflow.ExecResult {
 func (i *Interpreter) RegisterBuiltInTypes() error {
 	for name, typ := range value.BuiltInTypes {
 		if err := i.env.DefineType(typ); err != nil {
-			fmt.Println("SKIP DEBUG TYPE %q already defined", name)
+			fmt.Printf("SKIP DEBUG TYPE %q already defined", name)
 			continue
 		}
 	}
 
-	fmt.Println("DEBUG ENV TYPES after registration:[\n")
+	fmt.Println("DEBUG ENV TYPES after registration:[")
 	for name := range i.env.SymbolTable().Types {
 		fmt.Printf("%q ", name)
 	}
@@ -138,18 +138,24 @@ func (i *Interpreter) Execute(stmt ast.Stmt) controlflow.ExecResult {
 func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) controlflow.ExecResult {
 	structName := expr.TypeName.Lexeme
 
-	typeInfo, ok := value.GetType(structName)
-	if !ok || typeInfo.Kind != value.TypeKindStruct {
+	typeSym, ok := value.GetType(structName)
+	if !ok || typeSym == nil {
 		return controlflow.ExecResult{Value: value.Null(), Err: fmt.Errorf("struct type '%s' not found", structName)}
 	}
 
+	var orderedFields []token.Token
+
+	for fname := range typeSym.Fields {
+		orderedFields = append(orderedFields, token.Token{Lexeme: fname})
+	}
+
 	structType := &value.StructType{
-		Name:   typeInfo.Name,
-		Fields: make([]token.Token, 0, len(typeInfo.Fields)),
+		Name:   typeSym.SymName,
+		Fields: orderedFields,
 	}
-	for fname := range typeInfo.Fields {
-		structType.Fields = append(structType.Fields, token.Token{Lexeme: fname})
-	}
+	// for fname := range typeInfo.Fields {
+	// 	structType.Fields = append(structType.Fields, token.Token{Lexeme: fname})
+	// }
 
 	instance := &value.StructInstance{
 		Type:   structType,
@@ -164,7 +170,7 @@ func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) contro
 		instance.Fields[fname] = valRes.Value
 	}
 
-	for fname := range typeInfo.Fields {
+	for fname := range typeSym.Fields {
 		if _, ok := instance.Fields[fname]; !ok {
 			instance.Fields[fname] = value.Null()
 		}
@@ -174,7 +180,7 @@ func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) contro
 		Value: value.Value{
 			Type: value.ValueStruct,
 			Data: instance,
-			Meta: typeInfo,
+			// Meta: typeSym.,
 		},
 		Flow: controlflow.FlowNone,
 	}
@@ -900,7 +906,7 @@ func (i *Interpreter) VisitReturnStmt(stmt *ast.ReturnStmt) controlflow.ExecResu
 		result = valRes.Value
 	} else {
 		vals := make([]value.Value, len(stmt.Values))
-		types := make([]*value.TypeInfo, len(stmt.Values))
+		types := make([]*symtable.TypeSymbol, len(stmt.Values))
 		for idx, expr := range stmt.Values {
 			valRes := i.Evaluate(expr)
 			if valRes.Err != nil {

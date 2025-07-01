@@ -1,19 +1,21 @@
 package value
 
+import "github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
+
 type NiftelTupleType struct {
-	ElementTypes []*TypeInfo
+	ElementTypes []*symtable.TypeSymbol
 }
 
 type NiftelTupleValue struct {
-	Type     *TypeInfo
+	Type     *symtable.TypeSymbol
 	Elements []Value
 }
 
-func NewTupleType(elemsType []*TypeInfo) *NiftelTupleType {
+func NewTupleType(elemsType []*symtable.TypeSymbol) *NiftelTupleType {
 	return &NiftelTupleType{ElementTypes: elemsType}
 }
 
-func NewTupleValue(tupleType *TypeInfo, elements []Value) *NiftelTupleValue {
+func NewTupleValue(tupleType *symtable.TypeSymbol, elements []Value) *NiftelTupleValue {
 	return &NiftelTupleValue{
 		Type:     tupleType,
 		Elements: elements,
