@@ -1535,6 +1535,7 @@ func (p *Parser) forStatement() (ast.Stmt, error) {
 }
 
 func (p *Parser) statement() (ast.Stmt, error) {
+	fmt.Printf("[STATMENT] At: %v Current: %v (type=%v, line=%v, lexeme=%q)", p.curr.Type, p.curr.Type, p.curr.Line, p.curr.Lexeme)
 	ok, err := p.match(token.TokenVar)
 	if err != nil {
 		return nil, err
