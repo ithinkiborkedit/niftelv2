@@ -584,7 +584,7 @@ func (p *Parser) finishCall(callee ast.Expr) (ast.Expr, error) {
 	}, nil
 }
 
-func (p *Parser) structLiteralExpr(typeName token.Token) (ast.Expr, error) {
+func (p *Parser) structLiteralExpr(typeName *ast.TypeExpr) (ast.Expr, error) {
 	lbrace, err := p.consume(token.TokenLBrace, "expected '{' after struct type name")
 	if err != nil {
 		return nil, err
@@ -653,9 +653,7 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 	if ok {
 		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
-	// if p.match(token.TokenFalse) {
-	// 	return &ast.LiteralExpr{Value: p.prev}, nil
-	// }
+
 	ok, err = p.match(token.TokenTrue)
 	if err != nil {
 		return nil, err
@@ -690,11 +688,13 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 		return nil, err
 	}
 	if ok {
-		typeName := p.prev
-		if p.check(token.TokenLBrace) {
-			return p.structLiteralExpr(typeName)
+		typeExpr, err := p.parseTypeExprFromToken(p.prev)
+		if err != nil {
+			return nil, err
 		}
-		return &ast.VariableExpr{Name: typeName}, nil
+		if p.check(token.TokenLBrace) {
+			return p.structLiteralExpr(typeExpr)
+		}
 	}
 	ok, err = p.match(token.TokenIdentifier)
 	if err != nil {
@@ -736,6 +736,41 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 		return p.dictLiteralExpr()
 	}
 	return nil, fmt.Errorf("unexpected token '%s' as line %d", p.curr.Lexeme, p.curr.Line)
+}
+
+func (p *Parser) parseTypeExprFromToken(tok token.Token) (*ast.TypeExpr, error) {
+	typeExpr := &ast.TypeExpr{
+		Name:     tok,
+		TypeArgs: nil,
+	}
+
+	if p.check(token.TokenLBracket) {
+		_, err := p.consume(token.TokenLBracket, "expected '[' after type name for type arguments")
+		if err != nil {
+			return nil, err
+		}
+		var args []ast.TypeExpr
+		for {
+			arg, err := p.parseTypeExpr()
+			if err != nil {
+				return nil, err
+			}
+			args = append(args, *arg)
+			ok, err := p.match(token.TokenComma)
+			if err != nil {
+				return nil, err
+			}
+			if !ok {
+				break
+			}
+		}
+		_, err = p.consume(token.TokenRBracket, "expectd '[' after type arguments")
+		if err != nil {
+			return nil, err
+		}
+		typeExpr.TypeArgs = args
+	}
+	return typeExpr, nil
 }
 
 func (p *Parser) listLiteralExpr() (ast.Expr, error) {
