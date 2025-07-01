@@ -1,22 +1,18 @@
->>> var x: int = 10
-[REPL RAW BUFFER]
-"var x: int = 10\n"
-000: 'v' (118)
-001: 'a' (97)
-002: 'r' (114)
-003: ' ' (32)
-004: 'x' (120)
-005: ':' (58)
-006: ' ' (32)
-007: 'i' (105)
-008: 'n' (110)
-009: 't' (116)
-010: ' ' (32)
-011: '=' (61)
-012: ' ' (32)
-013: '1' (49)
-014: '0' (48)
-015: '\n' (10)
-DEBUG stms: []nifast.Stmt{(*nifast.VarStmt)(0x14000106120)}
-REPL: STATEMENT type: *nifast.VarStmt
-Runtime Error unknown type 'int'
+=== RUN   TestParseVarDeclarationWithType
+--- PASS: TestParseVarDeclarationWithType (0.00s)
+=== RUN   TestParseFuncDeclaration
+    parser_test.go:46: Parse failed: [Parse error] expected '{ before function body. Got 'int' at line 1
+--- FAIL: TestParseFuncDeclaration (0.00s)
+=== RUN   TestParseStructDeclaration
+[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Point' line='2'
+[AFTER OPENING '{' ] struct body: token 
+ lexem='
+' line='2'
+[Trying to check for 
+ after '{' ] struct body: token IDENTIFIER lexem='x' line='3'
+[PARSERLOOP] struct body: type=1  lexem='x' line='3'
+[PARSERLOOP] struct body: type=1  lexem='y' line='4'
+--- PASS: TestParseStructDeclaration (0.00s)
+FAIL
+FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/parser 0.225s
+FAIL

@@ -4,9 +4,8 @@ import (
 	"testing"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
-	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
 )
 
 // Test var x: int = 10
