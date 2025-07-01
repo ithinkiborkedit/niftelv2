@@ -1,5 +1,7 @@
-func greet(greet: string) -> string {
-    return greet
+func add(x: int, y: int) -> int {
+    return x+y
 }
 
-print(greet("hello!"))
+func identity[T](x: T) -> {
+    return x
+}
