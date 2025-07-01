@@ -4,3 +4,18 @@
 FAIL
 FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/value  0.345s
 FAIL
+
+func RegisterExampleStruct() {
+	myStruct := &TypeInfo{
+		Name: "Mystruct",
+		Kind: TypeKindStruct,
+		Fields: map[string]*TypeInfo{
+			"foo": {Name: "int", Kind: TypeKindBuiltin},
+			"bar": {Name: "string", Kind: TypeKindBuiltin},
+		},
+		Methods:       make(map[string]*FuncInfo),
+		GenericParams: nil,
+	}
+
+	RegisterType(myStruct.Name, myStruct)
+}

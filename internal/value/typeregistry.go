@@ -123,21 +123,6 @@ func BuiltinTypesInit() {
 	RegisterType("func", &TypeInfo{Name: "fun", Kind: TypeKindFunc})
 }
 
-// func RegisterExampleStruct() {
-// 	myStruct := &TypeInfo{
-// 		Name: "Mystruct",
-// 		Kind: TypeKindStruct,
-// 		Fields: map[string]*TypeInfo{
-// 			"foo": {Name: "int", Kind: TypeKindBuiltin},
-// 			"bar": {Name: "string", Kind: TypeKindBuiltin},
-// 		},
-// 		Methods:       make(map[string]*FuncInfo),
-// 		GenericParams: nil,
-// 	}
-
-// 	RegisterType(myStruct.Name, myStruct)
-// }
-
 func (t *TypeInfo) FieldByName(name string) (*TypeInfo, error) {
 	if t.Kind != TypeKindStruct {
 		return nil, errors.New("type is not a struct")
