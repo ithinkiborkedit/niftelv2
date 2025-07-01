@@ -122,7 +122,7 @@ func (v Value) Equals(other Value) bool {
 	}
 }
 
-func (v Value) TypeInfo() *TypeInfo {
+func (v Value) TypeInfo() *symtable.TypeSymbol {
 	switch v.Type {
 	case ValueInt:
 		t, _ := GetType("int")

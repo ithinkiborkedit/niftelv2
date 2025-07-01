@@ -45,25 +45,23 @@ type TypeRegistry struct {
 
 var tupleTypes = map[string]*NiftelTupleType{}
 
-func TupleTypeKey(elementTypes []*TypeInfo) string {
+func TupleTypeKey(elementTypes []*symtable.TypeSymbol) string {
 	var parts []string
 	for _, t := range elementTypes {
-		parts = append(parts, t.Name)
+		parts = append(parts, t.SymName)
 	}
 	return "(" + strings.Join(parts, ",") + ")"
 }
 
-func GetOrRegisterTupleType(elementTypes []*TypeInfo) *TypeInfo {
+func GetOrRegisterTupleType(elementTypes []*symtable.TypeSymbol) *symtable.TypeSymbol {
 	key := TupleTypeKey(elementTypes)
 	if t, ok := GetType(key); ok {
 		return t
 	}
-	tupleType := &TypeInfo{
-		Name:          key,
-		Kind:          TypeKindTuple,
-		Fields:        nil,
-		Methods:       nil,
-		GenericParams: nil,
+	tupleType := &symtable.TypeSymbol{
+		SymName: key,
+		SymKind: symtable.SymbolTypes,
+		Fields:  nil,
 	}
 	RegisterType(key, tupleType)
 	// t = NewTupleType(elementTypes)
@@ -76,17 +74,23 @@ var globalRegistry = TypeRegistry{
 	types: make(map[string]*TypeInfo),
 }
 
-func RegisterType(name string, info *TypeInfo) {
-	globalRegistry.mu.Lock()
-	defer globalRegistry.mu.Unlock()
-	globalRegistry.types[name] = info
+func RegisterType(name string, sym *symtable.TypeSymbol) {
+	BuiltInTypes[name] = sym
+	// globalRegistry.mu.Lock()
+	// defer globalRegistry.mu.Unlock()
+	// globalRegistry.types[name] = info
 }
 
-func GetType(name string) (*TypeInfo, bool) {
-	globalRegistry.mu.RLock()
-	defer globalRegistry.mu.RUnlock()
-	t, ok := globalRegistry.types[name]
-	return t, ok
+func GetType(name string) (*symtable.TypeSymbol, bool) {
+	if sym, ok := BuiltInTypes[name]; ok {
+		return sym, true
+	}
+	// globalRegistry.mu.RLock()
+	// defer globalRegistry.mu.RUnlock()
+	// t, ok := globalRegistry.types[name]
+	// return t, ok
+
+	return nil, false
 }
 
 func HasType(name string) bool {

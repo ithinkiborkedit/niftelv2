@@ -38,22 +38,35 @@ func (i *Interpreter) Eval(expr ast.Expr) controlflow.ExecResult {
 }
 
 func (i *Interpreter) RegisterBuiltInTypes() error {
-	fmt.Println("DEBUG LIST TYPES:", value.ListTypes())
-	for _, name := range value.ListTypes() {
-		typ, ok := value.LookupType(name)
-		if !ok {
-			return fmt.Errorf("missing builtint type %q", name)
-		}
+	for name, typ := range value.BuiltInTypes {
 		if err := i.env.DefineType(typ); err != nil {
-			return fmt.Errorf("failed to register type %q: %w", name, err)
+			fmt.Println("SKIP DEBUG TYPE %q already defined", name)
+			continue
 		}
-		fmt.Println(name)
 	}
-	fmt.Print("DEBUG: env.Types after RegisterBuiltInTypes:[\n")
+
+	fmt.Println("DEBUG ENV TYPES after registration:[\n")
 	for name := range i.env.SymbolTable().Types {
 		fmt.Printf("%q ", name)
 	}
+	fmt.Println("]")
 	return nil
+	// for _, name := range value.BuiltInTypes {
+
+	// 	// typ, ok := value.LookupType(name)
+	// 	// if !ok {
+	// 	// 	return fmt.Errorf("missing builtint type %q", name)
+	// 	// }
+	// 	// if err := i.env.DefineType(typ); err != nil {
+	// 	// 	return fmt.Errorf("failed to register type %q: %w", name, err)
+	// 	// }
+	// 	// fmt.Println(name)
+	// }
+	// fmt.Print("DEBUG: env.Types after RegisterBuiltInTypes:[\n")
+	// for name := range i.env.SymbolTable().Types {
+	// 	fmt.Printf("%q ", name)
+	// }
+	// return nil
 }
 
 // Evaluate dispatches to the correct Expr handler.
