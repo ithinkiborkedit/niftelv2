@@ -6,18 +6,18 @@ DEBUG DefineValue SKIPPED duplicate: "func", kind=2
 DEBUG: DefineValue ADDED: "func" kind=2
 DEBUG DefineValue SKIPPED duplicate: "int", kind=2
 DEBUG: DefineValue ADDED: "int" kind=2
+DEBUG DefineValue SKIPPED duplicate: "float", kind=2
+DEBUG: DefineValue ADDED: "float" kind=2
+DEBUG DefineValue SKIPPED duplicate: "string", kind=2
+DEBUG: DefineValue ADDED: "string" kind=2
 DEBUG DefineValue SKIPPED duplicate: "null", kind=2
 DEBUG: DefineValue ADDED: "null" kind=2
 DEBUG DefineValue SKIPPED duplicate: "tuple", kind=2
 DEBUG: DefineValue ADDED: "tuple" kind=2
 DEBUG DefineValue SKIPPED duplicate: "struct", kind=2
 DEBUG: DefineValue ADDED: "struct" kind=2
-DEBUG DefineValue SKIPPED duplicate: "float", kind=2
-DEBUG: DefineValue ADDED: "float" kind=2
-DEBUG DefineValue SKIPPED duplicate: "string", kind=2
-DEBUG: DefineValue ADDED: "string" kind=2
 DEBUG ENV TYPES after registration:[
-"null" "struct" "float" "string" "bool" "list" "tuple" "func" "int" ]
+"bool" "string" "null" "list" "func" "int" "float" "tuple" "struct" ]
 Niftel REPL v0
 >>> func greet(hi: string) -> string {
 ... return hi
@@ -71,8 +71,32 @@ Niftel REPL v0
 044: '\n' (10)
 045: '}' (125)
 046: '\n' (10)
-DEBUG stms: []nifast.Stmt{(*nifast.FuncStmt)(0x14000154000)}
+DEBUG stms: []nifast.Stmt{(*nifast.FuncStmt)(0x14000124000)}
 REPL: STATEMENT type: *nifast.FuncStmt
 Defining function: greet
 DEBUG: DefineValue ADDED: "greet" kind=1
 DEBUG: DefineValue ADDED: "greet" kind=0
+>>> greet("YOOOOO")
+[REPL RAW BUFFER]
+"greet(\"YOOOOO\")\n"
+000: 'g' (103)
+001: 'r' (114)
+002: 'e' (101)
+003: 'e' (101)
+004: 't' (116)
+005: '(' (40)
+006: '"' (34)
+007: 'Y' (89)
+008: 'O' (79)
+009: 'O' (79)
+010: 'O' (79)
+011: 'O' (79)
+012: 'O' (79)
+013: '"' (34)
+014: ')' (41)
+015: '\n' (10)
+DEBUG stms: []nifast.Stmt{(*nifast.ExprStmt)(0x14000184010)}
+REPL: STATEMENT type: *nifast.ExprStmt
+CALLING Function: greet, args: [{{IDENTIFIER hi <nil> 1 13} {IDENTIFIER string <nil> 1 21}}]DEBUG: DefineValue ADDED: "hi" kind=0
+DEBUG result: value.Value{Type:3, Data:"\"YOOOOO\"", Meta:(*value.TypeInfo)(nil)}
+"YOOOOO"
