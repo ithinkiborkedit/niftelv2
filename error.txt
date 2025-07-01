@@ -1,4 +1,4 @@
->>> func identity[T](x: T) -> T { 
+>>> func identity[T](x: T) -> T {
 ... return x
 ... }
 000: 'f' (102)
@@ -42,4 +42,5 @@
 038: '\n' (10)
 039: '}' (125)
 040: '\n' (10)
-Parser error: [Parse error] expect '(' after function name. Got '[' at line 1 
+Parser error: unexpected token '
+' as line 2 

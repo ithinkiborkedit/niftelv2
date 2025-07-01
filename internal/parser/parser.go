@@ -1095,6 +1095,31 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
+	var typeParams []token.Token
+	if p.check(token.TokenLBracket) {
+		_, err := p.consume(token.TokenLBracket, "expected '[' after function name for type params")
+		if err != nil {
+			return nil, err
+		}
+		for {
+			param, err := p.consume(token.TokenIdentifier, "expected generic type params")
+			if err != nil {
+				return nil, err
+			}
+			typeParams = append(typeParams, param)
+			ok, err := p.match(token.TokenComma)
+			if err != nil {
+				return nil, err
+			}
+			if !ok {
+				break
+			}
+		}
+		_, err = p.consume(token.TokenRBracket, "expeded ']' after generic type parameters")
+		if err != nil {
+			return nil, err
+		}
+	}
 	_, err = p.consume(token.TokenLParen, "expect '(' after function name")
 	if err != nil {
 		return nil, err
