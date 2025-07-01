@@ -140,7 +140,7 @@ func (v Value) TypeInfo() *symtable.TypeSymbol {
 		t, _ := GetType("list")
 		return t
 	case ValueDict:
-		t, _ := GetType("Dict")
+		t, _ := GetType("dict")
 		return t
 	case ValueStruct:
 		if s, ok := v.Data.(*StructInstance); ok {
