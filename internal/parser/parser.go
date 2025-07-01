@@ -30,10 +30,10 @@ func New(src lexer.TokenSource) *Parser {
 
 func (p *Parser) Parse() ([]ast.Stmt, error) {
 	var statements []ast.Stmt
-	err := p.skipnewLines()
-	if err != nil {
-		return nil, err
-	}
+	// err := p.skipnewLines()
+	// if err != nil {
+	// 	return nil, err
+	// }
 	for !p.isAtEnd() {
 		stmt, err := p.statement()
 		if err != nil {
@@ -42,10 +42,10 @@ func (p *Parser) Parse() ([]ast.Stmt, error) {
 		if stmt != nil {
 			statements = append(statements, stmt)
 		}
-		err = p.skipnewLines()
-		if err != nil {
-			return nil, err
-		}
+		// err = p.skipnewLines()
+		// if err != nil {
+		// 	return nil, err
+		// }
 	}
 	return statements, nil
 }
@@ -95,6 +95,7 @@ func (p *Parser) advance() error {
 	// 	p.current++
 	// }
 	// return p.previous()
+	fmt.Printf("[ADVANCE] Current: %v (type=%v, line=%v, lexeme=%q)", p.curr.Type, p.curr.Type, p.curr.Line, p.curr.Lexeme)
 	return nil
 }
 
@@ -984,10 +985,10 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 	lbrace := p.previous()
 	var statements []ast.Stmt
 
-	err := p.skipnewLines()
-	if err != nil {
-		return nil, err
-	}
+	// err := p.skipnewLines()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	for {
 		err := p.skipnewLines()
@@ -1005,13 +1006,13 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 		if stmt != nil {
 			statements = append(statements, stmt)
 		}
-		err = p.skipnewLines()
-		if err != nil {
-			return nil, err
-		}
+		// err = p.skipnewLines()
+		// if err != nil {
+		// 	return nil, err
+		// }
 	}
 
-	_, err = p.consume(token.TokenRBrace, "expected '}' after block")
+	_, err := p.consume(token.TokenRBrace, "expected '}' after block")
 	if err != nil {
 		if p.curr.Type == token.TokenEOF {
 			return nil, ErrIncomplete
