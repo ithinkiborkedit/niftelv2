@@ -408,9 +408,7 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 	if err != nil {
 		return controlflow.ExecResult{Err: fmt.Errorf("var declarations require a type %w", err)}
 	}
-	// if stmt.Type.Lexeme == "" {
-	// 	return controlflow.ExecResult{Err: fmt.Errorf("var declarations require a type")}
-	// }
+
 	valRes := i.Evaluate(stmt.Init)
 	if valRes.Err != nil {
 		return controlflow.ExecResult{Err: valRes.Err}
@@ -418,11 +416,10 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 	val := valRes.Value
 	if len(stmt.Names) == 1 {
 		name := stmt.Names[0].Lexeme
-		valRes := i.Evaluate(stmt.Init)
-		if valRes.Err != nil {
-			return controlflow.ExecResult{Err: valRes.Err}
-		}
-		val := valRes.Value
+		// valRes := i.Evaluate(stmt.Init)
+		// if valRes.Err != nil {
+		// 	return controlflow.ExecResult{Err: valRes.Err}
+		// }
 
 		varSym := &symtable.VarSymbol{
 			SymName: name,
@@ -449,9 +446,9 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 	}
 	for idx, name := range stmt.Names {
 		name := name.Lexeme
-		if stmt.Type.Lexeme == "" {
-			return controlflow.ExecResult{Err: fmt.Errorf("var declarations require a type")}
-		}
+		// if stmt.Type.Lexeme == "" {
+		// 	return controlflow.ExecResult{Err: fmt.Errorf("var declarations require a type")}
+		// }
 		varSym := &symtable.VarSymbol{
 			SymName: name,
 			SymKind: symtable.SymbolVar,
