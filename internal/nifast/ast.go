@@ -7,6 +7,11 @@ type Expr interface {
 	Pos() (line, column int)
 }
 
+type TypeExpr struct {
+	Name     token.Token
+	TypeArgs []TypeExpr
+}
+
 type Stmt interface {
 	stmtNode()
 	Pos() (line, column int)
@@ -86,7 +91,7 @@ func (*DictExpr) exprNode()         {}
 func (e *DictExpr) Pos() (int, int) { return e.LBrace.Line, e.LBrace.Column }
 
 type StructLiteralExpr struct {
-	TypeName token.Token
+	TypeName *TypeExpr
 	Fields   map[string]Expr
 	LBrace   token.Token
 }
@@ -102,7 +107,7 @@ type FuncExpr struct {
 
 type Param struct {
 	Name token.Token
-	Type token.Token
+	Type *TypeExpr
 }
 
 func (*FuncExpr) exprNode()         {}
@@ -112,7 +117,7 @@ func (e *FuncExpr) Pos() (int, int) { return e.Func.Line, e.Func.Column }
 
 type VarStmt struct {
 	Names []token.Token
-	Type  token.Token
+	Type  *TypeExpr
 	Init  Expr
 }
 
@@ -197,7 +202,7 @@ type FuncStmt struct {
 	Name        token.Token
 	Params      []Param
 	TypeParams  []token.Token
-	ReturnTypes []token.Token
+	ReturnTypes []*TypeExpr
 	Body        *BlockStmt
 	Return      []token.Token
 	Func        token.Token
@@ -207,10 +212,11 @@ func (*FuncStmt) stmtNode()         {}
 func (s *FuncStmt) Pos() (int, int) { return s.Func.Line, s.Func.Column }
 
 type StructStmt struct {
-	Name    token.Token
-	Fields  []VarStmt
-	Methods []FuncStmt
-	Struct  token.Token
+	Name       token.Token
+	TypeParams []token.Token
+	Fields     []VarStmt
+	Methods    []FuncStmt
+	Struct     token.Token
 }
 
 func (*StructStmt) stmtNode()         {}
