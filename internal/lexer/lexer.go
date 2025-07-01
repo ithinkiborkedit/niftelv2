@@ -322,7 +322,7 @@ func (l *Lexer) scanToken() (token.Token, error) {
 		if l.match('>') {
 			return l.makeToken(token.TokenArrow), nil
 		} else {
-			return l.makeToken(token.TokenBang), nil
+			return l.makeToken(token.TokenMinus), nil
 		}
 	case '*':
 		return l.makeToken(token.TokenStar), nil

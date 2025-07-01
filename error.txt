@@ -1,61 +1,18 @@
-Niftel REPL v0
->>> func greet(hello: string) -> string {
-... return greet
-... }
-[REPL RAW BUFFER]
-"func greet(hello: string) -> string {\nreturn greet\n}\n"
-000: 'f' (102)
-001: 'u' (117)
-002: 'n' (110)
-003: 'c' (99)
-004: ' ' (32)
-005: 'g' (103)
-006: 'r' (114)
-007: 'e' (101)
-008: 'e' (101)
-009: 't' (116)
-010: '(' (40)
-011: 'h' (104)
-012: 'e' (101)
-013: 'l' (108)
-014: 'l' (108)
-015: 'o' (111)
-016: ':' (58)
-017: ' ' (32)
-018: 's' (115)
-019: 't' (116)
-020: 'r' (114)
-021: 'i' (105)
-022: 'n' (110)
-023: 'g' (103)
-024: ')' (41)
-025: ' ' (32)
-026: '-' (45)
-027: '>' (62)
-028: ' ' (32)
-029: 's' (115)
-030: 't' (116)
-031: 'r' (114)
-032: 'i' (105)
-033: 'n' (110)
-034: 'g' (103)
-035: ' ' (32)
-036: '{' (123)
-037: '\n' (10)
-038: 'r' (114)
-039: 'e' (101)
-040: 't' (116)
-041: 'u' (117)
-042: 'r' (114)
-043: 'n' (110)
-044: ' ' (32)
-045: 'g' (103)
-046: 'r' (114)
-047: 'e' (101)
-048: 'e' (101)
-049: 't' (116)
-050: '\n' (10)
-051: '}' (125)
-052: '\n' (10)
-DEBUG stms: []nifast.Stmt(nil)
-Parser error: [Parse error] expected '{ before function body. Got 'string' at line 1 
+=== RUN   TestParseVarDeclarationWithType
+--- PASS: TestParseVarDeclarationWithType (0.00s)
+=== RUN   TestParseFuncDeclaration
+    parser_test.go:46: Parse failed: [Parse error] expected '{ before function body. Got 'int' at line 1
+--- FAIL: TestParseFuncDeclaration (0.00s)
+=== RUN   TestParseStructDeclaration
+[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Point' line='2'
+[AFTER OPENING '{' ] struct body: token 
+ lexem='
+' line='2'
+[Trying to check for 
+ after '{' ] struct body: token IDENTIFIER lexem='x' line='3'
+[PARSERLOOP] struct body: type=1  lexem='x' line='3'
+[PARSERLOOP] struct body: type=1  lexem='y' line='4'
+--- PASS: TestParseStructDeclaration (0.00s)
+FAIL
+FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/parser 0.808s
+FAIL
