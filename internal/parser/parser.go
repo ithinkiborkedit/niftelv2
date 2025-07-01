@@ -985,10 +985,10 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 	lbrace := p.previous()
 	var statements []ast.Stmt
 
-	// err := p.skipnewLines()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err := p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 
 	for {
 		err := p.skipnewLines()
@@ -1015,7 +1015,7 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 		// }
 	}
 
-	_, err := p.consume(token.TokenRBrace, "expected '}' after block")
+	_, err = p.consume(token.TokenRBrace, "expected '}' after block")
 	if err != nil {
 		if p.curr.Type == token.TokenEOF {
 			return nil, ErrIncomplete

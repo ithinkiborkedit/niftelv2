@@ -168,6 +168,7 @@ func main() {
 		lex := lexer.New(buffer.String())
 		par := parser.New(lex)
 		stmts, err := par.Parse()
+
 		// fmt.Printf("DEBUG stms: %#v\n", stmts)
 		if err == parser.ErrIncomplete {
 			prompt = "... "
