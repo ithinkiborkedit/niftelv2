@@ -11,7 +11,6 @@ import (
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/parser"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/runtimecontrol"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
@@ -100,8 +99,9 @@ func runFile(path string, interp *interpreter.Interpreter) {
 			continue
 		}
 		for _, stmt := range stmts {
-			if err := interp.Execute(stmt); err != nil {
-				fmt.Fprintf(os.Stderr, "runtime error: %v", err)
+			result := interp.Execute(stmt)
+			if result.Err != nil {
+				fmt.Fprintf(os.Stderr, "runtime error: %v\n", result.Err)
 			}
 		}
 	}
@@ -182,33 +182,41 @@ func main() {
 			switch s := stmt.(type) {
 			case *ast.ExprStmt:
 				var result value.Value
-				var evalErr error
-				func() {
-					defer func() {
-						if r := recover(); r != nil {
-							if ret, ok := r.(runtimecontrol.ReturnValue); ok {
-								result = ret.Value
-								evalErr = nil
-							} else {
-								panic(r)
-							}
-						}
-					}()
-					result, evalErr = interp.Eval(s.Expr)
-				}()
-				if evalErr != nil {
-					fmt.Printf("Runtime error: %v\n", evalErr)
+				// func() {
+				// 	defer func() {
+				// 		if r := recover(); r != nil {
+				// 			if ret, ok := r.(runtimecontrol.ReturnValue); ok {
+				// 				result = ret.Value
+				// 				evalErr = nil
+				// 			} else {
+				// 				panic(r)
+				// 			}
+				// 		}
+				// 	}()
+				// 	result, evalErr = interp.Eval(s.Expr)
+				// }()
+				res := interp.Eval(s.Expr)
+				if res.Err != nil {
+					fmt.Printf("Runtime error: %v\n", res.Err)
 					break
 				}
+				// if evalErr != nil {
+				// 	fmt.Printf("Runtime error: %v\n", evalErr)
+				// 	break
+				// }
 				fmt.Printf("DEBUG result: %#v\n", result)
 				if !result.IsNull() {
 					fmt.Println(result.String())
 				}
 			default:
-				err := interp.Execute(stmt)
-				if err != nil {
-					fmt.Printf("Runtime error: %v\n", err)
+				result := interp.Execute(stmt)
+				if result.Err != nil {
+					fmt.Printf("Runtime Error %v\n")
 				}
+				// err := interp.Execute(stmt)
+				// if err != nil {
+				// 	fmt.Printf("Runtime error: %v\n", err)
+				// }
 			}
 		}
 		// Reset prompt for next input
