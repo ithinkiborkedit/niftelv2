@@ -418,7 +418,6 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 	val := valRes.Value
 	if len(stmt.Names) == 1 {
 		name := stmt.Names[0].Lexeme
-		var varTypeSym *symtable.TypeSymbol = nil
 		valRes := i.Evaluate(stmt.Init)
 		if valRes.Err != nil {
 			return controlflow.ExecResult{Err: valRes.Err}
