@@ -46,6 +46,7 @@ func (i *Interpreter) RegisterBuiltInTypes() error {
 		if err := i.env.DefineType(typ); err != nil {
 			return fmt.Errorf("failed to register type %q: %w", name, err)
 		}
+		fmt.Println(name)
 	}
 	return nil
 }

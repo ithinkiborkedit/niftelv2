@@ -109,11 +109,8 @@ func runFile(path string, interp *interpreter.Interpreter) {
 
 func main() {
 	value.BuiltinTypesInit()
-	for name, typeSym := range value.BuiltInTypes {
-
-	}
 	interp := interpreter.NewInterpreter()
-
+	value.BuiltinTypesInit()
 	if len(os.Args) > 1 {
 		interp.ShouldPrintResults = false
 		runFile(os.Args[1], interp)
