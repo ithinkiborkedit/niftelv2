@@ -211,7 +211,7 @@ func main() {
 			default:
 				result := interp.Execute(stmt)
 				if result.Err != nil {
-					fmt.Printf("Runtime Error %v\n")
+					fmt.Printf("Runtime Error %v\n", result.Err)
 				}
 				// err := interp.Execute(stmt)
 				// if err != nil {
