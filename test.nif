@@ -2,6 +2,6 @@ func add(x: int, y: int) -> int {
     return x+y
 }
 
-func identity[T](x: T) -> {
+func identity[T](x: T) -> T {
     return x
 }
