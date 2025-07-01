@@ -194,11 +194,13 @@ func (*BlockStmt) stmtNode()         {}
 func (s *BlockStmt) Pos() (int, int) { return s.LBrace.Line, s.LBrace.Column }
 
 type FuncStmt struct {
-	Name   token.Token
-	Params []Param
-	Body   *BlockStmt
-	Return []token.Token
-	Func   token.Token
+	Name        token.Token
+	Params      []Param
+	TypeParams  []token.Token
+	ReturnTypes []token.Token
+	Body        *BlockStmt
+	Return      []token.Token
+	Func        token.Token
 }
 
 func (*FuncStmt) stmtNode()         {}

@@ -3,5 +3,5 @@ Defining function: foo
     newinterptest_test.go:63: func definition failed: undefined  variable 'foo'
 --- FAIL: TestInterpreter_VarDeclareAssignAndFuncCall (0.00s)
 FAIL
-FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/interpreter    0.279s
+FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/interpreter    0.200s
 FAIL

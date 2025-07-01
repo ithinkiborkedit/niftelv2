@@ -38,7 +38,7 @@ type VarSymbol struct {
 type FuncSymbol struct {
 	SymName    string
 	Params     []VarSymbol
-	ReturnType *TypeSymbol
+	ReturnType []*TypeSymbol
 	TypeParams []string
 }
 

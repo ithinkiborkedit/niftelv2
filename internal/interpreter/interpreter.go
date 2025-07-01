@@ -766,10 +766,25 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 			Err: fmt.Errorf("function '%s' already defined in this scope", stmt.Name.Lexeme),
 		}
 	}
+	var returnTypes []*symtable.TypeSymbol
+	for _, retTok := range stmt.Return {
+		if retTok.Lexeme == "" {
+			continue
+		}
+		typeSym, ok := i.env.LookupType(retTok.Lexeme)
+		if !ok {
+			return controlflow.ExecResult{Err: fmt.Errorf("unkown type '%s' for function '%s'", retTok.Lexeme, name)}
+		}
+		returnTypes = append(returnTypes, typeSym)
+	}
+	var params []symtable.VarSymbol
+
 	fmt.Printf("Defining function: %s\n", stmt.Name.Lexeme)
 	funcSym := &symtable.FuncSymbol{
-		SymName: name,
-		Params:  nil,
+		SymName:    name,
+		Params:     params,
+		ReturnType: returnTypes,
+		TypeParams: nil,
 	}
 	if err := i.env.DefineFunc(funcSym); err != nil {
 		return controlflow.ExecResult{Err: err}
@@ -781,13 +796,19 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 		i.env,
 		stmt.Func.Line,
 		stmt.Func.Column)
-
-	if err := i.env.AssignVar(stmt.Name.Lexeme, value.Value{
+	if err := i.env.AssignVar(name, value.Value{
 		Type: value.ValueFunc,
 		Data: fn,
 	}); err != nil {
 		return controlflow.ExecResult{Err: err}
 	}
+
+	// if err := i.env.AssignVar(stmt.Name.Lexeme, value.Value{
+	// 	Type: value.ValueFunc,
+	// 	Data: fn,
+	// }); err != nil {
+	// 	return controlflow.ExecResult{Err: err}
+	// }
 	return controlflow.ExecResult{Value: value.Null(), Flow: controlflow.FlowNone}
 }
 
