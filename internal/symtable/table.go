@@ -36,34 +36,36 @@ func InstantiationName(base string, args []*TypeSymbol) string {
 
 func InstantiateGenericType(gen *TypeSymbol, typeArgs []*TypeSymbol) *TypeSymbol {
 	if !gen.IsGeneric || len(gen.TypeParams) != len(typeArgs) {
-		key := InstantiationName(gen.SymName, typeArgs)
-		if val, ok := genericTypeCache.Load(key); ok {
-			return val.(*TypeSymbol)
-		}
-
-		paramMap := map[string]*TypeSymbol{}
-		for i, pname := range gen.TypeParams {
-			paramMap[pname] = typeArgs[i]
-		}
-
-		newFields := map[string]*TypeSymbol{}
-		for fname, ftype := range gen.Fields {
-			newFields[fname] = substituteTypeParams(ftype, paramMap)
-		}
-
-		inst := &TypeSymbol{
-			SymName:    key,
-			SymKind:    gen.SymKind,
-			TypeParams: nil,
-			TypeArgs:   typeArgs,
-			Fields:     newFields,
-			Methods:    nil,
-			IsGeneric:  false,
-			Origin:     gen,
-		}
-		genericTypeCache.Store(key, inst)
-		return inst
+		return gen
 	}
+
+	key := InstantiationName(gen.SymName, typeArgs)
+	if val, ok := genericTypeCache.Load(key); ok {
+		return val.(*TypeSymbol)
+	}
+
+	paramMap := map[string]*TypeSymbol{}
+	for i, pname := range gen.TypeParams {
+		paramMap[pname] = typeArgs[i]
+	}
+
+	newFields := map[string]*TypeSymbol{}
+	for fname, ftype := range gen.Fields {
+		newFields[fname] = substituteTypeParams(ftype, paramMap)
+	}
+
+	inst := &TypeSymbol{
+		SymName:    key,
+		SymKind:    gen.SymKind,
+		TypeParams: nil,
+		TypeArgs:   typeArgs,
+		Fields:     newFields,
+		Methods:    nil,
+		IsGeneric:  false,
+		Origin:     gen,
+	}
+	genericTypeCache.Store(key, inst)
+	return inst
 }
 
 func substituteTypeParams(typ *TypeSymbol, paramMap map[string]*TypeSymbol) *TypeSymbol {
