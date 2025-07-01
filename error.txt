@@ -1,1 +1,11 @@
 [ADVANCE] Current: func (type=func, line=1, lexeme="func")[STATMENT] At: func Current: func (type=1, line=func, lexeme=%!q(MISSING))[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="identity")[ADVANCE] Current: [ (type=[, line=1, lexeme="[")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="T")[ADVANCE] Current: ] (type=], line=1, lexeme="]")[ADVANCE] Current: ( (type=(, line=1, lexeme="(")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="x")[ADVANCE] Current: : (type=:, line=1, lexeme=":")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="T")[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: -> (type=->, line=1, lexeme="->")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="T")[ADVANCE] Current: { (type={, line=1, lexeme="{")[ADVANCE] Current: return (type=return, line=2, lexeme="return")[STATMENT] At: return Current: return (type=2, line=return, lexeme=%!q(MISSING))[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=2, lexeme="x")[ADVANCE] Current: } (type=}, line=3, lexeme="}")Parser error: unexpected token '}' as line 3 
+
+fmt.Printf("[BLOCK] Next token: type=%v lexeme=%q line=%d\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
+if p.check(token.TokenRBrace) || p.isAtEnd() {
+    break
+}
+
+if p.check(token.TokenRBrace) || p.isAtEnd() {
+    fmt.Println("[STATEMENT] RBRACE or EOF, returning nil")
+    return nil, nil
+}
