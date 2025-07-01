@@ -120,7 +120,7 @@ func BuiltinTypesInit() {
 	RegisterType("tuple", &TypeInfo{Name: "tuple", Kind: TypeKindTuple})
 	RegisterType("list", &TypeInfo{Name: "list", Kind: TypeKindList})
 	RegisterType("struct", &TypeInfo{Name: "struct", Kind: TypeKindStruct})
-	RegisterType("func", &TypeInfo{Name: "fun", Kind: TypeKindFunc})
+	RegisterType("func", &TypeInfo{Name: "func", Kind: TypeKindFunc})
 }
 
 func (t *TypeInfo) FieldByName(name string) (*TypeInfo, error) {
