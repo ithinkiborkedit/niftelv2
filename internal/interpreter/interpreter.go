@@ -151,7 +151,7 @@ func (i *Interpreter) resolveTypeExpr(expr *ast.TypeExpr) (*symtable.TypeSymbol,
 	for idx, arg := range expr.TypeArgs {
 		argSym, err := i.resolveTypeExpr(&arg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to resolve genric type arg %#d for '%s': %w", idx+1, expr.Name.Lexeme, err)
+			return nil, fmt.Errorf("failed to resolve genric type arg %d for '%s': %w", idx+1, expr.Name.Lexeme, err)
 		}
 		resolvedArgs[idx] = argSym
 	}
@@ -839,13 +839,13 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 		}
 	}
 	var returnTypes []*symtable.TypeSymbol
-	for _, retTok := range stmt.Return {
-		if retTok.Lexeme == "" {
+	for _, retType := range stmt.Return {
+		if retType == nil || retType.Name.Lexeme == "" {
 			continue
 		}
-		typeSym, ok := i.env.LookupType(retTok.Lexeme)
-		if !ok {
-			return controlflow.ExecResult{Err: fmt.Errorf("unkown type '%s' for function '%s'", retTok.Lexeme, name)}
+		typeSym, err := i.resolveTypeExpr(retType)
+		if err != nil {
+			return controlflow.ExecResult{Err: fmt.Errorf("unkown type '%s' for function '%s': %w", retType.Name.Lexeme, name, err)}
 		}
 		returnTypes = append(returnTypes, typeSym)
 	}
@@ -853,9 +853,9 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 
 	for _, param := range stmt.Params {
 		var typeSym *symtable.TypeSymbol
-		if param.Type.Lexeme != "" {
-			ts, ok := i.env.LookupType(param.Type.Lexeme)
-			if !ok {
+		if param.Type != nil && param.Name.Lexeme != "" {
+			ts, err := i.resolveTypeExpr(param.Type)
+			if err != nil {
 				fmt.Println("DEBUG: KNOWN TYPES IN INTERPRETER ENV:", func() []string {
 					names := []string{}
 					for name := range i.env.SymbolTable().Types {
@@ -863,7 +863,7 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 					}
 					return names
 				}())
-				return controlflow.ExecResult{Err: fmt.Errorf("unknown parameter type '%s'", param.Type.Lexeme)}
+				return controlflow.ExecResult{Err: fmt.Errorf("unknown parameter type '%s' in function '%s': %w", param.Name.Lexeme, name, err)}
 			}
 			typeSym = ts
 		}
