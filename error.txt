@@ -50,3 +50,6 @@
 DEBUG stms: []nifast.Stmt{(*nifast.FuncStmt)(0x140000ac000)}
 REPL: STATEMENT type: *nifast.FuncStmt
 Runtime Error unkown type 'string' for function 'greet'
+
+
+Types registered: [float null tuple int string bool list struct func]
