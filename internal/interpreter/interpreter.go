@@ -134,13 +134,36 @@ func (i *Interpreter) Execute(stmt ast.Stmt) controlflow.ExecResult {
 }
 
 // --- Expression Visitors ---
+func (i *Interpreter) resolveTypeExpr(expr *ast.TypeExpr) (*symtable.TypeSymbol, error) {
+	if expr == nil {
+		return nil, fmt.Errorf("type mising")
+	}
+
+	baseSym, ok := i.env.LookupType(expr.Name.Lexeme)
+	if !ok {
+		return nil, fmt.Errorf("unknown type '%s'", expr.Name.Lexeme)
+	}
+	if len(expr.TypeArgs) == 0 {
+		return baseSym, nil
+	}
+
+	resolvedArgs := make([]*symtable.TypeSymbol, len(expr.TypeArgs))
+	for idx, arg := range expr.TypeArgs {
+		argSym, err := i.resolveTypeExpr(&arg)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve genric type arg %#d for '%s': %w", idx+1, expr.Name.Lexeme, err)
+		}
+		resolvedArgs[idx] = argSym
+	}
+	return symtable.InstantiateGenericType(baseSym, resolvedArgs), nil
+}
 
 func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) controlflow.ExecResult {
-	structName := expr.TypeName.Lexeme
+	// structName := expr.TypeName.Lexeme
 
-	typeSym, ok := value.GetType(structName)
-	if !ok || typeSym == nil {
-		return controlflow.ExecResult{Value: value.Null(), Err: fmt.Errorf("struct type '%s' not found", structName)}
+	typeSym, err := i.resolveTypeExpr(expr.TypeName)
+	if err != nil || typeSym == nil {
+		return controlflow.ExecResult{Value: value.Null(), Err: fmt.Errorf("struct type '%s' not found %v", expr.TypeName.Name.Lexeme, err)}
 	}
 
 	var orderedFields []token.Token
@@ -353,10 +376,10 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) controlflow.ExecResu
 			return controlflow.ExecResult{Err: fmt.Errorf("struct field must have exactly one name!")}
 		}
 		fieldName := field.Names[0].Lexeme
-		fieldTypeName := field.Type.Lexeme
-		fieldType, ok := i.env.LookupType(fieldTypeName)
-		if !ok {
-			return controlflow.ExecResult{Err: fmt.Errorf("Uknown type '%s' for struct field '%s'", fieldTypeName, fieldName)}
+		// fieldTypeName := field.Type.Lexeme
+		fieldType, err := i.resolveTypeExpr(field.Type)
+		if err != nil {
+			return controlflow.ExecResult{Err: fmt.Errorf("Uknown type '%s' for struct field '%s'", fieldName, err)}
 		}
 		fields[fieldName] = fieldType
 	}
@@ -381,9 +404,13 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) controlflow.ExecResu
 }
 
 func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
-	if stmt.Type.Lexeme == "" {
-		return controlflow.ExecResult{Err: fmt.Errorf("var declarations require a type")}
+	varTypeSym, err := i.resolveTypeExpr(stmt.Type)
+	if err != nil {
+		return controlflow.ExecResult{Err: fmt.Errorf("var declarations require a type %w", err)}
 	}
+	// if stmt.Type.Lexeme == "" {
+	// 	return controlflow.ExecResult{Err: fmt.Errorf("var declarations require a type")}
+	// }
 	valRes := i.Evaluate(stmt.Init)
 	if valRes.Err != nil {
 		return controlflow.ExecResult{Err: valRes.Err}
@@ -397,13 +424,7 @@ func (i *Interpreter) VisitVarStmt(stmt *ast.VarStmt) controlflow.ExecResult {
 			return controlflow.ExecResult{Err: valRes.Err}
 		}
 		val := valRes.Value
-		// if stmt.Type.Lexeme != "" {
-		// 	typeSym, ok := i.env.LookupType(stmt.Type.Lexeme)
-		// 	if !ok {
-		// 		return controlflow.ExecResult{Err: fmt.Errorf("unknown type '%s'", stmt.Type.Lexeme)}
-		// 	}
-		// 	varTypeSym = typeSym
-		// }
+
 		varSym := &symtable.VarSymbol{
 			SymName: name,
 			SymKind: symtable.SymbolVar,

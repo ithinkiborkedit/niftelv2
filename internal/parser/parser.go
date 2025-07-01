@@ -696,13 +696,13 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 			return p.structLiteralExpr(typeExpr)
 		}
 	}
-	ok, err = p.match(token.TokenIdentifier)
-	if err != nil {
-		return nil, err
-	}
-	if ok {
-		return &ast.VariableExpr{Name: p.prev}, nil
-	}
+	// ok, err = p.match(token.TokenIdentifier)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// if ok {
+	// 	return &ast.VariableExpr{Name: p.prev}, nil
+	// }
 	ok, err = p.match(token.TokenLParen)
 	if err != nil {
 		return nil, err
