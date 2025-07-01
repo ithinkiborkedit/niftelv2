@@ -22,6 +22,10 @@ type TypeSymbol struct {
 	SymKind    SymbolKind
 	Fields     map[string]*TypeSymbol
 	TypeParams []string
+	TypeArgs   []*TypeSymbol
+	Methods    map[string]*FuncSymbol
+	IsGeneric  bool
+	Origin     *TypeSymbol
 }
 
 type TypeParamSymbol struct {
