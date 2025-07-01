@@ -1,7 +1,13 @@
-=== RUN   TestInterpreter_VarDeclareAssignAndFuncCall
-Defining function: foo
-    newinterptest_test.go:63: func definition failed: undefined  variable 'foo'
---- FAIL: TestInterpreter_VarDeclareAssignAndFuncCall (0.00s)
-FAIL
-FAIL    github.com/ithinkiborkedit/niftelv2.git/internal/interpreter    0.200s
-FAIL
+[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Person' line='1'
+[AFTER OPENING '{' ] struct body: token 
+ lexem='
+' line='1'
+[Trying to check for 
+ after '{' ] struct body: token IDENTIFIER lexem='name' line='2'
+[PARSERLOOP] struct body: type=1  lexem='name' line='2'
+[PARSERLOOP] struct body: type=1  lexem='age' line='3'
+runtime error: Uknown type 'string' for struct field 'name'
+runtime error: unkown type 'string' for function 'greet'
+runtime error: struct tpye 'Person' not found
+runtime error: undefined variable greet
+runtime error: undefined variable p
