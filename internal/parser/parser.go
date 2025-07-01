@@ -399,14 +399,14 @@ func (p *Parser) varDeclaration() (ast.Stmt, error) {
 		}
 		names = append(names, next)
 	}
-	var typ token.Token
+	var typ *ast.TypeExpr
 	if len(names) == 1 && p.check(token.TokenColon) {
 
 		_, err = p.consume(token.TokenColon, "expected ':' after variable name")
 		if err != nil {
 			return nil, err
 		}
-		typ, err = p.consume(token.TokenIdentifier, "expect type after ':'")
+		typ, err = p.parseTypeExpr()
 		if err != nil {
 			return nil, err
 		}
@@ -1100,7 +1100,7 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	var returnTypes []token.Token
+	var returnTypes []*ast.TypeExpr
 	ok, err := p.match(token.TokenArrow)
 	if err != nil {
 		return nil, err
@@ -1112,7 +1112,7 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 			}
 		}
 		if p.check(token.TokenIdentifier) {
-			typ, err := p.consume(token.TokenIdentifier, "expected return type after '->'")
+			typ, err := p.parseTypeExpr()
 			if err != nil {
 				return nil, err
 			}
@@ -1123,7 +1123,7 @@ func (p *Parser) funcDeclaration() (ast.Stmt, error) {
 				return nil, err
 			}
 			for {
-				typ, err := p.consume(token.TokenIdentifier, "expect return type in tuple")
+				typ, err := p.parseTypeExpr()
 				if err != nil {
 					return nil, err
 				}
@@ -1363,7 +1363,7 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 			if err != nil {
 				return nil, err
 			}
-			fieldType, err := p.consume(token.TokenIdentifier, "expected field type in struct")
+			fieldType, err := p.parseTypeExpr()
 			if err != nil {
 				return nil, err
 			}

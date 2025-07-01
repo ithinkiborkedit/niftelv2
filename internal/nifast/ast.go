@@ -204,7 +204,7 @@ type FuncStmt struct {
 	TypeParams  []token.Token
 	ReturnTypes []*TypeExpr
 	Body        *BlockStmt
-	Return      []token.Token
+	Return      []*TypeExpr
 	Func        token.Token
 }
 
