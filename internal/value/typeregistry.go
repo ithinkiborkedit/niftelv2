@@ -4,6 +4,8 @@ import (
 	"errors"
 	"strings"
 	"sync"
+
+	"github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
 )
 
 type TypeKind int
@@ -111,16 +113,27 @@ func ListTypes() []string {
 	return names
 }
 
+var BuiltInTypes = map[string]*symtable.TypeSymbol{}
+
 func BuiltinTypesInit() {
-	RegisterType("int", &TypeInfo{Name: "int", Kind: TypeKindInt})
-	RegisterType("float", &TypeInfo{Name: "float", Kind: TypeKindFloat})
-	RegisterType("string", &TypeInfo{Name: "string", Kind: TypeKindString})
-	RegisterType("bool", &TypeInfo{Name: "bool", Kind: TypeKindBool})
-	RegisterType("null", &TypeInfo{Name: "null", Kind: TypeKindNull})
-	RegisterType("tuple", &TypeInfo{Name: "tuple", Kind: TypeKindTuple})
-	RegisterType("list", &TypeInfo{Name: "list", Kind: TypeKindList})
-	RegisterType("struct", &TypeInfo{Name: "struct", Kind: TypeKindStruct})
-	RegisterType("func", &TypeInfo{Name: "func", Kind: TypeKindFunc})
+	BuiltInTypes["int"] = &symtable.TypeSymbol{SymName: "int", SymKind: symtable.SymbolTypes}
+	BuiltInTypes["float"] = &symtable.TypeSymbol{SymName: "float", SymKind: symtable.SymbolTypes}
+	BuiltInTypes["string"] = &symtable.TypeSymbol{SymName: "string", SymKind: symtable.SymbolTypes}
+	BuiltInTypes["bool"] = &symtable.TypeSymbol{SymName: "bool", SymKind: symtable.SymbolTypes}
+	BuiltInTypes["null"] = &symtable.TypeSymbol{SymName: "null", SymKind: symtable.SymbolTypes}
+	BuiltInTypes["tuple"] = &symtable.TypeSymbol{SymName: "tuple", SymKind: symtable.SymbolTypes}
+	BuiltInTypes["list"] = &symtable.TypeSymbol{SymName: "list", SymKind: symtable.SymbolTypes}
+	BuiltInTypes["struct"] = &symtable.TypeSymbol{SymName: "struct", SymKind: symtable.SymbolTypes}
+	BuiltInTypes["func"] = &symtable.TypeSymbol{SymName: "func", SymKind: symtable.SymbolTypes}
+	// RegisterType("int", &TypeInfo{Name: "int", Kind: TypeKindInt})
+	// RegisterType("float", &TypeInfo{Name: "float", Kind: TypeKindFloat})
+	// RegisterType("string", &TypeInfo{Name: "string", Kind: TypeKindString})
+	// RegisterType("bool", &TypeInfo{Name: "bool", Kind: TypeKindBool})
+	// RegisterType("null", &TypeInfo{Name: "null", Kind: TypeKindNull})
+	// RegisterType("tuple", &TypeInfo{Name: "tuple", Kind: TypeKindTuple})
+	// RegisterType("list", &TypeInfo{Name: "list", Kind: TypeKindList})
+	// RegisterType("struct", &TypeInfo{Name: "struct", Kind: TypeKindStruct})
+	// RegisterType("func", &TypeInfo{Name: "func", Kind: TypeKindFunc})
 }
 
 func (t *TypeInfo) FieldByName(name string) (*TypeInfo, error) {

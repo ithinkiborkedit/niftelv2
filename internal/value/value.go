@@ -92,8 +92,6 @@ func formatList(data interface{}) string {
 	return sb.String()
 }
 
-var BuiltInTypes = map[string]*symtable.TypeSymbol{}
-
 func LookupType(name string) (*symtable.TypeSymbol, bool) {
 	typ, ok := BuiltInTypes[name]
 	return typ, ok
