@@ -1548,7 +1548,7 @@ func (p *Parser) statement() (ast.Stmt, error) {
 	if p.check(token.TokenRBrace) || p.isAtEnd() {
 		return nil, nil
 	}
-	fmt.Printf("[STATMENT] At: %v Current: %v (type=%v, line=%v, lexeme=%q)", p.curr.Type, p.curr.Type, p.curr.Line, p.curr.Lexeme)
+	fmt.Printf("[STATMENT] At: %v Current: %v (type=%v, line=%v, lexeme=%q)", p.curr.Data, p.curr.Type, p.curr.Type, p.curr.Line, p.curr.Lexeme)
 	ok, err := p.match(token.TokenVar)
 	if err != nil {
 		return nil, err
