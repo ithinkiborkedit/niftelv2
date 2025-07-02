@@ -30,10 +30,10 @@ func New(src lexer.TokenSource) *Parser {
 
 func (p *Parser) Parse() ([]ast.Stmt, error) {
 	var statements []ast.Stmt
-	// err := p.skipnewLines()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err := p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
 	for !p.isAtEnd() {
 		stmt, err := p.statement()
 		if err != nil {
@@ -42,10 +42,10 @@ func (p *Parser) Parse() ([]ast.Stmt, error) {
 		if stmt != nil {
 			statements = append(statements, stmt)
 		}
-		// err = p.skipnewLines()
-		// if err != nil {
-		// 	return nil, err
-		// }
+		err = p.skipnewLines()
+		if err != nil {
+			return nil, err
+		}
 	}
 	return statements, nil
 }
