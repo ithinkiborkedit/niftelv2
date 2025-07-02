@@ -886,6 +886,11 @@ func (p *Parser) printStatement() (ast.Stmt, error) {
 func (p *Parser) returnStatement() (ast.Stmt, error) {
 	keyword := p.previous()
 
+	err := p.skipnewLines()
+	if err != nil {
+		return nil, err
+	}
+
 	var values []ast.Expr
 	if !p.check(token.TokenNewLine) && !p.check(token.TokenRBrace) && !p.isAtEnd() {
 		first, err := p.expression()
@@ -911,7 +916,7 @@ func (p *Parser) returnStatement() (ast.Stmt, error) {
 		}
 
 	}
-	err := p.skipnewLines()
+	err = p.skipnewLines()
 	if err != nil {
 		return nil, err
 	}
