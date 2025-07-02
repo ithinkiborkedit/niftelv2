@@ -26,6 +26,21 @@ func NewSymbolTable(parent *SymbolTable) *SymbolTable {
 	}
 }
 
+func (s *SymbolTable) ResolveType(name string) (*TypeSymbol, bool) {
+	for curr := s; curr != nil; curr = curr.Parent {
+		if sym, ok := curr.TypeParams[name]; ok {
+			return &TypeSymbol{
+				SymName: sym.Name(),
+				SymKind: SymbolTypeParams,
+			}, true
+		}
+		if sym, ok := curr.Types[name]; ok {
+			return sym.(*TypeSymbol), true
+		}
+	}
+	return nil, false
+}
+
 func InstantiationName(base string, args []*TypeSymbol) string {
 	var argNames []string
 	for _, t := range args {

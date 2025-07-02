@@ -37,6 +37,17 @@ func (i *Interpreter) Eval(expr ast.Expr) controlflow.ExecResult {
 	return i.Evaluate(expr)
 }
 
+func resolveTypeExpr(expr *ast.TypeExpr, symbols *symtable.SymbolTable) (*symtable.TypeSymbol, error) {
+	if expr == nil {
+		return nil, nil
+	}
+	typ, ok := symbols.ResolveType(expr.Name.Lexeme)
+	if !ok {
+		return nil, fmt.Errorf("unknown type '%s' ", expr.Name.Lexeme)
+	}
+	return typ, nil
+}
+
 func (i *Interpreter) RegisterBuiltInTypes() error {
 	for _, typ := range value.BuiltInTypes {
 		if err := i.env.DefineType(typ); err != nil {
@@ -51,22 +62,6 @@ func (i *Interpreter) RegisterBuiltInTypes() error {
 	}
 	fmt.Println("]")
 	return nil
-	// for _, name := range value.BuiltInTypes {
-
-	// 	// typ, ok := value.LookupType(name)
-	// 	// if !ok {
-	// 	// 	return fmt.Errorf("missing builtint type %q", name)
-	// 	// }
-	// 	// if err := i.env.DefineType(typ); err != nil {
-	// 	// 	return fmt.Errorf("failed to register type %q: %w", name, err)
-	// 	// }
-	// 	// fmt.Println(name)
-	// }
-	// fmt.Print("DEBUG: env.Types after RegisterBuiltInTypes:[\n")
-	// for name := range i.env.SymbolTable().Types {
-	// 	fmt.Printf("%q ", name)
-	// }
-	// return nil
 }
 
 // Evaluate dispatches to the correct Expr handler.
