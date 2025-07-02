@@ -996,10 +996,10 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 	}
 
 	for {
-		err := p.skipnewLines()
-		if err != nil {
-			return nil, err
-		}
+		// err := p.skipnewLines()
+		// if err != nil {
+		// 	return nil, err
+		// }
 		fmt.Printf("[BLOCK] Next token: type=%v lexeme=%q line=%d\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
 		if p.check(token.TokenRBrace) || p.isAtEnd() {
 			break
