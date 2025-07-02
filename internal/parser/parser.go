@@ -920,31 +920,11 @@ func (p *Parser) returnStatement() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Printf("[RETURN] After parsing expr (vurrent %v (type=%v lexeme=%q)", p.curr.Type, p.curr.Type, p.curr.Lexeme)
 	return &ast.ReturnStmt{
 		Keyword: keyword,
 		Values:  values,
 	}, nil
-	// keyword := p.previous()
-
-	// var value ast.Expr
-
-	// if !p.check(token.TokenNewLine) && !p.check(token.TokenRBrace) && !p.isAtEnd() {
-	// 	val, err := p.expression()
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	value = val
-	// }
-	// err := p.skipnewLines()
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// return &ast.ReturnStmt{
-	// 	Keyword: keyword,
-	// 	Value:   value,
-	// }, nil
 }
 
 func (p *Parser) ifStatement() (ast.Stmt, error) {
