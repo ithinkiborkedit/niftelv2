@@ -885,28 +885,21 @@ func (p *Parser) printStatement() (ast.Stmt, error) {
 
 func (p *Parser) returnStatement() (ast.Stmt, error) {
 	keyword := p.previous()
-
-	err := p.skipnewLines()
-	if err != nil {
-		return nil, err
-	}
-
 	var values []ast.Expr
+
+	// Only parse a value if not immediately at newline, '}', or EOF.
 	if !p.check(token.TokenNewLine) && !p.check(token.TokenRBrace) && !p.isAtEnd() {
 		first, err := p.expression()
 		if err != nil {
 			return nil, err
 		}
-
 		values = append(values, first)
 
-		for {
-			ok, err := p.match(token.TokenComma)
+		// Now, keep parsing comma-separated values
+		for p.check(token.TokenComma) {
+			_, err := p.match(token.TokenComma)
 			if err != nil {
 				return nil, err
-			}
-			if !ok {
-				break
 			}
 			next, err := p.expression()
 			if err != nil {
@@ -914,13 +907,14 @@ func (p *Parser) returnStatement() (ast.Stmt, error) {
 			}
 			values = append(values, next)
 		}
-
 	}
-	err = p.skipnewLines()
-	if err != nil {
+
+	// After all return values, skip optional newlines.
+	if err := p.skipnewLines(); err != nil {
 		return nil, err
 	}
-	fmt.Printf("[RETURN] After parsing expr (vurrent %v (type=%v lexeme=%q)", p.curr.Type, p.curr.Type, p.curr.Lexeme)
+
+	fmt.Printf("[RETURN] After parsing expr, current=%v (type=%v, lexeme=%q)\n", p.curr.Type, p.curr.Type, p.curr.Lexeme)
 	return &ast.ReturnStmt{
 		Keyword: keyword,
 		Values:  values,
