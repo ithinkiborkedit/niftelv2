@@ -999,9 +999,9 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 		if p.check(token.TokenRBrace) || p.isAtEnd() {
 			break
 		}
-		if p.check(token.TokenRBrace) || p.isAtEnd() {
-			break
-		}
+		// if p.check(token.TokenRBrace) || p.isAtEnd() {
+		// 	break
+		// }
 		stmt, err := p.statement()
 		if err != nil {
 			return nil, err
@@ -1009,10 +1009,10 @@ func (p *Parser) blockStatement() (*ast.BlockStmt, error) {
 		if stmt != nil {
 			statements = append(statements, stmt)
 		}
-		// err = p.skipnewLines()
-		// if err != nil {
-		// 	return nil, err
-		// }
+		err = p.skipnewLines()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	_, err = p.consume(token.TokenRBrace, "expected '}' after block")
