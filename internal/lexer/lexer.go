@@ -243,7 +243,7 @@ func (l *Lexer) number() (token.Token, error) {
 func (l *Lexer) identifier() (token.Token, error) {
 	for !l.isAtEnd() {
 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
-		if !unicode.IsLetter(r) && unicode.IsDigit(r) && r == '_' {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_' {
 			break
 		}
 		l.advance()
