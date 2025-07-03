@@ -137,6 +137,12 @@ func (i *Interpreter) resolveTypeExpr(expr *ast.TypeExpr) (*symtable.TypeSymbol,
 		return nil, fmt.Errorf("type mising")
 	}
 
+	if i.typEnv != nil {
+		if tsym, ok := i.typEnv.LookupTypeParam(expr.Name.Lexeme); ok {
+			return tsym, nil
+		}
+	}
+
 	baseSym, ok := i.env.LookupType(expr.Name.Lexeme)
 	if !ok {
 		return nil, fmt.Errorf("unknown type '%s'", expr.Name.Lexeme)
@@ -829,15 +835,20 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) controlflow.ExecResult {
 
 // VisitFuncStmt defines a function in the environment.
 func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
-	typeParamTable := make(map[string]*symtable.TypeSymbol)
-	typeParamNames := make([]string, len(stmt.TypeParams))
-	for i, tp := range stmt.Params {
-		typeParamNames[i] = tp.Name.Lexeme
-		typeParamTable[tp.Name.Lexeme] = &symtable.TypeSymbol{
-			SymName: tp.Name.Lexeme,
-			SymKind: symtable.SymbolTypeParams,
+	oldTypeEnv := i.typEnv
+	if len(stmt.TypeParams) > 0 {
+		i.typEnv = typeenv.NewTypeEnv(oldTypeEnv)
+		for _, tp := range stmt.TypeParams {
+			i.typEnv.DefineTypeParam(tp.Lexeme, &symtable.TypeSymbol{
+				SymName: tp.Lexeme,
+				SymKind: symtable.SymbolTypeParams,
+			})
 		}
 	}
+	defer func() {
+		i.typEnv = oldTypeEnv
+	}()
+
 	name := stmt.Name.Lexeme
 
 	if i.env.HasLocalFunc(name) {
