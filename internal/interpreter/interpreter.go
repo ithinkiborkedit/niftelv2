@@ -685,8 +685,16 @@ func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) controlflow.ExecResult {
 		}
 		args[idx] = argRes.Value
 	}
+	typeSyms := make([]*symtable.TypeSymbol, len(expr.TypeArgs))
+	for j, typeArg := range expr.TypeArgs {
+		tsym, err := i.resolveTypeExpr(typeArg)
+		if err != nil {
+			return controlflow.ExecResult{Err: fmt.Errorf("failed to resolve type arguemnt %d: %w", j+1, err)}
+		}
+		typeSyms[j] = tsym
+	}
 
-	return callable.Call(args, expr.TypeArgs, i)
+	return callable.Call(args, typeSyms, i)
 }
 
 func (i *Interpreter) VisitIndexExpr(expr *ast.IndexExpr) controlflow.ExecResult {
