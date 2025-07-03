@@ -603,6 +603,7 @@ func (p *Parser) finishCall(callee ast.Expr, typeArgs []*ast.TypeExpr) (ast.Expr
 		}
 		return nil, err
 	}
+	fmt.Printf("DEBUG CALL callee=%#v, typeArg=%#v, arguments=%#v", callee, typeArgs, arguments)
 	return &ast.CallExpr{
 		Callee:    callee,
 		Paren:     paren,
