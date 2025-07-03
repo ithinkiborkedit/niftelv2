@@ -10,6 +10,8 @@ import (
 
 type TypeKind int
 
+var GenericStruct = map[string]*TypeInfo{}
+
 const (
 	TypeKindStruct TypeKind = iota
 	TypeKindEnum
@@ -64,8 +66,7 @@ func GetOrRegisterTupleType(elementTypes []*symtable.TypeSymbol) *symtable.TypeS
 		Fields:  nil,
 	}
 	RegisterType(key, tupleType)
-	// t = NewTupleType(elementTypes)
-	// tupleTypes[key] = t
+
 	return tupleType
 
 }
@@ -74,21 +75,74 @@ var globalRegistry = TypeRegistry{
 	types: make(map[string]*TypeInfo),
 }
 
+func RegisterGenericStruct(name string, typeParams []string, fieldTemplates map[string]*TypeInfo) {
+	info := &TypeInfo{
+		Name:          name,
+		Kind:          TypeKindStruct,
+		Fields:        fieldTemplates,
+		GenericParams: typeParams,
+	}
+
+	GenericStruct[name] = info
+}
+
+func InstatiateGenericStruct(name string, typeArgs []string) (*TypeInfo, error) {
+	gen, ok := GenericStruct[name]
+	if !ok {
+		return nil, errors.New("unknown generic struct: " + name)
+	}
+	if len(typeArgs) != len(gen.GenericParams) {
+		return nil, errors.New("wrong number of type arguments")
+	}
+
+	subst := map[string]string{}
+
+	for i, param := range gen.GenericParams {
+		subst[param] = typeArgs[i]
+	}
+
+	fields := map[string]*TypeInfo{}
+
+	for fieldName, fieldType := range gen.Fields {
+		fields[fieldName] = substituteTypeInfo(fieldType, subst)
+	}
+	instName := name + "[" + strings.Join(typeArgs, ",") + "]"
+
+	info := &TypeInfo{
+		Name:   instName,
+		Kind:   TypeKindStruct,
+		Fields: fields,
+	}
+	RegisterType(instName, &symtable.TypeSymbol{
+		SymName: instName,
+		SymKind: symtable.SymbolTypes,
+	})
+
+	return info, nil
+}
+
+func substituteTypeInfo(t *TypeInfo, subst map[string]string) *TypeInfo {
+	if t == nil {
+		return nil
+	}
+	if val, ok := subst[t.Name]; ok {
+		return &TypeInfo{
+			Name: val,
+			Kind: TypeKindStruct,
+		}
+
+	}
+	return t
+}
+
 func RegisterType(name string, sym *symtable.TypeSymbol) {
 	BuiltInTypes[name] = sym
-	// globalRegistry.mu.Lock()
-	// defer globalRegistry.mu.Unlock()
-	// globalRegistry.types[name] = info
 }
 
 func GetType(name string) (*symtable.TypeSymbol, bool) {
 	if sym, ok := BuiltInTypes[name]; ok {
 		return sym, true
 	}
-	// globalRegistry.mu.RLock()
-	// defer globalRegistry.mu.RUnlock()
-	// t, ok := globalRegistry.types[name]
-	// return t, ok
 
 	return nil, false
 }
@@ -129,15 +183,6 @@ func BuiltinTypesInit() {
 	BuiltInTypes["list"] = &symtable.TypeSymbol{SymName: "list", SymKind: symtable.SymbolTypes}
 	BuiltInTypes["struct"] = &symtable.TypeSymbol{SymName: "struct", SymKind: symtable.SymbolTypes}
 	BuiltInTypes["func"] = &symtable.TypeSymbol{SymName: "func", SymKind: symtable.SymbolTypes}
-	// RegisterType("int", &TypeInfo{Name: "int", Kind: TypeKindInt})
-	// RegisterType("float", &TypeInfo{Name: "float", Kind: TypeKindFloat})
-	// RegisterType("string", &TypeInfo{Name: "string", Kind: TypeKindString})
-	// RegisterType("bool", &TypeInfo{Name: "bool", Kind: TypeKindBool})
-	// RegisterType("null", &TypeInfo{Name: "null", Kind: TypeKindNull})
-	// RegisterType("tuple", &TypeInfo{Name: "tuple", Kind: TypeKindTuple})
-	// RegisterType("list", &TypeInfo{Name: "list", Kind: TypeKindList})
-	// RegisterType("struct", &TypeInfo{Name: "struct", Kind: TypeKindStruct})
-	// RegisterType("func", &TypeInfo{Name: "func", Kind: TypeKindFunc})
 }
 
 func (t *TypeInfo) FieldByName(name string) (*TypeInfo, error) {

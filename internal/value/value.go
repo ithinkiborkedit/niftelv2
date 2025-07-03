@@ -97,10 +97,6 @@ func LookupType(name string) (*symtable.TypeSymbol, bool) {
 	return typ, ok
 }
 
-// func formatDict(data interface{}) string {
-// 	dict, ok := data.(map[string]Value)
-// }
-
 func Null() Value {
 	return Value{Type: ValueNull, Data: nil}
 }
