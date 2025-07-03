@@ -496,6 +496,31 @@ func (p *Parser) CallExpr() (ast.Expr, error) {
 		return nil, err
 	}
 	for {
+		var typeArgs []*ast.TypeExpr
+		if p.check(token.TokenLBracket) {
+			_, err := p.consume(token.TokenLBracket, "expected '[' for generic call type arguments")
+			if err != nil {
+				return nil, err
+			}
+			for {
+				typ, err := p.parseTypeExpr()
+				if err != nil {
+					return nil, err
+				}
+				typeArgs = append(typeArgs, typ)
+				ok, err := p.match(token.TokenComma)
+				if err != nil {
+					return nil, err
+				}
+				if !ok {
+					break
+				}
+			}
+			_, err = p.consume(token.TokenRBracket, "expected ']' after type arguments")
+			if err != nil {
+				return nil, err
+			}
+		}
 		ok, err := p.match(token.TokenLParen)
 		if err != nil {
 			return nil, err
@@ -553,7 +578,7 @@ func (p *Parser) CallExpr() (ast.Expr, error) {
 	return expr, nil
 }
 
-func (p *Parser) finishCall(callee ast.Expr) (ast.Expr, error) {
+func (p *Parser) finishCall(callee ast.Expr, typeArgs []*ast.TypeExpr) (ast.Expr, error) {
 	var arguments []ast.Expr
 	if !p.check(token.TokenRParen) {
 		for {
@@ -582,6 +607,7 @@ func (p *Parser) finishCall(callee ast.Expr) (ast.Expr, error) {
 		Callee:    callee,
 		Paren:     paren,
 		Arguments: arguments,
+		TypeArgs:  typeArgs,
 	}, nil
 }
 

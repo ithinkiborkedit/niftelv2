@@ -60,6 +60,7 @@ func NewNativeFunc(name string, fn func([]value.Value, InterpreterAPI) controlfl
 }
 
 func (f *Function) Call(args []value.Value, typeArgs []*symtable.TypeSymbol, interp InterpreterAPI) controlflow.ExecResult {
+
 	fmt.Printf("CALLING Function: %v, args: %v", f.name, f.params)
 	if f.isNative {
 		return f.nativeFunc(args, interp)

@@ -677,7 +677,7 @@ func (i *Interpreter) VisitCallExpr(expr *ast.CallExpr) controlflow.ExecResult {
 		args[idx] = argRes.Value
 	}
 
-	return callable.Call(args, i)
+	return callable.Call(args, nil, i)
 }
 
 func (i *Interpreter) VisitIndexExpr(expr *ast.IndexExpr) controlflow.ExecResult {

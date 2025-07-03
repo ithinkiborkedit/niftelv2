@@ -52,6 +52,7 @@ type CallExpr struct {
 	Callee    Expr
 	Paren     token.Token
 	Arguments []Expr
+	TypeArgs  []*TypeExpr
 }
 
 func (*CallExpr) exprNode()         {}
