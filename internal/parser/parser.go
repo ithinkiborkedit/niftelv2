@@ -498,6 +498,7 @@ func (p *Parser) CallExpr() (ast.Expr, error) {
 	for {
 		var typeArgs []*ast.TypeExpr
 		if p.check(token.TokenLBracket) {
+
 			_, err := p.consume(token.TokenLBracket, "expected '[' for generic call type arguments")
 			if err != nil {
 				return nil, err
@@ -519,6 +520,9 @@ func (p *Parser) CallExpr() (ast.Expr, error) {
 			_, err = p.consume(token.TokenRBracket, "expected ']' after type arguments")
 			if err != nil {
 				return nil, err
+			}
+			if !p.check(token.TokenLParen) {
+				return nil, fmt.Errorf("Type arguments only allowed in function calls e.g(foo[T](args...)")
 			}
 		}
 		ok, err := p.match(token.TokenLParen)
