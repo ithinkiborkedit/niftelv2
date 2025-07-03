@@ -230,6 +230,7 @@ func (p *Parser) equalityExpr() (ast.Expr, error) {
 }
 
 func (p *Parser) parseTypeExpr() (*ast.TypeExpr, error) {
+	fmt.Printf("parseTypeExpr: current token = %v\n", p.curr)
 	name, err := p.consume(token.TokenIdentifier, "expected type name")
 	if err != nil {
 		return nil, err
