@@ -526,7 +526,7 @@ func (p *Parser) CallExpr() (ast.Expr, error) {
 			return nil, err
 		}
 		if ok {
-			expr, err = p.finishCall(expr)
+			expr, err = p.finishCall(expr, typeArgs)
 			if err != nil {
 				return nil, err
 			}
