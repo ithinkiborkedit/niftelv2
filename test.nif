@@ -2,4 +2,13 @@ func swap[T](a: T, b: T) -> (T,T){
     return b,a
 }
 
-swap[int](1,2)
+struct Box[T] {
+    value: T
+}
+
+func unbox[T](b: Box[T]) -> T {
+    return b.value
+}
+
+var x: Box[int] = Box[int]{value: 42}
+
