@@ -10,6 +10,7 @@ import (
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/typeenv"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
@@ -18,13 +19,15 @@ type Interpreter struct {
 	env                *environment.Environment
 	envStack           []*environment.Environment
 	ShouldPrintResults bool
+	typEnv             *typeenv.TypeEnv
 	// Add flags, call stacks, etc. here as needed
 }
 
 // NewInterpreter returns a fresh Interpreter with a global environment.
 func NewInterpreter() *Interpreter {
 	interp := &Interpreter{
-		env: environment.NewEnvironment(nil),
+		env:    environment.NewEnvironment(nil),
+		typEnv: typeenv.NewTypeEnv(nil),
 	}
 	if err := interp.RegisterBuiltInTypes(); err != nil {
 		panic(fmt.Sprintf("Interpreter failed to register builtin types: %v", err))
@@ -826,6 +829,15 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) controlflow.ExecResult {
 
 // VisitFuncStmt defines a function in the environment.
 func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
+	typeParamTable := make(map[string]*symtable.TypeSymbol)
+	typeParamNames := make([]string, len(stmt.TypeParams))
+	for i, tp := range stmt.Params {
+		typeParamNames[i] = tp.Name.Lexeme
+		typeParamTable[tp.Name.Lexeme] = &symtable.TypeSymbol{
+			SymName: tp.Name.Lexeme,
+			SymKind: symtable.SymbolTypeParams,
+		}
+	}
 	name := stmt.Name.Lexeme
 
 	if i.env.HasLocalFunc(name) {

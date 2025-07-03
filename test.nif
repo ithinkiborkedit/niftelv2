@@ -2,4 +2,4 @@ func swap[T](a: T, b: T) -> (T,T){
     return b,a
 }
 
-swap[string](1,2)
+swap[int](1,2)
