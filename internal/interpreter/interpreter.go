@@ -843,6 +843,10 @@ func (i *Interpreter) VisitFuncExpr(expr *ast.FuncExpr) controlflow.ExecResult {
 
 // VisitFuncStmt defines a function in the environment.
 func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
+	fmt.Printf("[DEBUG GENERICS: VISIT FUNCSTMT]: %#v", stmt.TypeParams)
+	for idx, tp := range stmt.TypeParams {
+		fmt.Printf("[DEBUG GENERICS: VISIT FUNCSTMT]: TYP PARAM[%d]: %q LEXEME:%q", idx, tp, tp.Lexeme)
+	}
 	oldTypeEnv := i.typEnv
 	if len(stmt.TypeParams) > 0 {
 		i.typEnv = typeenv.NewTypeEnv(oldTypeEnv)
