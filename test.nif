@@ -1,4 +1,4 @@
-func swap[T](a: T, b: T) -> (T,T){
+func swap[int](a: int, b: int) -> (int,int){
     return b,a
 }
 
