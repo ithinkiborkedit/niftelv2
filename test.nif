@@ -18,3 +18,5 @@ struct Person {
     return x
   }
 }
+
+print(identity[T]("me"))

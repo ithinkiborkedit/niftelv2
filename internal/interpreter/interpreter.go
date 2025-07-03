@@ -872,11 +872,12 @@ func (i *Interpreter) VisitFuncStmt(stmt *ast.FuncStmt) controlflow.ExecResult {
 	}
 
 	fmt.Printf("Defining function: %s\n", stmt.Name.Lexeme)
+	typeParamNames := make([]string, len(stmt.TypeParams))
 	funcSym := &symtable.FuncSymbol{
 		SymName:    name,
 		Params:     params,
 		ReturnType: returnTypes,
-		TypeParams: nil,
+		TypeParams: typeParamNames,
 	}
 	if err := i.env.DefineFunc(funcSym); err != nil {
 		return controlflow.ExecResult{Err: err}

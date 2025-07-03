@@ -13,6 +13,7 @@ import (
 type Function struct {
 	name       string
 	params     []ast.Param
+	typeParams []string
 	body       *ast.BlockStmt
 	env        *environment.Environment
 	isNative   bool
@@ -30,7 +31,7 @@ type InterpreterAPI interface {
 }
 
 type Callable interface {
-	Call(args []value.Value, interp InterpreterAPI) controlflow.ExecResult
+	Call(args []value.Value, typeArgs []*symtable.TypeSymbol, interp InterpreterAPI) controlflow.ExecResult
 	Arity() int
 	Name() string
 	IsNative() bool
@@ -58,7 +59,7 @@ func NewNativeFunc(name string, fn func([]value.Value, InterpreterAPI) controlfl
 	}
 }
 
-func (f *Function) Call(args []value.Value, interp InterpreterAPI) controlflow.ExecResult {
+func (f *Function) Call(args []value.Value, typeArgs []*symtable.TypeSymbol, interp InterpreterAPI) controlflow.ExecResult {
 	fmt.Printf("CALLING Function: %v, args: %v", f.name, f.params)
 	if f.isNative {
 		return f.nativeFunc(args, interp)
@@ -88,27 +89,6 @@ func (f *Function) Call(args []value.Value, interp InterpreterAPI) controlflow.E
 	// fmt.Printf("RETURNING from function.Call: %#v, err: %v\n", controlflow.ExecResult{Value: })
 	execResult := interp.ExecuteBlock(f.body, callEnv)
 	return execResult
-
-	// var ret value.Value = value.Null()
-	// var err error
-
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		fmt.Printf("Function CALLER caught panic: %#v\n", r)
-	// 		if rv, ok := r.(runtimecontrol.ReturnValue); ok {
-	// 			fmt.Printf("Function returning %v\n", rv.Value)
-	// 			ret = rv.Value
-	// 			err = nil
-	// 		} else {
-	// 			panic(r)
-	// 		}
-	// 	}
-
-	// }()
-	// ret, err = interp.ExecuteBlock(f.body, callEnv)
-	// _, execErr := interp.ExecuteBlock(f.body, callEnv)
-	// if execErr != nil {
-	// 	return value.Null(), execErr
 }
 
 // return value.Null(), nil
