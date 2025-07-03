@@ -1335,10 +1335,7 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 }
 
 func (p *Parser) structDeclartion() (ast.Stmt, error) {
-	// err := p.skipnewLines()
-	// if err != nil {
-	// 	return nil, err
-	// }
+
 	fmt.Printf("[AFTER SKIP NEW LINES] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
 	structTok := p.previous()
 
@@ -1346,7 +1343,31 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	var typeParams []token.Token
+	if p.check(token.TokenLBracket) {
+		_, err := p.consume(token.TokenLBracket, "expected '[' after struct name for type parameters")
+		if err != nil {
+			return nil, err
+		}
+		for {
+			param, err := p.consume(token.TokenIdentifier, "expected type parameter")
+			if err != nil {
+				return nil, err
+			}
+			typeParams = append(typeParams, param)
+			ok, err := p.match(token.TokenComma)
+			if err != nil {
+				return nil, err
+			}
+			if !ok {
+				break
+			}
+		}
+		_, err = p.consume(token.TokenRBracket, "expected ']' after type paramters")
+		if err != nil {
+			return nil, err
+		}
+	}
 	_, err = p.consume(token.TokenLBrace, "expected '{' after struct name")
 	fmt.Printf("[AFTER OPENING '{' ] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
 	if err != nil {
