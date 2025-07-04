@@ -24,6 +24,7 @@ const (
 	TypeKindBool
 	TypeKindNull
 	TypeKindFunc
+	TypeKindGeneric
 )
 
 type TypeInfo struct {
