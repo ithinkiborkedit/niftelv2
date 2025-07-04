@@ -41,6 +41,13 @@ func (s *SymbolTable) ResolveType(name string) (*TypeSymbol, bool) {
 	return nil, false
 }
 
+func NewTypeParamSymbol(name string) *TypeSymbol {
+	return &TypeSymbol{
+		SymName: name,
+		SymKind: SymbolTypeParams,
+	}
+}
+
 func InstantiationName(base string, args []*TypeSymbol) string {
 	var argNames []string
 	for _, t := range args {
