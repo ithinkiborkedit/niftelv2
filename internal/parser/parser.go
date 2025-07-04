@@ -743,9 +743,6 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 		if p.check(token.TokenLBrace) {
 			return p.structLiteralExpr(typeExpr)
 		}
-		if len(typeExpr.TypeArgs) > 0 {
-			return nil, fmt.Errorf("type arguments only allowed in struct literals or function calls")
-		}
 		return &ast.VariableExpr{Name: typeExpr.Name}, nil
 	}
 
