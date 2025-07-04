@@ -1,0 +1,10 @@
+struct Person {
+    name: string
+    age: int
+
+    func greet() -> string {
+        return "hi"
+    }
+}
+
+var p: Person = Person{name: "Jim", age: 23}

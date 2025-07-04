@@ -6,12 +6,26 @@ struct Box[T] {
     value: T
 }
 
+struct Person {
+    name: string
+    age: int
+
+    func greet() -> string {
+        return "hi"
+    }
+}
+
 func unbox[T](b: Box[T]) -> T {
     return b.value
 }
 
 var x:Box[int] = Box[int]{value: 42}
 
+var p: Person = Person{name: "Jim", age: 23}
+
 print(unbox[int](x))
+print(swap[int](1,2))
+print(swap[string]("a","b"))
+
 
 
