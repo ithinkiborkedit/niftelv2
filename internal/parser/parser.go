@@ -728,8 +728,39 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 			}
 			return p.structLiteralExpr(typeExpr)
 		}
+		// typeExpr, err := p.parseTypeExprFromToken(p.prev)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// if p.check(token.TokenLBrace) {
+		// 	return p.structLiteralExpr(typeExpr)
+		// }
 		return &ast.VariableExpr{Name: p.prev}, nil
 	}
+	ok, err = p.match(token.TokenIdentifier)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		typeExpr, err := p.parseTypeExprFromToken(p.prev)
+		if err != nil {
+			return nil, err
+		}
+		if p.check(token.TokenLBrace) {
+			return p.structLiteralExpr(typeExpr)
+		}
+		if len(typeExpr.TypeArgs) > 0 {
+			return nil, fmt.Errorf("type arguments only allowed in struct literals or function calls")
+		}
+		return &ast.VariableExpr{Name: typeExpr.Name}, nil
+	}
+	// ok, err = p.match(token.TokenIdentifier)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// if ok {
+	// 	return &ast.VariableExpr{Name: p.prev}, nil
+	// }
 	ok, err = p.match(token.TokenLParen)
 	if err != nil {
 		return nil, err

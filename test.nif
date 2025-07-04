@@ -6,5 +6,4 @@ func unbox[T](b: Box[T]) -> T {
     return b.value
 }
 
-
 var x: Box[int] = Box[int]{value: 42}
