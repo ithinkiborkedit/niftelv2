@@ -8,3 +8,5 @@ struct Person {
 }
 
 var p: Person = Person{name: "Jim", age: 23}
+
+print(p.greet())
