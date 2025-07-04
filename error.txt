@@ -1,8 +1,5 @@
 DEBUG ENV TYPES after registration:[
-"tuple" "func" "float" "list" "struct" "int" "string" "bool" "null" ]
-Niftel REPL v0
->>> DEBUG ENV TYPES after registration:[
-"string" "struct" "func" "int" "float" "null" "bool" "tuple" "list" ]
+"tuple" "int" "float" "string" "null" "func" "struct" "bool" "list" ]
 [ADVANCE] Current: struct (type=struct, line=1, lexeme="struct")[STATMENT] At: <nil> Current: struct (type=struct, line=1, lexeme="struct")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="Box")[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Box' line='1'
 [ADVANCE] Current: [ (type=[, line=1, lexeme="[")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="T")[ADVANCE] Current: ] (type=], line=1, lexeme="]")[ADVANCE] Current: { (type={, line=1, lexeme="{")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=2, lexeme="value")[AFTER OPENING '{' ] struct body: token IDENTIFIER lexem='value' line='2'
 [Trying to check for 
@@ -20,5 +17,4 @@ Niftel REPL v0
 [ADVANCE] Current: var (type=var, line=1, lexeme="var")[STATMENT] At: <nil> Current: var (type=var, line=1, lexeme="var")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="x")[ADVANCE] Current: : (type=:, line=1, lexeme=":")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="Box")parseTypeExpr: current token = {IDENTIFIER Box <nil> 1 10}
 [ADVANCE] Current: [ (type=[, line=1, lexeme="[")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="int")parseTypeExpr: current token = {IDENTIFIER int <nil> 1 14}
 [ADVANCE] Current: ] (type=], line=1, lexeme="]")[ADVANCE] Current: = (type==, line=1, lexeme="=")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="Box")[ADVANCE] Current: [ (type=[, line=1, lexeme="[")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="int")parseTypeExpr: current token = {IDENTIFIER int <nil> 1 25}
-[ADVANCE] Current: ] (type=], line=1, lexeme="]")[ADVANCE] Current: { (type={, line=1, lexeme="{")
-parser error: Type arguments only allowed in function calls e.g(foo[T](args...)
+[ADVANCE] Current: ] (type=], line=1, lexeme="]")[ADVANCE] Current: { (type={, line=1, lexeme="{")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="value")[ADVANCE] Current: : (type=:, line=1, lexeme=":")[ADVANCE] Current: NUMBER (type=NUMBER, line=1, lexeme="42")[ADVANCE] Current: } (type=}, line=1, lexeme="}")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")%  
