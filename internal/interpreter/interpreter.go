@@ -40,17 +40,6 @@ func (i *Interpreter) Eval(expr ast.Expr) controlflow.ExecResult {
 	return i.Evaluate(expr)
 }
 
-func resolveTypeExpr(expr *ast.TypeExpr, symbols *symtable.SymbolTable) (*symtable.TypeSymbol, error) {
-	if expr == nil {
-		return nil, nil
-	}
-	typ, ok := symbols.ResolveType(expr.Name.Lexeme)
-	if !ok {
-		return nil, fmt.Errorf("unknown type '%s' ", expr.Name.Lexeme)
-	}
-	return typ, nil
-}
-
 func (i *Interpreter) RegisterBuiltInTypes() error {
 	for _, typ := range value.BuiltInTypes {
 		if err := i.env.DefineType(typ); err != nil {
@@ -372,6 +361,22 @@ func (i *Interpreter) VisitStructStmt(stmt *ast.StructStmt) controlflow.ExecResu
 
 	if i.env.HasLocalType(structName) {
 		return controlflow.ExecResult{Err: fmt.Errorf("struct '%s' already defined", structName)}
+	}
+
+	prevTypeEnv := i.typEnv
+	localTypeEnv := typeenv.NewTypeEnv(prevTypeEnv)
+	i.typEnv = localTypeEnv
+
+	defer func() {
+		i.typEnv = prevTypeEnv
+
+	}()
+
+	for _, params := range stmt.TypeParams {
+		err := i.typEnv.DefineTypeParam(params.Lexeme, symtable.NewTypeParamSymbol(params.Lexeme))
+		if err != nil {
+			return controlflow.ExecResult{Err: fmt.Errorf("duplicate type param '%s'", params.Lexeme)}
+		}
 	}
 
 	fields := make(map[string]*symtable.TypeSymbol)
