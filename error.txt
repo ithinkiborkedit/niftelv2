@@ -1,5 +1,5 @@
 DEBUG ENV TYPES after registration:[
-"int" "float" "struct" "func" "null" "tuple" "string" "bool" "list" ]
+"float" "bool" "list" "string" "tuple" "int" "struct" "null" "func" ]
 [ADVANCE] Current: struct (type=struct, line=1, lexeme="struct")[STATMENT] At: <nil> Current: struct (type=struct, line=1, lexeme="struct")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="Box")[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Box' line='1'
 [ADVANCE] Current: [ (type=[, line=1, lexeme="[")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="T")[ADVANCE] Current: ] (type=], line=1, lexeme="]")[ADVANCE] Current: { (type={, line=1, lexeme="{")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=2, lexeme="value")[AFTER OPENING '{' ] struct body: token IDENTIFIER lexem='value' line='2'
 [Trying to check for 
@@ -18,3 +18,4 @@ DEBUG ENV TYPES after registration:[
 [ADVANCE] Current: [ (type=[, line=1, lexeme="[")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="int")parseTypeExpr: current token = {IDENTIFIER int <nil> 1 14}
 [ADVANCE] Current: ] (type=], line=1, lexeme="]")[ADVANCE] Current: = (type==, line=1, lexeme="=")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="Box")[ADVANCE] Current: [ (type=[, line=1, lexeme="[")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="int")parseTypeExpr: current token = {IDENTIFIER int <nil> 1 25}
 [ADVANCE] Current: ] (type=], line=1, lexeme="]")[ADVANCE] Current: { (type={, line=1, lexeme="{")
+parser error: Type arguments only allowed in function calls e.g(foo[T](args...)
