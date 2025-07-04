@@ -1,5 +1,5 @@
 DEBUG ENV TYPES after registration:[
-"bool" "list" "tuple" "struct" "func" "float" "string" "null" "int" ]
+"struct" "string" "bool" "null" "float" "list" "func" "int" "tuple" ]
 [ADVANCE] Current: struct (type=struct, line=1, lexeme="struct")[STATMENT] At: <nil> Current: struct (type=struct, line=1, lexeme="struct")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="Box")[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Box' line='1'
 [ADVANCE] Current: [ (type=[, line=1, lexeme="[")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="T")[ADVANCE] Current: ] (type=], line=1, lexeme="]")[ADVANCE] Current: { (type={, line=1, lexeme="{")[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=2, lexeme="value")[AFTER OPENING '{' ] struct body: token IDENTIFIER lexem='value' line='2'
 [Trying to check for 

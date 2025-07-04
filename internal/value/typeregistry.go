@@ -10,7 +10,7 @@ import (
 
 type TypeKind int
 
-var GenericStruct = map[string]*TypeInfo{}
+var GenericStructTemplates = map[string]*TypeInfo{}
 
 const (
 	TypeKindStruct TypeKind = iota
@@ -83,11 +83,11 @@ func RegisterGenericStruct(name string, typeParams []string, fieldTemplates map[
 		GenericParams: typeParams,
 	}
 
-	GenericStruct[name] = info
+	GenericStructTemplates[name] = info
 }
 
 func InstatiateGenericStruct(name string, typeArgs []string) (*TypeInfo, error) {
-	gen, ok := GenericStruct[name]
+	gen, ok := GenericStructTemplates[name]
 	if !ok {
 		return nil, errors.New("unknown generic struct: " + name)
 	}

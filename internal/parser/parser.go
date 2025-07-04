@@ -1334,6 +1334,8 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 	}, nil
 }
 
+// func (p *Parser) genericStructDeclaration(name token.Token, typeParams []token.Token, field)
+
 func (p *Parser) structDeclartion() (ast.Stmt, error) {
 
 	fmt.Printf("[AFTER SKIP NEW LINES] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
@@ -1380,10 +1382,6 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 		}
 	}
 	fmt.Printf("[Trying to check for \n after '{' ] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
-	// err = p.skipnewLines()
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	var fields []ast.VarStmt
 	var methods []ast.FuncStmt
@@ -1467,12 +1465,19 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	return &ast.StructStmt{
-		Name:    name,
-		Fields:  fields,
-		Methods: methods,
-		Struct:  structTok,
-	}, nil
+	stmt := &ast.StructStmt{
+		Name:       name,
+		Fields:     fields,
+		Methods:    methods,
+		Struct:     structTok,
+		TypeParams: typeParams,
+	}
+
+	// if len(typeParams) > 0 {
+	// 	value.GenericStructTemplates[name.Lexeme] = stmt
+	// }
+
+	return stmt, nil
 }
 
 func (p *Parser) forStatement() (ast.Stmt, error) {
