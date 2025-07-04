@@ -7,8 +7,6 @@ import (
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	token "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/symtable"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/typeenv"
 )
 
 var ErrIncomplete = errors.New("incomplete input")
@@ -1338,7 +1336,7 @@ func (p *Parser) funcExpression() (ast.Expr, error) {
 
 // func (p *Parser) genericStructDeclaration(name token.Token, typeParams []token.Token, field)
 
-func (p *Parser) structDeclartion(currentTypeEnv *typeenv.TypeEnv) (ast.Stmt, error) {
+func (p *Parser) structDeclartion() (ast.Stmt, error) {
 
 	fmt.Printf("[AFTER SKIP NEW LINES] struct body: token %v lexem='%s' line='%d'\n", p.curr.Type, p.curr.Lexeme, p.curr.Line)
 	structTok := p.previous()
@@ -1378,13 +1376,13 @@ func (p *Parser) structDeclartion(currentTypeEnv *typeenv.TypeEnv) (ast.Stmt, er
 		return nil, err
 	}
 
-	localTypeEen := typeenv.NewTypeEnv(currentTypeEnv)
-	for _, param := range typeParams {
-		err := localTypeEen.DefineTypeParam(param.Lexeme, symtable.NewTypeParamSymbol(param.Lexeme))
-		if err != nil {
-			return nil, fmt.Errorf("duplicate type param '%s'", param.Lexeme)
-		}
-	}
+	// localTypeEen := typeenv.NewTypeEnv(currentTypeEnv)
+	// for _, param := range typeParams {
+	// 	err := localTypeEen.DefineTypeParam(param.Lexeme, symtable.NewTypeParamSymbol(param.Lexeme))
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("duplicate type param '%s'", param.Lexeme)
+	// 	}
+	// }
 
 	for p.check(token.TokenNewLine) {
 		if err := p.advance(); err != nil {
