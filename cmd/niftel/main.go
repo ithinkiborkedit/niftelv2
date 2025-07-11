@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 
+	"github.com/ithinkiborkedit/niftelv2.git/internal/codegen"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/interpreter"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/lexer"
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
@@ -41,6 +44,57 @@ func countBraces(line string) (open, close int) {
 		}
 	}
 	return
+}
+
+func compileProject(path string) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not read file: %v\n", err)
+		os.Exit(2)
+	}
+	source := string(data)
+
+	lex := lexer.New(source)
+	par := parser.New(lex)
+	stmts, err := par.Parse()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Parse error: %v\n", err)
+		os.Exit(3)
+	}
+
+	cg := codegen.NewCodeGen()
+	ir, err := cg.GenerateLLVM(stmts)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "code gen error: %v\n", err)
+		os.Exit(4)
+	}
+
+	baseName := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
+	llFile := baseName + ".ll"
+	objFile := baseName + ".o"
+	nifFile := baseName + ""
+
+	if err := os.WriteFile(llFile, []byte(ir), 0644); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to write LLVM IR: %v\n", err)
+		os.Exit(5)
+	}
+
+	llcCmd := exec.Command("llc", "-march=arm64", llFile, "-filetype=obj", "-o", objFile)
+	llcCmd.Stdout = os.Stdout
+	llcCmd.Stderr = os.Stderr
+	if err := llcCmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "llc failed: %v\n", err)
+		os.Exit(6)
+	}
+
+	clangCmd := exec.Command("clang", objFile, "-o", nifFile)
+	clangCmd.Stdout = os.Stdout
+	clangCmd.Stderr = os.Stderr
+	if err := clangCmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "clang failed: %v\n", err)
+		os.Exit(7)
+	}
+	// fmt.Printf("LLVM IR WRITTEN to: %s\n", outfile)
 }
 
 func runFile(path string, interp *interpreter.Interpreter) {
@@ -112,9 +166,19 @@ func main() {
 	interp := interpreter.NewInterpreter()
 	// value.BuiltinTypesInit()
 	if len(os.Args) > 1 {
-		interp.ShouldPrintResults = false
-		runFile(os.Args[1], interp)
-		return
+		switch os.Args[1] {
+		case "compile":
+			if len(os.Args) < 3 {
+				fmt.Fprintf(os.Stderr, "Usgae %s compile <source-code-file.nif>\n", os.Args[0])
+				os.Exit(1)
+			}
+			compileProject(os.Args[2])
+			return
+		default:
+			interp.ShouldPrintResults = false
+			runFile(os.Args[1], interp)
+			return
+		}
 	}
 	interp.ShouldPrintResults = true
 	defer func() {
