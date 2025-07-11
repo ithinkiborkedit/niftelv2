@@ -56,5 +56,5 @@ func (c *Codegen) emitPrint(s *ast.PrintStmt) {
 	}
 
 	val := lit.Value.Lexeme
-	c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print.str, i32 0, i32 0 %s))\n", val))
+	c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print.str, i32 0, i32 0), i32 %s)\n", val))
 }
