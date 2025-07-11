@@ -23,7 +23,7 @@ func (c *Codegen) GenerateLLVM(stmts []ast.Stmt) (string, error) {
 
 func (c *Codegen) emitPreamble() {
 	c.builder.WriteString(`declare i32 @print(i8*,...)
-	@print.str = constant [4 x i8] c"%\d\0A\00"
+	@print.str = constant [4 x i8] c"%d\0A\00"
 
 	`)
 }
@@ -56,5 +56,5 @@ func (c *Codegen) emitPrint(s *ast.PrintStmt) {
 	}
 
 	val := lit.Value.Lexeme
-	c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8]* @print.str,i32 0,i32 0 %s)\n", val))
+	c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8]*, @print.str,i32 0,i32 0 %s)\n", val))
 }
