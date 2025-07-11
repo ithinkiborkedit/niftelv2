@@ -1,4 +1,4 @@
 DEBUG ENV TYPES after registration:[
-"null" "struct" "float" "bool" "string" "tuple" "list" "func" "int" ]
-[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")[ADVANCE] Current: ( (type=(, line=1, lexeme="(")[ADVANCE] Current: NUMBER (type=NUMBER, line=1, lexeme="42")[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:58: error: expected type
-call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8]*, @print.str,i32 0,i32 0 42)
+"int" "string" "null" "func" "bool" "struct" "float" "tuple" "list" ]
+[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")[ADVANCE] Current: ( (type=(, line=1, lexeme="(")[ADVANCE] Current: NUMBER (type=NUMBER, line=1, lexeme="42")[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:92: error: expected ')' in constantexpr
+call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print.str, i32 0, i32 0 42))
