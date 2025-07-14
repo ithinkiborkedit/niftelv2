@@ -1,4 +1,6 @@
 DEBUG ENV TYPES after registration:[
-"int" "string" "null" "func" "bool" "struct" "float" "tuple" "list" ]
-[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")[ADVANCE] Current: ( (type=(, line=1, lexeme="(")[ADVANCE] Current: NUMBER (type=NUMBER, line=1, lexeme="42")[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:92: error: expected ')' in constantexpr
-call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print.str, i32 0, i32 0 42))
+"float" "string" "list" "struct" "func" "int" "bool" "null" "tuple" ]
+[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")[ADVANCE] Current: ( (type=(, line=1, lexeme="(")[ADVANCE] Current: STRING (type=STRING, line=1, lexeme="\"hello\"")[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:1: error: expected instruction opcode
+@.str7 = private constant [8 x i8] c"s%!\(string=\"hello\")00"
+^
+llc failed: exit status 1
