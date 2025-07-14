@@ -3,7 +3,7 @@ declare i32 @printf(i8*,...)
 	@print_int_format = constant [4 x i8] c"%d\0A\00"
 	define i32 @main(){
 entry:
-@.str7 = private constant [8 x i8] c"\"hello\"\00"
-call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0), i8* getelementptr ([8 x i8], [8 x i8]* @.str7, i32 0, i32 0))
+@.str6 = private constant [7 x i8] c"hello\"\00"
+call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0), i8* getelementptr ([7 x i8], [7 x i8]* @.str6, i32 0, i32 0))
  ret i32 0
 }
