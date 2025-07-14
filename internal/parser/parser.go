@@ -716,21 +716,7 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 	if ok {
 		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
-	// ok, err = p.match(token.TokenIdentifier)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// if ok {
-	// 	if p.check(token.TokenLBrace) {
-	// 		typeExpr, err := p.parseTypeExprFromToken(p.prev)
-	// 		if err != nil {
-	// 			return nil, err
-	// 		}
-	// 		return p.structLiteralExpr(typeExpr)
-	// 	}
 
-	// 	return &ast.VariableExpr{Name: p.prev}, nil
-	// }
 	ok, err = p.match(token.TokenIdentifier)
 	if err != nil {
 		return nil, err
