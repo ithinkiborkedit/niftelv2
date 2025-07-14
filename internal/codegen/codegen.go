@@ -28,7 +28,7 @@ func (c *Codegen) emitStringLiteral(s string) string {
 
 	escaped := escapeStringForLLVM(s)
 
-	c.builder.WriteString(fmt.Sprintf("%s = private constant [%d x i8] c\"s%\\00\"\n", name, length, escaped))
+	c.builder.WriteString(fmt.Sprintf("%s = private constant [%d x i8] c\"%s\\00\"\n", name, length, escaped))
 
 	return name
 }
@@ -90,7 +90,7 @@ func (c *Codegen) emitPrint(s *ast.PrintStmt) {
 	case tokens.TokenString:
 		strName := c.emitStringLiteral(lit.Value.Lexeme)
 		length := len(lit.Value.Lexeme) + 1
-		c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([%d x i8], [%d x i8]* @print_str_format, i32 0, i32 0), i32 %s)\n", length, length, strName))
+		c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0), i8* getelmtptr ([%d x i8], [%d x i8]* %s, i32 0, i32 0))\n", length, length, strName))
 	default:
 		fmt.Println("warning print only works with string or ints")
 
