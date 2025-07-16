@@ -7,6 +7,6 @@ define i32 @main(){
 entry:
 call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0), i8* getelementptr ([6 x i8], [6 x i8]* @.str0, i32 0, i32 0))
 call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_float_format, i32 0, i32 0), double 1.000000)
-
+call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_float_format, i32 0, i32 0), double 14.100000)
  ret i32 0
 }

@@ -19,6 +19,15 @@ func Convert(tok tokens.Token) (value.Value, error) {
 			Type: value.ValueFloat,
 			Data: fval,
 		}, nil
+	case tokens.TokenFloat:
+		fval, err := strconv.ParseFloat(tok.Lexeme, 64)
+		if err != nil {
+			return value.Null(), fmt.Errorf("invalid float token %v", err)
+		}
+		return value.Value{
+			Type: value.ValueFloat,
+			Data: fval,
+		}, nil
 	case tokens.TokenString:
 		str := tok.Lexeme
 		if len(str) >= 2 && (str[0] == '"' || str[0] == '\'') && str[len(str)-1] == str[0] {
