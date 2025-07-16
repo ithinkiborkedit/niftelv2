@@ -1,5 +1,5 @@
 DEBUG ENV TYPES after registration:[
-"string" "null" "list" "func" "int" "float" "tuple" "bool" "struct" ]
+"int" "string" "list" "float" "bool" "tuple" "null" "struct" "func" ]
 Raw source string: "print(\"hello\")"
 scanToken advanced: l.current=1 char="print(\"hello\")"
 [ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")scanToken advanced: l.current=6 char="print(\"hello\")"
@@ -20,5 +20,5 @@ string loop: l.current=12 remaining source="\")"
 char at l.current=12 char='"'
 after advancing l.current=13
 [ADVANCE] Current: STRING (type=STRING, line=1, lexeme="hello")scanToken advanced: l.current=14 char="print(\"hello\")"
-[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:1: error: expected instruction opcode
-@.str5 = private constant [6 x i8] c"hello\00"
+[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:7:32: error: expected value token
+call i32 (i8*,...) @printf(i8* getelemntptr ([4 x i8],[4 x i8]* @print_str_format, i32 0, i32), i8* getelemntptr ([6 x i8], [6 x i8]* @.str0, i32 0, i32 0))

@@ -9,19 +9,59 @@ import (
 )
 
 type Codegen struct {
-	builder strings.Builder
+	builder      strings.Builder
+	strings      map[string]string
+	nextStrIndex int
 }
 
 func NewCodeGen() *Codegen {
-	return &Codegen{}
+	return &Codegen{
+		strings: make(map[string]string),
+	}
 }
 
 func (c *Codegen) GenerateLLVM(stmts []ast.Stmt) (string, error) {
 	c.emitPreamble()
+	for _, stmt := range stmts {
+		c.collectStringsStmt(stmt)
+	}
+	c.emitStringConstants()
 	c.emitMainFunction(stmts)
 	return c.builder.String(), nil
 }
 
+func (c *Codegen) registerStringLiteral(s string) string {
+	if name, ok := c.strings[s]; ok {
+		return name
+	}
+	name := fmt.Sprintf("@.str%d", c.nextStrIndex)
+	c.strings[s] = name
+	return name
+}
+
+func (c *Codegen) emitStringConstants() {
+	for s, name := range c.strings {
+		length := len(s) + 1
+		escaped := escapeStringForLLVM(s)
+		c.builder.WriteString(fmt.Sprintf("%s = private constant [%d x i8] c\"%s\\00\"\n", name, length, escaped))
+	}
+}
+
+func (c *Codegen) collectStringsStmt(s ast.Stmt) {
+	switch stmt := s.(type) {
+	case *ast.PrintStmt:
+		c.collectStringsExpr(stmt.Expr)
+	}
+}
+
+func (c *Codegen) collectStringsExpr(e ast.Expr) {
+	switch expr := e.(type) {
+	case *ast.LiteralExpr:
+		if expr.Value.Type == tokens.TokenString {
+			c.registerStringLiteral(expr.Value.Lexeme)
+		}
+	}
+}
 func (c *Codegen) emitStringLiteral(s string) string {
 	name := fmt.Sprintf("@.str%d", len(s))
 	length := len(s) + 1
@@ -84,23 +124,18 @@ func (c *Codegen) emitPrint(s *ast.PrintStmt) {
 		return
 	}
 	switch lit.Value.Type {
+
 	case tokens.TokenNumber:
 		val := lit.Value.Lexeme
 		c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_int_format, i32 0, i32 0), i32 %s)\n", val))
 	case tokens.TokenString:
-		strName := c.emitStringLiteral(lit.Value.Lexeme)
+		strName := c.strings[lit.Value.Lexeme]
 		length := len(lit.Value.Lexeme) + 1
-		c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0), i8* getelementptr ([%d x i8], [%d x i8]* %s, i32 0, i32 0))\n", length, length, strName))
+		c.builder.WriteString(fmt.Sprintf(
+			"call i32 (i8*,...) @printf(i8* getelemntptr ([4 x i8],[4 x i8]* @print_str_format, i32 0, i32), i8* getelemntptr ([%d x i8], [%d x i8]* %s, i32 0, i32 0))\n",
+			length, length, strName))
 	default:
 		fmt.Println("warning print only works with string or ints")
 
 	}
-	// lit, ok := s.Expr.(*ast.LiteralExpr)
-
-	// if !ok {
-	// 	fmt.Println("warning: print only supports literal ints now")
-	// }
-
-	// val := lit.Value.Lexeme
-	// c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print.str, i32 0, i32 0), i32 %s)\n", val))
 }
