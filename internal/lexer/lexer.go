@@ -196,9 +196,11 @@ func (l *Lexer) string(quote rune) (token.Token, error) {
 	startLine, startColumn := l.line, l.column
 
 	for !l.isAtEnd() {
+		fmt.Printf("string loop: l.current=%d char=%q\n", l.current, l.source)
 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
 		if r == quote {
 			l.advance()
+			fmt.Printf("after advancing l.current=%d\n", l.current)
 			return token.Token{
 				Type:   token.TokenString,
 				Lexeme: sb.String(),
@@ -434,13 +436,13 @@ func (l *Lexer) scanToken() (token.Token, error) {
 			return token.Token{}, fmt.Errorf("unexpected character: %q", ch)
 		}
 	case '"', '\'':
-		l.start = l.current
 		l.advance()
+		l.start = l.current
 		return l.string(ch)
 	case '\n':
 		l.line++
 		l.column = 0
-		l.start = l.current
+		l.start = l.current - 1
 		return l.scanToken()
 	default:
 		if unicode.IsDigit(ch) {

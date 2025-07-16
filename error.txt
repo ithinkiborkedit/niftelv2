@@ -1,4 +1,10 @@
 DEBUG ENV TYPES after registration:[
-"func" "string" "bool" "null" "struct" "int" "float" "tuple" "list" ]
-[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")[ADVANCE] Current: ( (type=(, line=1, lexeme="(")[ADVANCE] Current: STRING (type=STRING, line=1, lexeme="hello\"")[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:1: error: expected instruction opcode
-@.str6 = private constant [7 x i8] c"hello\"\00"
+"int" "string" "bool" "null" "tuple" "list" "func" "float" "struct" ]
+[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")[ADVANCE] Current: ( (type=(, line=1, lexeme="(")string loop: l.current=8 char="print(\"hello\")"
+string loop: l.current=9 char="print(\"hello\")"
+string loop: l.current=10 char="print(\"hello\")"
+string loop: l.current=11 char="print(\"hello\")"
+string loop: l.current=12 char="print(\"hello\")"
+after advancing l.current=13
+[ADVANCE] Current: STRING (type=STRING, line=1, lexeme="ello")[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:1: error: expected instruction opcode
+@.str4 = private constant [5 x i8] c"ello\00"
