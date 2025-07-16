@@ -7,6 +7,7 @@ import (
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	tokens "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/tokentoval"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
 type Codegen struct {
@@ -85,6 +86,7 @@ func (c *Codegen) emitPreamble() {
 	c.builder.WriteString(`declare i32 @printf(i8*,...)
 	@print_str_format = constant [4 x i8] c"%s\0A\00"
 	@print_int_format = constant [4 x i8] c"%d\0A\00"
+	@print_float_format = constant [4 x i8] c"%f\0A\00"
 	`)
 }
 
@@ -123,10 +125,12 @@ func (c *Codegen) emitPrint(s *ast.PrintStmt) {
 	}
 	llvmLiteral := c.emitValueLiteral(val)
 	var formatName string
-	switch lit.Value.Type {
-	case tokens.TokenNumber:
+	switch val.Type {
+	case value.ValueInt:
 		formatName = "@print_int_format"
-	case tokens.TokenString:
+	case value.ValueFloat:
+		formatName = "@print_float_format"
+	case value.ValueString:
 		formatName = "@print_str_format"
 	default:
 		fmt.Printf("usupported literal type in print %v", lit)

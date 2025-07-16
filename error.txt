@@ -1,29 +1,33 @@
 DEBUG ENV TYPES after registration:[
-"bool" "null" "list" "struct" "float" "func" "tuple" "int" "string" ]
-Raw source string: "print(\"hello\")\nprint(42)"
-scanToken advanced: l.current=1 char="print(\"hello\")\nprint(42)"
-[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")scanToken advanced: l.current=6 char="print(\"hello\")\nprint(42)"
-[ADVANCE] Current: ( (type=(, line=1, lexeme="(")scanToken advanced: l.current=7 char="print(\"hello\")\nprint(42)"
-scanToken start string literal: l.current=7 char="print(\"hello\")\nprint(42)"
+"func" "bool" "float" "string" "null" "tuple" "list" "struct" "int" ]
+Raw source string: "print(\"hello\")\nprint(1)\nprint(14.1)"
+scanToken advanced: l.current=1 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")scanToken advanced: l.current=6 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: ( (type=(, line=1, lexeme="(")scanToken advanced: l.current=7 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+scanToken start string literal: l.current=7 char="print(\"hello\")\nprint(1)\nprint(14.1)"
 scanToken string literal: l.current=7 char='\a'
-string loop: l.current=7 remaining source="hello\")\nprint(42)"
+string loop: l.current=7 remaining source="hello\")\nprint(1)\nprint(14.1)"
 char at l.current=7 char='h'
-string loop: l.current=8 remaining source="ello\")\nprint(42)"
+string loop: l.current=8 remaining source="ello\")\nprint(1)\nprint(14.1)"
 char at l.current=8 char='e'
-string loop: l.current=9 remaining source="llo\")\nprint(42)"
+string loop: l.current=9 remaining source="llo\")\nprint(1)\nprint(14.1)"
 char at l.current=9 char='l'
-string loop: l.current=10 remaining source="lo\")\nprint(42)"
+string loop: l.current=10 remaining source="lo\")\nprint(1)\nprint(14.1)"
 char at l.current=10 char='l'
-string loop: l.current=11 remaining source="o\")\nprint(42)"
+string loop: l.current=11 remaining source="o\")\nprint(1)\nprint(14.1)"
 char at l.current=11 char='o'
-string loop: l.current=12 remaining source="\")\nprint(42)"
+string loop: l.current=12 remaining source="\")\nprint(1)\nprint(14.1)"
 char at l.current=12 char='"'
 after advancing l.current=13
-[ADVANCE] Current: STRING (type=STRING, line=1, lexeme="hello")scanToken advanced: l.current=14 char="print(\"hello\")\nprint(42)"
-[ADVANCE] Current: ) (type=), line=1, lexeme=")")scanToken advanced: l.current=15 char="print(\"hello\")\nprint(42)"
-scanToken advanced: l.current=16 char="print(\"hello\")\nprint(42)"
-[ADVANCE] Current: print (type=print, line=2, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=2, lexeme="print")scanToken advanced: l.current=21 char="print(\"hello\")\nprint(42)"
-[ADVANCE] Current: ( (type=(, line=2, lexeme="(")scanToken advanced: l.current=22 char="print(\"hello\")\nprint(42)"
-[ADVANCE] Current: NUMBER (type=NUMBER, line=2, lexeme="42")scanToken advanced: l.current=24 char="print(\"hello\")\nprint(42)"
-[ADVANCE] Current: ) (type=), line=2, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=2, lexeme="")llc: error: llc: sourcetest.ll:7:99: error: expected ',' in argument list
-call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0). i8* getelementptr ([6 x i8], [6 x i8]* @.str0, i32 0, i32 0))call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_int_format, i32 0, i32 0). double 42.000000) ret i32 0
+[ADVANCE] Current: STRING (type=STRING, line=1, lexeme="hello")scanToken advanced: l.current=14 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: ) (type=), line=1, lexeme=")")scanToken advanced: l.current=15 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+scanToken advanced: l.current=16 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: print (type=print, line=2, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=2, lexeme="print")scanToken advanced: l.current=21 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: ( (type=(, line=2, lexeme="(")scanToken advanced: l.current=22 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: NUMBER (type=NUMBER, line=2, lexeme="1")scanToken advanced: l.current=23 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: ) (type=), line=2, lexeme=")")scanToken advanced: l.current=24 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+scanToken advanced: l.current=25 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: print (type=print, line=3, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=3, lexeme="print")scanToken advanced: l.current=30 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: ( (type=(, line=3, lexeme="(")scanToken advanced: l.current=31 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: NUMBER (type=NUMBER, line=3, lexeme="14.1")scanToken advanced: l.current=35 char="print(\"hello\")\nprint(1)\nprint(14.1)"
+[ADVANCE] Current: ) (type=), line=3, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=3, lexeme="")% 
