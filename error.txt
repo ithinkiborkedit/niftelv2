@@ -1,5 +1,5 @@
 DEBUG ENV TYPES after registration:[
-"struct" "string" "func" "null" "list" "tuple" "int" "float" "bool" ]
+"tuple" "func" "int" "bool" "float" "string" "null" "list" "struct" ]
 Raw source string: "struct Person {\n    name: string\n    age: int\n}"
 scanToken advanced: l.current=1 char="struct Person {\n    name: string\n    age: int\n}"
 [ADVANCE] Current: struct (type=struct, line=1, lexeme="struct")[STATMENT] At: <nil> Current: struct (type=struct, line=1, lexeme="struct")scanToken advanced: l.current=8 char="struct Person {\n    name: string\n    age: int\n}"
@@ -24,5 +24,4 @@ scanToken advanced: l.current=41 char="struct Person {\n    name: string\n    ag
 [ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=3, lexeme="int")parseTypeExpr: current token = {IDENTIFIER int <nil> 3 12}
 scanToken advanced: l.current=46 char="struct Person {\n    name: string\n    age: int\n}"
 scanToken advanced: l.current=47 char="struct Person {\n    name: string\n    age: int\n}"
-[ADVANCE] Current: } (type=}, line=4, lexeme="\n}")[ADVANCE] Current: EOF (type=EOF, line=4, lexeme="")llc: error: llc: sourcetest.ll:7:11: error: expected instruction opcode
-%Person = type { i8*, i64 }
+[ADVANCE] Current: } (type=}, line=4, lexeme="\n}")[ADVANCE] Current: EOF (type=EOF, line=4, lexeme="")warning: unsupported statement type: *nifast.StructStmt

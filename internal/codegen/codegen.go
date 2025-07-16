@@ -60,6 +60,13 @@ func (c *Codegen) GenerateLLVM(stmts []ast.Stmt) (string, error) {
 	for _, stmt := range stmts {
 		c.collectStringsStmt(stmt)
 	}
+
+	for _, stmt := range stmts {
+		if s, ok := stmt.(*ast.StructStmt); ok {
+			c.emitStructStmt(s)
+		}
+	}
+
 	c.emitStringConstants()
 	c.emitMainFunction(stmts)
 	return c.builder.String(), nil
@@ -180,13 +187,24 @@ func (c *Codegen) emitStructStmt(s *ast.StructStmt) {
 	st.Emitted = true
 }
 
+func (c *Codegen) RegisterStructFromAST(s *ast.StructStmt) {
+	if _, exists := c.structs[s.Name.Lexeme]; exists {
+		return
+	}
+	var fieldNames []string
+	var fieldTypes []string
+
+	for _, f := range s.Fields {
+		fieldNames = append(fieldNames, f.Names[0].Lexeme)
+		fieldTypes = append(fieldTypes, c.llvmTypeForTypeExpr(f.Type))
+	}
+	c.RegisterStruct(s.Name.Lexeme, fieldNames, fieldTypes)
+}
+
 func (c *Codegen) emitStmt(s ast.Stmt) {
 	switch stmt := s.(type) {
 	case *ast.PrintStmt:
 		c.emitPrint(stmt)
-		c.builder.WriteString("\n")
-	case *ast.StructStmt:
-		c.emitStructStmt(stmt)
 		c.builder.WriteString("\n")
 	default:
 		fmt.Printf("warning: unsupported statement type: %T\n", stmt)
