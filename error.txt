@@ -1,10 +1,16 @@
 DEBUG ENV TYPES after registration:[
-"int" "string" "bool" "null" "tuple" "list" "func" "float" "struct" ]
-[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")[ADVANCE] Current: ( (type=(, line=1, lexeme="(")string loop: l.current=8 char="print(\"hello\")"
+"bool" "tuple" "list" "struct" "null" "float" "string" "func" "int" ]
+scanToken advanced: l.current=1 char="print(\"hello\")"
+[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")scanToken advanced: l.current=6 char="print(\"hello\")"
+[ADVANCE] Current: ( (type=(, line=1, lexeme="(")scanToken advanced: l.current=7 char="print(\"hello\")"
+scanToken start string literal: l.current=7 char="print(\"hello\")"
+scanToken string literal: l.current=8 char=%!q(MISSING)
+string loop: l.current=8 char="print(\"hello\")"
 string loop: l.current=9 char="print(\"hello\")"
 string loop: l.current=10 char="print(\"hello\")"
 string loop: l.current=11 char="print(\"hello\")"
 string loop: l.current=12 char="print(\"hello\")"
 after advancing l.current=13
-[ADVANCE] Current: STRING (type=STRING, line=1, lexeme="ello")[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:1: error: expected instruction opcode
+[ADVANCE] Current: STRING (type=STRING, line=1, lexeme="ello")scanToken advanced: l.current=14 char="print(\"hello\")"
+[ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:1: error: expected instruction opcode
 @.str4 = private constant [5 x i8] c"ello\00"

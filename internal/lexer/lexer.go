@@ -192,9 +192,9 @@ func (l *Lexer) peekNext() rune {
 }
 
 func (l *Lexer) string(quote rune) (token.Token, error) {
+	l.start = l.current
 	var sb strings.Builder
 	startLine, startColumn := l.line, l.column
-
 	for !l.isAtEnd() {
 		fmt.Printf("string loop: l.current=%d char=%q\n", l.current, l.source)
 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
@@ -350,6 +350,7 @@ func lookupIdentifier(lexeme string) token.TokenType {
 
 func (l *Lexer) scanToken() (token.Token, error) {
 	ch := l.advance()
+	fmt.Printf("scanToken advanced: l.current=%d char=%q\n", l.current, l.source)
 	switch ch {
 	case '(':
 		return l.makeToken(token.TokenLParen), nil
@@ -436,8 +437,10 @@ func (l *Lexer) scanToken() (token.Token, error) {
 			return token.Token{}, fmt.Errorf("unexpected character: %q", ch)
 		}
 	case '"', '\'':
+		fmt.Printf("scanToken start string literal: l.current=%d char=%q\n", l.current, l.source)
 		l.advance()
 		l.start = l.current
+		fmt.Printf("scanToken string literal: l.current=%d char=%q\n", l.current)
 		return l.string(ch)
 	case '\n':
 		l.line++
