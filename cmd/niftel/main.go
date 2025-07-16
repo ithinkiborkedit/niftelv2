@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/ithinkiborkedit/niftelv2.git/internal/codegen"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/interpreter"
@@ -20,30 +21,59 @@ import (
 // Helper: counts '{' and '}' in a line, ignoring those in strings
 func countBraces(line string) (open, close int) {
 	inString := false
-	stringChar := byte(0)
-	for i := 0; i < len(line); i++ {
-		c := line[i]
+	var stringChar rune
+
+	i := 0
+	for i < len(line) {
+		r, size := utf8.DecodeRuneInString(line[i:])
 		if inString {
-			if c == stringChar {
+			if r == stringChar {
 				inString = false
-			} else if c == '\\' && i+1 < len(line) {
-				i++ // skip escaped char
+			} else if r == '\\' && i+size < len(line) {
+				_, escSize := utf8.DecodeRuneInString(line[i+size:])
+				i += escSize
 			}
+			i += size
 			continue
 		}
-		if c == '"' || c == '\'' {
+		if r == '"' || r == '\'' {
 			inString = true
-			stringChar = c
+			stringChar = r
+			i += size
 			continue
 		}
-		if c == '{' {
+		if r == '{' {
 			open++
 		}
-		if c == '}' {
+		if r == '}' {
 			close++
 		}
+		i += size
 	}
 	return
+	// for i := 0; i < len(line); i++ {
+	// 	c := line[i]
+	// 	if inString {
+	// 		if c == stringChar {
+	// 			inString = false
+	// 		} else if c == '\\' && i+1 < len(line) {
+	// 			i++ // skip escaped char
+	// 		}
+	// 		continue
+	// 	}
+	// 	if c == '"' || c == '\'' {
+	// 		inString = true
+	// 		stringChar = c
+	// 		continue
+	// 	}
+	// 	if c == '{' {
+	// 		open++
+	// 	}
+	// 	if c == '}' {
+	// 		close++
+	// 	}
+	// }
+	// return
 }
 
 func compileProject(path string) {
@@ -53,7 +83,6 @@ func compileProject(path string) {
 		os.Exit(2)
 	}
 	source := string(data)
-
 	lex := lexer.New(source)
 	par := parser.New(lex)
 	stmts, err := par.Parse()
