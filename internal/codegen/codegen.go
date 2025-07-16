@@ -120,7 +120,7 @@ func (c *Codegen) emitPrint(s *ast.PrintStmt) {
 	}
 	val, err := tokentoval.Convert(lit.Value)
 	if err != nil {
-		fmt.Printf("error converting token to vale %v\n", err)
+		fmt.Printf("error converting token to value %v\n", err)
 		return
 	}
 	llvmLiteral := c.emitValueLiteral(val)

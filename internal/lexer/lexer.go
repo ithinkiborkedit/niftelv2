@@ -62,13 +62,9 @@ func (l *Lexer) NextToken() (token.Token, error) {
 		l.skipWhiteSpace()
 		l.start = l.current
 		tok, err := l.scanToken()
-		// fmt.Printf("scanToken() return type=%v, Lexeme=%q, current=%d, start=%d", tok.Type, tok.Lexeme, l.current, l.start)
 		if err != nil {
 			return token.Token{}, err
 		}
-		// if tok.Type == token.TokenIllegal {
-		// 	return tok, nil
-		// }
 		if tok.Type == 0 || tok.Lexeme == "" {
 			continue
 		}
@@ -100,24 +96,8 @@ func New(source string) *Lexer {
 		current: 0,
 		line:    1,
 		column:  0,
-		// tokens:  []token.Token{},
 	}
 }
-
-// func (l *Lexer) ScanTokens() []token.Token {
-// 	for !l.isAtEnd() {
-// 		l.start = l.current
-// 		l.scanToken()
-// 	}
-// 	l.tokens = append(l.tokens, token.Token{
-// 		Type:   token.TokenEOF,
-// 		Lexeme: "",
-// 		Line:   l.line,
-// 		Column: l.column,
-// 	})
-
-// 	return l.tokens
-// }
 
 func (l *Lexer) isAtEnd() bool {
 	return l.current >= len(l.source)
@@ -179,10 +159,10 @@ func (l *Lexer) skipBlockComment() {
 	}
 }
 
-func (l *Lexer) errorf(format string, args ...interface{}) {
-	msg := fmt.Sprintf(format, args...)
-	panic(fmt.Sprintf("Lexer error at line %d, col %d: %s", l.line, l.column, msg))
-}
+// func (l *Lexer) errorf(format string, args ...interface{}) {
+// 	msg := fmt.Sprintf(format, args...)
+// 	panic(fmt.Sprintf("Lexer error at line %d, col %d: %s", l.line, l.column, msg))
+// }
 
 func (l *Lexer) peekNext() rune {
 	if l.current >= len(l.source) {
@@ -255,33 +235,6 @@ func (l *Lexer) string(quote rune) (token.Token, error) {
 	return token.Token{}, fmt.Errorf("undetermined string literal")
 }
 
-// func (l *Lexer) string(quote rune) (token.Token, error) {
-// 	for !l.isAtEnd() {
-// 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
-// 		if r == quote {
-// 			l.advance()
-// 			lexeme := l.source[l.start:l.current]
-// 			return token.Token{
-// 				Type:   token.TokenString,
-// 				Lexeme: lexeme,
-// 				Line:   l.line,
-// 				Column: l.column,
-// 			}, nil
-// 		}
-// 		if r == '\n' {
-// 			l.line++
-// 			l.column = 0
-// 		}
-
-// 		if r == '\\' {
-// 			l.advance()
-// 		}
-// 		l.advance()
-
-// 	}
-// 	return token.Token{}, fmt.Errorf("unterminated string literal")
-// }
-
 func (l *Lexer) number() (token.Token, error) {
 	start := l.start
 	hasDot := false
@@ -297,13 +250,6 @@ func (l *Lexer) number() (token.Token, error) {
 		}
 		l.advance()
 	}
-	// for !l.isAtEnd() {
-	// 	r, _ := utf8.DecodeRuneInString(l.source[l.current:])
-	// 	if !unicode.IsDigit(r) && r != '.' {
-	// 		break
-	// 	}
-	// 	l.advance()
-	// }
 	lexeme := l.source[start:l.current]
 
 	if hasDot {
@@ -332,17 +278,6 @@ func (l *Lexer) number() (token.Token, error) {
 		}, nil
 	}
 
-	// val, err := strconv.ParseFloat(lexeme, 64)
-	// if err != nil {
-	// 	return token.Token{}, fmt.Errorf("invalid number literal: %s", lexeme)
-	// }
-	// return token.Token{
-	// 	Type:   token.TokenNumber,
-	// 	Lexeme: lexeme,
-	// 	Data:   val,
-	// 	Line:   l.line,
-	// 	Column: l.column,
-	// }, nil
 }
 
 func (l *Lexer) identifier() (token.Token, error) {
@@ -484,7 +419,6 @@ func (l *Lexer) scanToken() (token.Token, error) {
 		}
 	case '"', '\'':
 		fmt.Printf("scanToken start string literal: l.current=%d char=%q\n", l.current, l.source)
-		// l.advance()
 		l.start = l.current
 		fmt.Printf("scanToken string literal: l.current=%d char=%q\n", l.current, l.current)
 		return l.string(ch)
@@ -507,5 +441,5 @@ func (l *Lexer) scanToken() (token.Token, error) {
 			return token.Token{}, nil
 		}
 	}
-	// return token.Token{}, fmt.Errorf("unexpected character %q", ch)
+
 }
