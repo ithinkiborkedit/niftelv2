@@ -36,6 +36,7 @@ func (c *Codegen) registerStringLiteral(s string) string {
 	}
 	name := fmt.Sprintf("@.str%d", c.nextStrIndex)
 	c.strings[s] = name
+	c.nextStrIndex++
 	return name
 }
 
@@ -61,16 +62,6 @@ func (c *Codegen) collectStringsExpr(e ast.Expr) {
 			c.registerStringLiteral(expr.Value.Lexeme)
 		}
 	}
-}
-func (c *Codegen) emitStringLiteral(s string) string {
-	name := fmt.Sprintf("@.str%d", len(s))
-	length := len(s) + 1
-
-	escaped := escapeStringForLLVM(s)
-
-	c.builder.WriteString(fmt.Sprintf("%s = private constant [%d x i8] c\"%s\\00\"\n", name, length, escaped))
-
-	return name
 }
 
 func escapeStringForLLVM(s string) string {
@@ -132,7 +123,7 @@ func (c *Codegen) emitPrint(s *ast.PrintStmt) {
 		strName := c.strings[lit.Value.Lexeme]
 		length := len(lit.Value.Lexeme) + 1
 		c.builder.WriteString(fmt.Sprintf(
-			"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8],[4 x i8]* @print_str_format, i32 0, i32), i8* getelementptr ([%d x i8], [%d x i8]* %s, i32 0, i32 0))\n",
+			"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8],[4 x i8]* @print_str_format, i32 0, i32 0), i8* getelementptr ([%d x i8], [%d x i8]* %s, i32 0, i32 0))\n",
 			length, length, strName))
 	default:
 		fmt.Println("warning print only works with string or ints")
