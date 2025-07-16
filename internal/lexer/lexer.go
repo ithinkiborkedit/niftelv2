@@ -3,6 +3,7 @@ package lexer
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 
@@ -191,18 +192,21 @@ func (l *Lexer) peekNext() rune {
 }
 
 func (l *Lexer) string(quote rune) (token.Token, error) {
+	var sb strings.Builder
+	startLine, startColumn := l.line, l.column
+
 	for !l.isAtEnd() {
 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
 		if r == quote {
 			l.advance()
-			lexeme := l.source[l.start:l.current]
 			return token.Token{
 				Type:   token.TokenString,
-				Lexeme: lexeme,
-				Line:   l.line,
-				Column: l.column,
+				Lexeme: sb.String(),
+				Line:   startLine,
+				Column: startColumn,
 			}, nil
 		}
+
 		if r == '\n' {
 			l.line++
 			l.column = 0
@@ -210,12 +214,65 @@ func (l *Lexer) string(quote rune) (token.Token, error) {
 
 		if r == '\\' {
 			l.advance()
-		}
-		l.advance()
+			if l.isAtEnd() {
+				return token.Token{}, fmt.Errorf("unterminated escape sequance")
+			}
+			escRune, _ := utf8.DecodeRuneInString(l.source[l.current:])
+			l.advance()
 
+			switch escRune {
+			case 'n':
+				sb.WriteRune('\n')
+				l.line++
+				l.column = 0
+			case 'r':
+				sb.WriteRune('\r')
+			case 't':
+				sb.WriteRune('\t')
+			case '\\':
+				sb.WriteRune('\\')
+			case '"':
+				sb.WriteRune('"')
+			case '\'':
+				sb.WriteRune('\'')
+			default:
+				sb.WriteRune(escRune)
+			}
+		} else {
+
+			sb.WriteRune(r)
+			l.advance()
+		}
 	}
-	return token.Token{}, fmt.Errorf("unterminated string literal")
+	return token.Token{}, fmt.Errorf("undetermined string literal")
 }
+
+// func (l *Lexer) string(quote rune) (token.Token, error) {
+// 	for !l.isAtEnd() {
+// 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
+// 		if r == quote {
+// 			l.advance()
+// 			lexeme := l.source[l.start:l.current]
+// 			return token.Token{
+// 				Type:   token.TokenString,
+// 				Lexeme: lexeme,
+// 				Line:   l.line,
+// 				Column: l.column,
+// 			}, nil
+// 		}
+// 		if r == '\n' {
+// 			l.line++
+// 			l.column = 0
+// 		}
+
+// 		if r == '\\' {
+// 			l.advance()
+// 		}
+// 		l.advance()
+
+// 	}
+// 	return token.Token{}, fmt.Errorf("unterminated string literal")
+// }
 
 func (l *Lexer) number() (token.Token, error) {
 	for !l.isAtEnd() {
