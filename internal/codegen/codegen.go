@@ -13,12 +13,14 @@ import (
 type Codegen struct {
 	builder      strings.Builder
 	strings      map[string]string
+	structTypes  structTypes
 	nextStrIndex int
 }
 
 func NewCodeGen() *Codegen {
 	return &Codegen{
-		strings: make(map[string]string),
+		strings:     make(map[string]string),
+		structTypes: make(map[string]*StructTypeInfo),
 	}
 }
 

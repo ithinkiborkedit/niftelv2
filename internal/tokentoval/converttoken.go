@@ -16,7 +16,7 @@ func Convert(tok tokens.Token) (value.Value, error) {
 			return value.Null(), fmt.Errorf("invalid numbner token: %v", err)
 		}
 		return value.Value{
-			Type: value.ValueFloat,
+			Type: value.ValueInt,
 			Data: fval,
 		}, nil
 	case tokens.TokenFloat:
