@@ -93,6 +93,7 @@ func (l *Lexer) makeToken(tt token.TokenType) token.Token {
 }
 
 func New(source string) *Lexer {
+	fmt.Printf("Raw source string: %q\n", source)
 	fmt.Printf("Source bytes: %x\n", []byte(source))
 	return &Lexer{
 		source:  source,
