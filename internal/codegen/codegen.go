@@ -104,6 +104,7 @@ func (c *Codegen) emitStmt(s ast.Stmt) {
 	switch stmt := s.(type) {
 	case *ast.PrintStmt:
 		c.emitPrint(stmt)
+		c.builder.WriteString("\n")
 	default:
 		fmt.Printf("warning: unsupported statement type: %T\n", stmt)
 	}
@@ -128,25 +129,10 @@ func (c *Codegen) emitPrint(s *ast.PrintStmt) {
 	case tokens.TokenString:
 		formatName = "@print_str_format"
 	default:
-		fmt.Errorf("usupported literal type in print")
+		fmt.Printf("usupported literal type in print %v", lit)
 		return
 	}
 	c.builder.WriteString(fmt.Sprintf(
-		"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* %s, i32 0, i32 0). %s)",
+		"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* %s, i32 0, i32 0), %s)",
 		formatName, llvmLiteral))
-	// switch lit.Value.Type {
-
-	// case tokens.TokenNumber:
-	// 	val := lit.Value.Lexeme
-	// 	c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_int_format, i32 0, i32 0), i32 %s)\n", val))
-	// case tokens.TokenString:
-	// 	strName := c.strings[lit.Value.Lexeme]
-	// 	length := len(lit.Value.Lexeme) + 1
-	// 	c.builder.WriteString(fmt.Sprintf(
-	// 		"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8],[4 x i8]* @print_str_format, i32 0, i32 0), i8* getelementptr ([%d x i8], [%d x i8]* %s, i32 0, i32 0))\n",
-	// 		length, length, strName))
-	// default:
-	// 	fmt.Println("warning print only works with string or ints")
-
-	// }
 }
