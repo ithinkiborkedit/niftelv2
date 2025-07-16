@@ -6,7 +6,7 @@ import (
 
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	tokens "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/tokentoval"
 )
 
 type Codegen struct {
@@ -115,10 +115,12 @@ func (c *Codegen) emitPrint(s *ast.PrintStmt) {
 		fmt.Println("warning: print only supports strings and ints")
 		return
 	}
-	llvmLiteral := c.emitValueLiteral(value.Value{
-		Type: lit.Value.ValueType(),
-		Data: lit.Value.Data,
-	})
+	val, err := tokentoval.Convert(lit.Value)
+	if err != nil {
+		fmt.Printf("error converting token to vale %v\n", err)
+		return
+	}
+	llvmLiteral := c.emitValueLiteral(val)
 	var formatName string
 	switch lit.Value.Type {
 	case tokens.TokenNumber:
