@@ -1,3 +1,4 @@
-print("hello")
-print(1)
-print(14.1)
+struct Person {
+    name: string
+    age: int
+}

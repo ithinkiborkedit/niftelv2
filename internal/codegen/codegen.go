@@ -13,15 +13,46 @@ import (
 type Codegen struct {
 	builder      strings.Builder
 	strings      map[string]string
-	structTypes  structTypes
+	structs      structTypes
 	nextStrIndex int
 }
 
 func NewCodeGen() *Codegen {
 	return &Codegen{
-		strings:     make(map[string]string),
-		structTypes: make(map[string]*StructTypeInfo),
+		strings: make(map[string]string),
+		structs: NewStructTypes(),
 	}
+}
+
+func (c *Codegen) RegisterStruct(name string, fieldNames []string, fieldTypes []string) {
+	fieldIndices := make(map[string]int)
+	for i, fname := range fieldNames {
+		fieldIndices[fname] = i
+	}
+	info := &StructTypeInfo{
+		Name:         name,
+		FieldNames:   fieldNames,
+		FieldTypes:   fieldTypes,
+		FieldIndices: fieldIndices,
+		Emitted:      false,
+	}
+	c.structs.Register(info)
+}
+
+func (c *Codegen) EmitStructDefinitions() {
+	for _, info := range c.structs {
+		if info.Emitted {
+			continue
+		}
+		c.emitStructDefinition(info)
+		c.structs.MarkEmitted(info.Name)
+	}
+}
+
+func (c *Codegen) emitStructDefinition(info *StructTypeInfo) {
+	fieldsLLVMTypes := make([]string, len(info.FieldTypes))
+	copy(fieldsLLVMTypes, info.FieldTypes)
+	c.builder.WriteString(fmt.Sprintf("%%%s = type { %s }\n", info.Name, strings.Join(fieldsLLVMTypes, ", ")))
 }
 
 func (c *Codegen) GenerateLLVM(stmts []ast.Stmt) (string, error) {

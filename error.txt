@@ -1,33 +1,27 @@
 DEBUG ENV TYPES after registration:[
-"float" "string" "bool" "tuple" "int" "list" "struct" "null" "func" ]
-Raw source string: "print(\"hello\")\nprint(1)\nprint(14.1)"
-scanToken advanced: l.current=1 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")scanToken advanced: l.current=6 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: ( (type=(, line=1, lexeme="(")scanToken advanced: l.current=7 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-scanToken start string literal: l.current=7 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-scanToken string literal: l.current=7 char='\a'
-string loop: l.current=7 remaining source="hello\")\nprint(1)\nprint(14.1)"
-char at l.current=7 char='h'
-string loop: l.current=8 remaining source="ello\")\nprint(1)\nprint(14.1)"
-char at l.current=8 char='e'
-string loop: l.current=9 remaining source="llo\")\nprint(1)\nprint(14.1)"
-char at l.current=9 char='l'
-string loop: l.current=10 remaining source="lo\")\nprint(1)\nprint(14.1)"
-char at l.current=10 char='l'
-string loop: l.current=11 remaining source="o\")\nprint(1)\nprint(14.1)"
-char at l.current=11 char='o'
-string loop: l.current=12 remaining source="\")\nprint(1)\nprint(14.1)"
-char at l.current=12 char='"'
-after advancing l.current=13
-[ADVANCE] Current: STRING (type=STRING, line=1, lexeme="hello")scanToken advanced: l.current=14 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: ) (type=), line=1, lexeme=")")scanToken advanced: l.current=15 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-scanToken advanced: l.current=16 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: print (type=print, line=2, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=2, lexeme="print")scanToken advanced: l.current=21 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: ( (type=(, line=2, lexeme="(")scanToken advanced: l.current=22 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: NUMBER (type=NUMBER, line=2, lexeme="1")scanToken advanced: l.current=23 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: ) (type=), line=2, lexeme=")")scanToken advanced: l.current=24 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-scanToken advanced: l.current=25 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: print (type=print, line=3, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=3, lexeme="print")scanToken advanced: l.current=30 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: ( (type=(, line=3, lexeme="(")scanToken advanced: l.current=31 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: FLOAT (type=FLOAT, line=3, lexeme="14.1")scanToken advanced: l.current=35 char="print(\"hello\")\nprint(1)\nprint(14.1)"
-[ADVANCE] Current: ) (type=), line=3, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=3, lexeme="")error converting token to vale unsported token type for conversion: FLOAT
+"func" "null" "list" "bool" "tuple" "int" "float" "string" "struct" ]
+Raw source string: "struct Person {\n    name: string\n    age: int\n}"
+scanToken advanced: l.current=1 char="struct Person {\n    name: string\n    age: int\n}"
+[ADVANCE] Current: struct (type=struct, line=1, lexeme="struct")[STATMENT] At: <nil> Current: struct (type=struct, line=1, lexeme="struct")scanToken advanced: l.current=8 char="struct Person {\n    name: string\n    age: int\n}"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="Person")[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Person' line='1'
+scanToken advanced: l.current=15 char="struct Person {\n    name: string\n    age: int\n}"
+[ADVANCE] Current: { (type={, line=1, lexeme="{")scanToken advanced: l.current=16 char="struct Person {\n    name: string\n    age: int\n}"
+scanToken advanced: l.current=17 char="struct Person {\n    name: string\n    age: int\n}"
+scanToken advanced: l.current=21 char="struct Person {\n    name: string\n    age: int\n}"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=2, lexeme="name")[AFTER OPENING '{' ] struct body: token IDENTIFIER lexem='name' line='2'
+[Trying to check for 
+ after '{' ] struct body: token IDENTIFIER lexem='name' line='2'
+[PARSERLOOP] struct body: type=1  lexem='name' line='2'
+scanToken advanced: l.current=25 char="struct Person {\n    name: string\n    age: int\n}"
+[ADVANCE] Current: : (type=:, line=2, lexeme=":")scanToken advanced: l.current=27 char="struct Person {\n    name: string\n    age: int\n}"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=2, lexeme="string")parseTypeExpr: current token = {IDENTIFIER string <nil> 2 16}
+scanToken advanced: l.current=33 char="struct Person {\n    name: string\n    age: int\n}"
+scanToken advanced: l.current=34 char="struct Person {\n    name: string\n    age: int\n}"
+scanToken advanced: l.current=38 char="struct Person {\n    name: string\n    age: int\n}"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=3, lexeme="age")[PARSERLOOP] struct body: type=1  lexem='age' line='3'
+scanToken advanced: l.current=41 char="struct Person {\n    name: string\n    age: int\n}"
+[ADVANCE] Current: : (type=:, line=3, lexeme=":")scanToken advanced: l.current=43 char="struct Person {\n    name: string\n    age: int\n}"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=3, lexeme="int")parseTypeExpr: current token = {IDENTIFIER int <nil> 3 12}
+scanToken advanced: l.current=46 char="struct Person {\n    name: string\n    age: int\n}"
+scanToken advanced: l.current=47 char="struct Person {\n    name: string\n    age: int\n}"
+[ADVANCE] Current: } (type=}, line=4, lexeme="\n}")[ADVANCE] Current: EOF (type=EOF, line=4, lexeme="")warning: unsupported statement type: *nifast.StructStmt
