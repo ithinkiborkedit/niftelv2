@@ -1,21 +1,20 @@
 DEBUG ENV TYPES after registration:[
-"func" "null" "tuple" "float" "bool" "list" "int" "struct" "string" ]
+"list" "int" "string" "bool" "struct" "null" "tuple" "func" "float" ]
 Raw source string: "print(\"hello\")"
-Source bytes: 7072696e74282268656c6c6f2229
 scanToken advanced: l.current=1 char="print(\"hello\")"
 [ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")scanToken advanced: l.current=6 char="print(\"hello\")"
 [ADVANCE] Current: ( (type=(, line=1, lexeme="(")scanToken advanced: l.current=7 char="print(\"hello\")"
 scanToken start string literal: l.current=7 char="print(\"hello\")"
 scanToken string literal: l.current=8 char=%!q(MISSING)
-string loop: l.current=8 char='\x0e'
+string loop: l.current=8 remaining source="ello\")"
 char at l.current=101 char=%!q(MISSING)
-string loop: l.current=9 char='\x0e'
+string loop: l.current=9 remaining source="llo\")"
 char at l.current=108 char=%!q(MISSING)
-string loop: l.current=10 char='\x0e'
+string loop: l.current=10 remaining source="lo\")"
 char at l.current=108 char=%!q(MISSING)
-string loop: l.current=11 char='\x0e'
+string loop: l.current=11 remaining source="o\")"
 char at l.current=111 char=%!q(MISSING)
-string loop: l.current=12 char='\x0e'
+string loop: l.current=12 remaining source="\")"
 char at l.current=34 char=%!q(MISSING)
 after advancing l.current=13
 [ADVANCE] Current: STRING (type=STRING, line=1, lexeme="ello")scanToken advanced: l.current=14 char="print(\"hello\")"

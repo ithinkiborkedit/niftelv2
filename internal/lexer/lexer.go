@@ -94,7 +94,6 @@ func (l *Lexer) makeToken(tt token.TokenType) token.Token {
 
 func New(source string) *Lexer {
 	fmt.Printf("Raw source string: %q\n", source)
-	fmt.Printf("Source bytes: %x\n", []byte(source))
 	return &Lexer{
 		source:  source,
 		start:   0,
@@ -198,7 +197,7 @@ func (l *Lexer) string(quote rune) (token.Token, error) {
 	var sb strings.Builder
 	startLine, startColumn := l.line, l.column
 	for !l.isAtEnd() {
-		fmt.Printf("string loop: l.current=%d char=%q\n", l.current, len(l.source))
+		fmt.Printf("string loop: l.current=%d remaining source=%q\n", l.current, l.source[l.current:])
 		if l.current < len(l.source) {
 			fmt.Printf("char at l.current=%d char=%q\n", l.source[l.current])
 		} else {
