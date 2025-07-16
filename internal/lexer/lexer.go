@@ -193,7 +193,7 @@ func (l *Lexer) peekNext() rune {
 }
 
 func (l *Lexer) string(quote rune) (token.Token, error) {
-	l.start = l.current
+	l.current = l.start
 	var sb strings.Builder
 	startLine, startColumn := l.line, l.column
 	for !l.isAtEnd() {
