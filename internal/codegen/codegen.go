@@ -135,10 +135,58 @@ func (c *Codegen) emitMainFunction(stmts []ast.Stmt) {
 	c.builder.WriteString("}\n")
 }
 
+func (c *Codegen) llvmTypeForTypeExpr(typ *ast.TypeExpr) string {
+	switch typ.Name.Lexeme {
+	case "int":
+		return "i64"
+	case "float":
+		return "double"
+	case "bool":
+		return "i1"
+	case "string":
+		return "i8*"
+	default:
+		return "%" + typ.Name.Lexeme
+	}
+}
+
+func (c *Codegen) emitStructStmt(s *ast.StructStmt) {
+	if _, exists := c.structs[s.Name.Lexeme]; exists {
+		return
+	}
+
+	fieldNames := []string{}
+	fieldTypes := []string{}
+
+	fieldIndices := make(map[string]int)
+
+	for i, f := range s.Fields {
+		fieldName := f.Names[0].Lexeme
+		fieldType := c.llvmTypeForTypeExpr(f.Type)
+
+		fieldNames = append(fieldNames, fieldName)
+		fieldTypes = append(fieldTypes, fieldType)
+		fieldIndices[fieldName] = i
+	}
+
+	st := &StructTypeInfo{
+		Name:         s.Name.Lexeme,
+		FieldNames:   fieldNames,
+		FieldTypes:   fieldTypes,
+		FieldIndices: fieldIndices,
+		Emitted:      false,
+	}
+	c.emitStructDefinition(st)
+	st.Emitted = true
+}
+
 func (c *Codegen) emitStmt(s ast.Stmt) {
 	switch stmt := s.(type) {
 	case *ast.PrintStmt:
 		c.emitPrint(stmt)
+		c.builder.WriteString("\n")
+	case *ast.StructStmt:
+		c.emitStructStmt(stmt)
 		c.builder.WriteString("\n")
 	default:
 		fmt.Printf("warning: unsupported statement type: %T\n", stmt)

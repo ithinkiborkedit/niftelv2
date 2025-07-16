@@ -4,5 +4,7 @@ declare i32 @printf(i8*,...)
 	@print_float_format = constant [4 x i8] c"%f\0A\00"
 	define i32 @main(){
 entry:
+%Person = type { i8*, i64 }
+
  ret i32 0
 }
