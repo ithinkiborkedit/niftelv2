@@ -20,3 +20,6 @@ after advancing l.current=13
 [ADVANCE] Current: STRING (type=STRING, line=1, lexeme="ello")scanToken advanced: l.current=14 char="print(\"hello\")"
 [ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:1: error: expected instruction opcode
 @.str4 = private constant [5 x i8] c"ello\00"
+
+
+00000000: 7072 696e 7428 2268 656c 6c6f 2229       print("hello")
