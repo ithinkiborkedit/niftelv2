@@ -1,11 +1,13 @@
 DEBUG ENV TYPES after registration:[
-"float" "null" "list" "func" "string" "bool" "struct" "int" "tuple" ]
+"string" "null" "list" "func" "int" "float" "tuple" "bool" "struct" ]
 Raw source string: "print(\"hello\")"
 scanToken advanced: l.current=1 char="print(\"hello\")"
 [ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")scanToken advanced: l.current=6 char="print(\"hello\")"
 [ADVANCE] Current: ( (type=(, line=1, lexeme="(")scanToken advanced: l.current=7 char="print(\"hello\")"
 scanToken start string literal: l.current=7 char="print(\"hello\")"
-scanToken string literal: l.current=8 char='\b'
+scanToken string literal: l.current=7 char='\a'
+string loop: l.current=7 remaining source="hello\")"
+char at l.current=7 char='h'
 string loop: l.current=8 remaining source="ello\")"
 char at l.current=8 char='e'
 string loop: l.current=9 remaining source="llo\")"
@@ -17,9 +19,6 @@ char at l.current=11 char='o'
 string loop: l.current=12 remaining source="\")"
 char at l.current=12 char='"'
 after advancing l.current=13
-[ADVANCE] Current: STRING (type=STRING, line=1, lexeme="ello")scanToken advanced: l.current=14 char="print(\"hello\")"
+[ADVANCE] Current: STRING (type=STRING, line=1, lexeme="hello")scanToken advanced: l.current=14 char="print(\"hello\")"
 [ADVANCE] Current: ) (type=), line=1, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=1, lexeme="")llc: error: llc: sourcetest.ll:6:1: error: expected instruction opcode
-@.str4 = private constant [5 x i8] c"ello\00"
-
-
-00000000: 7072 696e 7428 2268 656c 6c6f 2229       print("hello")
+@.str5 = private constant [6 x i8] c"hello\00"

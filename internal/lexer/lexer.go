@@ -444,7 +444,7 @@ func (l *Lexer) scanToken() (token.Token, error) {
 		}
 	case '"', '\'':
 		fmt.Printf("scanToken start string literal: l.current=%d char=%q\n", l.current, l.source)
-		l.advance()
+		// l.advance()
 		l.start = l.current
 		fmt.Printf("scanToken string literal: l.current=%d char=%q\n", l.current, l.current)
 		return l.string(ch)
