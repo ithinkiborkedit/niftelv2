@@ -1,5 +1,6 @@
 DEBUG ENV TYPES after registration:[
-"null" "struct" "func" "int" "float" "string" "tuple" "list" "bool" ]
+"func" "null" "tuple" "float" "bool" "list" "int" "struct" "string" ]
+Raw source string: "print(\"hello\")"
 Source bytes: 7072696e74282268656c6c6f2229
 scanToken advanced: l.current=1 char="print(\"hello\")"
 [ADVANCE] Current: print (type=print, line=1, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=1, lexeme="print")scanToken advanced: l.current=6 char="print(\"hello\")"
