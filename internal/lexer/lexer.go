@@ -199,7 +199,7 @@ func (l *Lexer) string(quote rune) (token.Token, error) {
 	for !l.isAtEnd() {
 		fmt.Printf("string loop: l.current=%d remaining source=%q\n", l.current, l.source[l.current:])
 		if l.current < len(l.source) {
-			fmt.Printf("char at l.current=%d char=%q\n", l.source[l.current])
+			fmt.Printf("char at l.current=%d char=%q\n", l.current, l.source[l.current])
 		} else {
 			fmt.Println("l.current beyond end of source")
 		}
@@ -446,7 +446,7 @@ func (l *Lexer) scanToken() (token.Token, error) {
 		fmt.Printf("scanToken start string literal: l.current=%d char=%q\n", l.current, l.source)
 		l.advance()
 		l.start = l.current
-		fmt.Printf("scanToken string literal: l.current=%d char=%q\n", l.current)
+		fmt.Printf("scanToken string literal: l.current=%d char=%q\n", l.current, l.current)
 		return l.string(ch)
 	case '\n':
 		l.line++
