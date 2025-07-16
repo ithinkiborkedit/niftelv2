@@ -22,19 +22,20 @@ func (c *Codegen) llvmTypeForValueType(vt value.ValueType) string {
 }
 
 func (c *Codegen) emitValueLiteral(v value.Value) string {
+	llvmType := c.llvmTypeForValueType(v.Type)
 	switch v.Type {
 	case value.ValueInt:
 		intVal := int64(v.Data.(float64))
-		return fmt.Sprintf("i64 %d", intVal)
+		return fmt.Sprintf("%s %d", llvmType, intVal)
 	case value.ValueFloat:
 		floatVal := v.Data.(float64)
-		return fmt.Sprintf("double %f", floatVal)
+		return fmt.Sprintf("%s %f", llvmType, floatVal)
 	case value.ValueBool:
 		boolVal := 0
 		if v.Data.(bool) {
 			boolVal = 1
 		}
-		return fmt.Sprintf("i1 %d", boolVal)
+		return fmt.Sprintf("%s %d", llvmType, boolVal)
 	case value.ValueString:
 		strName := c.registerStringLiteral(v.Data.(string))
 		length := len(v.Data.(string)) + 1

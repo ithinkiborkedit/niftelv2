@@ -6,6 +6,7 @@ const (
 	TokenEOF TokenType = iota
 	TokenIdentifier
 	TokenNumber
+	TokenFloat
 	TokenString
 	TokenBool
 	TokenNull
@@ -72,6 +73,7 @@ var tokenTypeToString = map[TokenType]string{
 	TokenEOF:        "EOF",
 	TokenIdentifier: "IDENTIFIER",
 	TokenNumber:     "NUMBER",
+	TokenFloat:      "FLOAT",
 	TokenString:     "STRING",
 	TokenAssign:     "=",
 	TokenBang:       "!",

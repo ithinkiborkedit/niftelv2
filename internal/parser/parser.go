@@ -132,12 +132,6 @@ func (p *Parser) skipnewLines() error {
 	return nil
 }
 
-// func (p *Parser) skipnewLines() {
-// 	for p.check(token.TokenNewLine) {
-// 		p.advance()
-// 	}
-// }
-
 func (p *Parser) expression() (ast.Expr, error) {
 	return p.orExpr()
 }
@@ -428,40 +422,7 @@ func (p *Parser) varDeclaration() (ast.Stmt, error) {
 		Type:  typ,
 		Init:  init,
 	}, nil
-	// p.consume(token.TokenVar, "Expect 'var' keyword")
-	// name, err := p.consume(token.TokenIdentifier, "expect variable name after var")
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// _, err = p.consume(token.TokenColon, "expected ':' after variable name")
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// typ, err := p.consume(token.TokenIdentifier, "expect type after variable name")
-	// if err != nil {
-	// 	return nil, err
-	// }
 
-	// _, err = p.consume(token.TokenAssign, "expect '=' after variable type")
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// init, err := p.expression()
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// err = p.skipnewLines()
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// return &ast.VarStmt{
-	// 	Names: []token.Token{name},
-	// 	Type:  typ,
-	// 	Init:  init,
-	// }, nil
 }
 
 func (p *Parser) shortVarDeclaration() (ast.Stmt, error) {
@@ -1363,14 +1324,6 @@ func (p *Parser) structDeclartion() (ast.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// localTypeEen := typeenv.NewTypeEnv(currentTypeEnv)
-	// for _, param := range typeParams {
-	// 	err := localTypeEen.DefineTypeParam(param.Lexeme, symtable.NewTypeParamSymbol(param.Lexeme))
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("duplicate type param '%s'", param.Lexeme)
-	// 	}
-	// }
 
 	for p.check(token.TokenNewLine) {
 		if err := p.advance(); err != nil {

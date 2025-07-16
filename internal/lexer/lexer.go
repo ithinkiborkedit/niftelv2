@@ -283,26 +283,66 @@ func (l *Lexer) string(quote rune) (token.Token, error) {
 // }
 
 func (l *Lexer) number() (token.Token, error) {
+	start := l.start
+	hasDot := false
 	for !l.isAtEnd() {
 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
-		if !unicode.IsDigit(r) && r != '.' {
+		if r == '.' {
+			if hasDot {
+				break
+			}
+			hasDot = true
+		} else if !unicode.IsDigit(r) {
 			break
 		}
 		l.advance()
 	}
-	lexeme := l.source[l.start:l.current]
+	// for !l.isAtEnd() {
+	// 	r, _ := utf8.DecodeRuneInString(l.source[l.current:])
+	// 	if !unicode.IsDigit(r) && r != '.' {
+	// 		break
+	// 	}
+	// 	l.advance()
+	// }
+	lexeme := l.source[start:l.current]
 
-	val, err := strconv.ParseFloat(lexeme, 64)
-	if err != nil {
-		return token.Token{}, fmt.Errorf("invalid number literal: %s", lexeme)
+	if hasDot {
+		val, err := strconv.ParseFloat(lexeme, 64)
+		if err != nil {
+			return token.Token{}, fmt.Errorf("invalid float literal: %s", lexeme)
+		}
+		return token.Token{
+			Type:   token.TokenFloat,
+			Lexeme: lexeme,
+			Data:   val,
+			Line:   l.line,
+			Column: l.column,
+		}, nil
+	} else {
+		val, err := strconv.ParseInt(lexeme, 10, 64)
+		if err != nil {
+			return token.Token{}, fmt.Errorf("invalid int literal: %s", lexeme)
+		}
+		return token.Token{
+			Type:   token.TokenNumber,
+			Lexeme: lexeme,
+			Data:   val,
+			Line:   l.line,
+			Column: l.column,
+		}, nil
 	}
-	return token.Token{
-		Type:   token.TokenNumber,
-		Lexeme: lexeme,
-		Data:   val,
-		Line:   l.line,
-		Column: l.column,
-	}, nil
+
+	// val, err := strconv.ParseFloat(lexeme, 64)
+	// if err != nil {
+	// 	return token.Token{}, fmt.Errorf("invalid number literal: %s", lexeme)
+	// }
+	// return token.Token{
+	// 	Type:   token.TokenNumber,
+	// 	Lexeme: lexeme,
+	// 	Data:   val,
+	// 	Line:   l.line,
+	// 	Column: l.column,
+	// }, nil
 }
 
 func (l *Lexer) identifier() (token.Token, error) {

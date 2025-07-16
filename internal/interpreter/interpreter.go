@@ -206,17 +206,21 @@ func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) controlflow.ExecRe
 	tok := expr.Value
 	switch tok.Type {
 	case token.TokenNumber:
-		switch val := tok.Data.(type) {
-		case int:
-			return controlflow.ExecResult{Value: value.Value{Type: value.ValueInt, Data: float64(val)}, Flow: controlflow.FlowNone}
-		case int64:
-			return controlflow.ExecResult{Value: value.Value{Type: value.ValueInt, Data: float64(val)}, Flow: controlflow.FlowNone}
-		case float64:
-			return controlflow.ExecResult{Value: value.Value{Type: value.ValueInt, Data: float64(val)}, Flow: controlflow.FlowNone}
-		default:
+		val, ok := tok.Data.(int64)
+		if !ok {
 			return controlflow.ExecResult{Err: errors.New("invalid int literal token data")}
-
 		}
+		return controlflow.ExecResult{Value: value.Value{
+			Type: value.ValueInt, Data: float64(val),
+		},
+			Flow: controlflow.FlowNone,
+		}
+	case token.TokenFloat:
+		val, ok := tok.Data.(float64)
+		if !ok {
+			return controlflow.ExecResult{Err: errors.New("invalid literal token data")}
+		}
+		return controlflow.ExecResult{Value: value.Value{Type: value.ValueFloat, Data: val}, Flow: controlflow.FlowNone}
 
 	case token.TokenString:
 		return controlflow.ExecResult{Value: value.Value{Type: value.ValueString, Data: tok.Lexeme}, Flow: controlflow.FlowNone}
