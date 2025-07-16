@@ -196,7 +196,12 @@ func (l *Lexer) string(quote rune) (token.Token, error) {
 	var sb strings.Builder
 	startLine, startColumn := l.line, l.column
 	for !l.isAtEnd() {
-		fmt.Printf("string loop: l.current=%d char=%q\n", l.current, l.source)
+		fmt.Printf("string loop: l.current=%d char=%q\n", l.current, len(l.source))
+		if l.current < len(l.source) {
+			fmt.Printf("char at l.current=%d char=%q\n", l.source[l.current])
+		} else {
+			fmt.Println("l.current beyond end of source")
+		}
 		r, _ := utf8.DecodeRuneInString(l.source[l.current:])
 		if r == quote {
 			l.advance()
