@@ -6,6 +6,7 @@ import (
 
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	tokens "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
+	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
 type Codegen struct {
@@ -114,19 +115,36 @@ func (c *Codegen) emitPrint(s *ast.PrintStmt) {
 		fmt.Println("warning: print only supports strings and ints")
 		return
 	}
+	llvmLiteral := c.emitValueLiteral(value.Value{
+		Type: lit.Value.ValueType(),
+		Data: lit.Value.Data,
+	})
+	var formatName string
 	switch lit.Value.Type {
-
 	case tokens.TokenNumber:
-		val := lit.Value.Lexeme
-		c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_int_format, i32 0, i32 0), i32 %s)\n", val))
+		formatName = "@print_int_format"
 	case tokens.TokenString:
-		strName := c.strings[lit.Value.Lexeme]
-		length := len(lit.Value.Lexeme) + 1
-		c.builder.WriteString(fmt.Sprintf(
-			"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8],[4 x i8]* @print_str_format, i32 0, i32 0), i8* getelementptr ([%d x i8], [%d x i8]* %s, i32 0, i32 0))\n",
-			length, length, strName))
+		formatName = "@print_str_format"
 	default:
-		fmt.Println("warning print only works with string or ints")
-
+		fmt.Errorf("usupported literal type in print")
+		return
 	}
+	c.builder.WriteString(fmt.Sprintf(
+		"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* %s, i32 0, i32 0). %s)",
+		formatName, llvmLiteral))
+	// switch lit.Value.Type {
+
+	// case tokens.TokenNumber:
+	// 	val := lit.Value.Lexeme
+	// 	c.builder.WriteString(fmt.Sprintf("call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_int_format, i32 0, i32 0), i32 %s)\n", val))
+	// case tokens.TokenString:
+	// 	strName := c.strings[lit.Value.Lexeme]
+	// 	length := len(lit.Value.Lexeme) + 1
+	// 	c.builder.WriteString(fmt.Sprintf(
+	// 		"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8],[4 x i8]* @print_str_format, i32 0, i32 0), i8* getelementptr ([%d x i8], [%d x i8]* %s, i32 0, i32 0))\n",
+	// 		length, length, strName))
+	// default:
+	// 	fmt.Println("warning print only works with string or ints")
+
+	// }
 }
