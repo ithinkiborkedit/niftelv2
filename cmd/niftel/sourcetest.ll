@@ -7,10 +7,10 @@ define i32 @main(){
 entry:
  %t0 = alloca %Person
  %t1 = alloca %Person
-%t2 = getelementptr %Person, %Person* %t1, i32 0, i32 1
-store i64 2, %t2* i64
-%t3 = getelementptr %Person, %Person* %t1, i32 0, i32 0
-store i8* getelementptr ([5 x i8], [5 x i8]* @.str0, i32 0, i32 0), %t3* i8*
+%t2 = getelementptr %Person, %Person* %t1, i32 0, i32 0
+store i8* getelementptr ([5 x i8], [5 x i8]* @.str0, i32 0, i32 0), i8** %t2
+%t3 = getelementptr %Person, %Person* %t1, i32 0, i32 1
+store i64 2, i64* %t3
  store %Person* %t1, %Person** %t0
  ret i32 0
 }
