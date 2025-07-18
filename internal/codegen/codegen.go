@@ -24,9 +24,8 @@ func NewCodeGen() *Codegen {
 	return &Codegen{
 		strings: make(map[string]string),
 		symbols: make(map[string]VariableInfo),
-		// symbolTypes: make(map[string]string),
-		nextReg: 0,
 		structs: NewStructTypes(),
+		nextReg: 0,
 	}
 }
 
@@ -143,8 +142,10 @@ func (c *Codegen) emitVarStmt(s *ast.VarStmt) {
 
 	c.builder.WriteString(fmt.Sprintf(" store %s %s, %s* %s\n", initValType, initValReg, initValType, allocaReg))
 
-	c.symbols[name] = allocaReg
-	c.symbolTypes[name] = llvmType
+	c.symbols[name] = &VariableInfo{
+	  LLVMName: allocaReg,
+	  LLVMType: llvmType,
+	},
 }
 
 func (c *Codegen) collectStringsStmt(s ast.Stmt) {
