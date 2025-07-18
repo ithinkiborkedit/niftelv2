@@ -1,5 +1,5 @@
 DEBUG ENV TYPES after registration:[
-"bool" "func" "list" "string" "null" "int" "float" "tuple" "struct" ]
+"null" "string" "tuple" "func" "float" "bool" "list" "struct" "int" ]
 Raw source string: "struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
 scanToken advanced: l.current=1 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
 [ADVANCE] Current: struct (type=struct, line=1, lexeme="struct")[STATMENT] At: <nil> Current: struct (type=struct, line=1, lexeme="struct")scanToken advanced: l.current=8 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
@@ -61,4 +61,5 @@ scanToken advanced: l.current=105 char="struct Person {\n    name: string\n    a
 [ADVANCE] Current: print (type=print, line=8, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=8, lexeme="print")scanToken advanced: l.current=110 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
 [ADVANCE] Current: ( (type=(, line=8, lexeme="(")scanToken advanced: l.current=111 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
 [ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=8, lexeme="testPerson")scanToken advanced: l.current=121 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
-[ADVANCE] Current: ) (type=), line=8, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=8, lexeme="")error emitting print: unsupported struct field type i8* for print
+[ADVANCE] Current: ) (type=), line=8, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=8, lexeme="")llc: error: llc: sourcetest.ll:22:101: error: expected ',' in argument list
+ call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0) i8* %t5)
