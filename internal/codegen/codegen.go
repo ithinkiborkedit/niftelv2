@@ -244,7 +244,7 @@ func (c *Codegen) emitStructLiteralExpr(expr *ast.StructLiteralExpr) (string, st
 		gepReg := c.freshReg()
 
 		c.builder.WriteString(fmt.Sprintf(
-			"%s = getelementptr %s, %s* %s i32 0, i32 %d\n",
+			"%s = getelementptr %s, %s* %s, i32 0, i32 %d\n",
 			gepReg, structType, structType, ptrReg, fieldIndex,
 		))
 

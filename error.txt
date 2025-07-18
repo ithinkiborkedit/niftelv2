@@ -1,5 +1,5 @@
 DEBUG ENV TYPES after registration:[
-"list" "struct" "int" "bool" "null" "func" "string" "tuple" "float" ]
+"float" "bool" "string" "null" "tuple" "list" "struct" "int" "func" ]
 Raw source string: "struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}"
 scanToken advanced: l.current=1 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}"
 [ADVANCE] Current: struct (type=struct, line=1, lexeme="struct")[STATMENT] At: <nil> Current: struct (type=struct, line=1, lexeme="struct")scanToken advanced: l.current=8 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}"
@@ -55,5 +55,5 @@ after advancing l.current=93
 [ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=6, lexeme="age")scanToken advanced: l.current=99 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}"
 [ADVANCE] Current: : (type=:, line=6, lexeme=":")scanToken advanced: l.current=101 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}"
 [ADVANCE] Current: NUMBER (type=NUMBER, line=6, lexeme="2")scanToken advanced: l.current=102 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}"
-[ADVANCE] Current: } (type=}, line=6, lexeme="}")[ADVANCE] Current: EOF (type=EOF, line=6, lexeme="")llc: error: llc: sourcetest.ll:10:43: error: expected instruction opcode
-%t2 = getelementptr %Person, %Person* %t1 i32 0, i32 0
+[ADVANCE] Current: } (type=}, line=6, lexeme="}")[ADVANCE] Current: EOF (type=EOF, line=6, lexeme="")llc: error: llc: sourcetest.ll:11:19: error: expected value token
+store i64 2, %t2* i64
