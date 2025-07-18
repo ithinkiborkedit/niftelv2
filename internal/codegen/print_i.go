@@ -58,7 +58,7 @@ func (p *printableVariableExpr) EmitPrint(c *Codegen) error {
 			return fmt.Errorf("unkown struct type %s for print", structName)
 		}
 
-		c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @print_str_open_brace, i32 0, i32 0))` + "\n")
+		c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([2 x i8], [2 x i8]* @print_str_open_brace, i32 0, i32 0))` + "\n")
 
 		for i := range structInfo.FieldNames {
 			fieldType := structInfo.FieldTypes[i]
@@ -94,7 +94,7 @@ func (p *printableVariableExpr) EmitPrint(c *Codegen) error {
 				c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @print_str_comma, i32 0, i32 0))` + "\n")
 			}
 		}
-		c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @print_str_close_brace, i32 0, i32 0))` + "\n")
+		c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([2 x i8], [2 x i8]* @print_str_close_brace, i32 0, i32 0))` + "\n")
 		return nil
 	}
 

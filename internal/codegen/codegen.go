@@ -196,9 +196,9 @@ func (c *Codegen) emitPreamble() {
 	@print_str_format = constant [4 x i8] c"%s\0A\00"
 	@print_int_format = constant [4 x i8] c"%d\0A\00"
 	@print_float_format = constant [4 x i8] c"%f\0A\00"
-	@print_str_open_brace = private constant [3 x i8] c"{\00"
-	@print_str_close_brace = private constant [3 x i8] c"}\00"
-	@print_str_comma = private constant [3 x i8] c", \00"
+	@print_str_open_brace = private constant [2 x i8] c"{\00"
+	@print_str_close_brace = private constant [2 x i8] c"}\00"
+	@print_str_comma = private constant [2 x i8] c", \00"
 	`)
 }
 
