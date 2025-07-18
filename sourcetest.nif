@@ -4,3 +4,5 @@ struct Person {
 }
 
 var testPerson: Person = Person{name: "test", age: 2}
+
+print(testPerson)

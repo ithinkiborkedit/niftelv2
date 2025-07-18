@@ -157,6 +157,8 @@ func (c *Codegen) collectStringsStmt(s ast.Stmt) {
 	switch stmt := s.(type) {
 	case *ast.PrintStmt:
 		c.collectStringsExpr(stmt.Expr)
+	case *ast.VarStmt:
+		c.collectStringsExpr(stmt.Init)
 	}
 }
 
@@ -165,6 +167,10 @@ func (c *Codegen) collectStringsExpr(e ast.Expr) {
 	case *ast.LiteralExpr:
 		if expr.Value.Type == tokens.TokenString {
 			c.registerStringLiteral(expr.Value.Lexeme)
+		}
+	case *ast.StructLiteralExpr:
+		for _, fieldExpr := range expr.Fields {
+			c.collectStringsExpr(fieldExpr)
 		}
 	}
 }
@@ -237,7 +243,6 @@ func (c *Codegen) emitStructLiteralExpr(expr *ast.StructLiteralExpr) (string, st
 		if !exists {
 			panic(fmt.Sprintf("unknown field %s in struct %s", fieldName, structName))
 		}
-		// fieldType := info.FieldTypes[fieldIndex]
 
 		valReg, valType := c.emitExpr(fieldExpr)
 
