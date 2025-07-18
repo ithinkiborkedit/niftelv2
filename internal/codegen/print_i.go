@@ -51,6 +51,53 @@ func (p *printableVariableExpr) EmitPrint(c *Codegen) error {
 		return fmt.Errorf("variable lookup failed: %v", llvmVarInfo)
 	}
 
+	if len(llvmVarInfo.LLVMType) > 0 && llvmVarInfo.LLVMType[0] == '%' {
+		structName := llvmVarInfo.LLVMType[1:]
+		structInfo, ok := c.structs[structName]
+		if !ok {
+			return fmt.Errorf("unkown struct type %s for print", structName)
+		}
+
+		c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @print_str_open_brace, i32 0, i32 0))` + "\n")
+
+		for i := range structInfo.FieldNames {
+			fieldType := structInfo.FieldTypes[i]
+
+			gepReg := c.freshReg()
+			c.builder.WriteString(fmt.Sprintf(
+				" %s = getelementptr %s, %s* %s, i32 0, i32 %d\n",
+				gepReg, llvmVarInfo.LLVMType, llvmVarInfo.LLVMType, llvmVarInfo.LLVMName, i))
+
+			loadReg := c.freshReg()
+			c.builder.WriteString(fmt.Sprintf(
+				"%s = load %s, %s* %s\n",
+				loadReg, fieldType, fieldType, gepReg))
+
+			switch fieldType {
+			case "i64":
+				c.builder.WriteString(fmt.Sprintf(
+					" call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8]* @print_int_format, i32 0, i32 0) i64 %s)\n",
+					loadReg))
+			case "double":
+				c.builder.WriteString(fmt.Sprintf(
+					" call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8]* @print_float_format, i32 0, i32 0) double %s)\n",
+					loadReg))
+			case "i8":
+				c.builder.WriteString(fmt.Sprintf(
+					" call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8]* @print_str_format, i32 0, i32 0) double %s)\n",
+					loadReg))
+			default:
+				return fmt.Errorf("unsupported struct field type %s for print", fieldType)
+
+			}
+			if i < len(structInfo.FieldNames)-1 {
+				c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @print_str_comma, i32 0, i32 0))` + "\n")
+			}
+		}
+		c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @print_str_close_brace, i32 0, i32 0))` + "\n")
+		return nil
+	}
+
 	var formatName string
 	switch llvmVarInfo.LLVMType {
 	case "i64":
