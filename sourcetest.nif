@@ -2,3 +2,5 @@ struct Person {
     name: string
     age: int
 }
+
+var testPerson: Person = Person{name: "test", age: 2}

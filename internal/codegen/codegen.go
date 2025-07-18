@@ -7,19 +7,25 @@ import (
 	ast "github.com/ithinkiborkedit/niftelv2.git/internal/nifast"
 	tokens "github.com/ithinkiborkedit/niftelv2.git/internal/niftokens"
 	"github.com/ithinkiborkedit/niftelv2.git/internal/tokentoval"
-	"github.com/ithinkiborkedit/niftelv2.git/internal/value"
 )
 
 type Codegen struct {
+	entryBuilder strings.Builder
 	builder      strings.Builder
 	strings      map[string]string
 	structs      structTypes
 	nextStrIndex int
+	symbols      map[string]VariableInfo
+	// symbolTypes  map[string]string
+	nextReg int
 }
 
 func NewCodeGen() *Codegen {
 	return &Codegen{
 		strings: make(map[string]string),
+		symbols: make(map[string]VariableInfo),
+		// symbolTypes: make(map[string]string),
+		nextReg: 0,
 		structs: NewStructTypes(),
 	}
 }
@@ -58,12 +64,10 @@ func (c *Codegen) emitStructDefinition(info *StructTypeInfo) {
 func (c *Codegen) GenerateLLVM(stmts []ast.Stmt) (string, error) {
 	c.emitPreamble()
 	for _, stmt := range stmts {
-		c.collectStringsStmt(stmt)
-	}
-
-	for _, stmt := range stmts {
 		if s, ok := stmt.(*ast.StructStmt); ok {
 			c.emitStructStmt(s)
+		} else {
+			c.collectStringsStmt(stmt)
 		}
 	}
 
@@ -88,6 +92,59 @@ func (c *Codegen) emitStringConstants() {
 		escaped := escapeStringForLLVM(s)
 		c.builder.WriteString(fmt.Sprintf("%s = private constant [%d x i8] c\"%s\\00\"\n", name, length, escaped))
 	}
+}
+
+func (c *Codegen) freshReg() string {
+	reg := fmt.Sprintf("%%t%d", c.nextReg)
+	c.nextReg++
+
+	return reg
+}
+
+func (c *Codegen) emitExpr(e ast.Expr) (string, string) {
+	switch expr := e.(type) {
+	case *ast.LiteralExpr:
+		val, err := tokentoval.Convert(expr.Value)
+		if err != nil {
+			panic(err)
+		}
+		llvmLiteral := c.emitValueLiteral(val)
+		parts := strings.SplitN(llvmLiteral, " ", 2)
+		if len(parts) != 2 {
+			panic("invalid llvm literal")
+		}
+
+		return parts[1], parts[0]
+	default:
+		panic(fmt.Sprintf("unsupported expr %T", expr))
+	}
+}
+
+func (c *Codegen) loadVariable(name string) (string, VariableInfo) {
+	allocaReg, ok := c.symbols[name]
+	if !ok {
+		panic("undefined varaible: " + name)
+	}
+	llvmType := c.symbols[name]
+	loadReg := c.freshReg()
+
+	c.builder.WriteString(fmt.Sprintf(" %s = load %s, %s* %s\n", loadReg, llvmType, llvmType, allocaReg))
+	return loadReg, llvmType
+}
+
+func (c *Codegen) emitVarStmt(s *ast.VarStmt) {
+	name := s.Names[0].Lexeme
+	llvmType := c.llvmTypeForTypeExpr(s.Type)
+
+	allocaReg := c.freshReg()
+	c.builder.WriteString(fmt.Sprintf(" %s = alloca %s\n", allocaReg, llvmType))
+
+	initValReg, initValType := c.emitExpr(s.Init)
+
+	c.builder.WriteString(fmt.Sprintf(" store %s %s, %s* %s\n", initValType, initValReg, initValType, allocaReg))
+
+	c.symbols[name] = allocaReg
+	c.symbolTypes[name] = llvmType
 }
 
 func (c *Codegen) collectStringsStmt(s ast.Stmt) {
@@ -183,6 +240,7 @@ func (c *Codegen) emitStructStmt(s *ast.StructStmt) {
 		FieldIndices: fieldIndices,
 		Emitted:      false,
 	}
+	c.structs.Register(st)
 	c.emitStructDefinition(st)
 	st.Emitted = true
 }
@@ -206,36 +264,44 @@ func (c *Codegen) emitStmt(s ast.Stmt) {
 	case *ast.PrintStmt:
 		c.emitPrint(stmt)
 		c.builder.WriteString("\n")
+	case *ast.StructStmt:
+		c.emitStructStmt(stmt)
 	default:
 		fmt.Printf("warning: unsupported statement type: %T\n", stmt)
 	}
 }
 
+func (c *Codegen) lookupVariable(name string) (VariableInfo, bool) {
+	info, ok := c.symbols[name]
+	return info, ok
+}
+
 func (c *Codegen) emitPrint(s *ast.PrintStmt) {
-	lit, ok := s.Expr.(*ast.LiteralExpr)
-	if !ok {
-		fmt.Println("warning: print only supports strings and ints")
-		return
-	}
-	val, err := tokentoval.Convert(lit.Value)
-	if err != nil {
-		fmt.Printf("error converting token to value %v\n", err)
-		return
-	}
-	llvmLiteral := c.emitValueLiteral(val)
-	var formatName string
-	switch val.Type {
-	case value.ValueInt:
-		formatName = "@print_int_format"
-	case value.ValueFloat:
-		formatName = "@print_float_format"
-	case value.ValueString:
-		formatName = "@print_str_format"
-	default:
-		fmt.Printf("usupported literal type in print %v", lit)
-		return
-	}
-	c.builder.WriteString(fmt.Sprintf(
-		"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* %s, i32 0, i32 0), %s)",
-		formatName, llvmLiteral))
+	// lit, ok := s.Expr.(*ast.LiteralExpr)
+	// if !ok {
+	// 	fmt.Println("warning: print only supports strings and ints")
+	// 	return
+	// }
+	// val, err := tokentoval.Convert(lit.Value)
+	// if err != nil {
+	// 	fmt.Printf("error converting token to value %v\n", err)
+	// 	return
+	// }
+	// llvmLiteral := c.emitValueLiteral(val)
+	// var formatName string
+	// switch val.Type {
+
+	// case value.ValueInt:
+	// 	formatName = "@print_int_format"
+	// case value.ValueFloat:
+	// 	formatName = "@print_float_format"
+	// case value.ValueString:
+	// 	formatName = "@print_str_format"
+	// default:
+	// 	fmt.Printf("usupported literal type in print %v", lit)
+	// 	return
+	// }
+	// c.builder.WriteString(fmt.Sprintf(
+	// 	"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* %s, i32 0, i32 0), %s)",
+	// 	formatName, llvmLiteral))
 }
