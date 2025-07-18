@@ -21,11 +21,6 @@ type Printable interface {
 }
 
 func (p *printableLiteralExp) EmitPrint(c *Codegen) error {
-	// lit, ok := s.Expr.(*ast.LiteralExpr)
-	// if !ok {
-	// 	fmt.Println("warning: print only supports strings and ints")
-	// 	return
-	// }
 	val, err := tokentoval.Convert(p.lit.Value)
 	if err != nil {
 		fmt.Printf("error converting token to value %v\n", err)
@@ -42,7 +37,7 @@ func (p *printableLiteralExp) EmitPrint(c *Codegen) error {
 	case value.ValueString:
 		formatName = "@print_str_format"
 	default:
-		fmt.Errorf("usupported literal type in print %v", val.Type)
+		fmt.Printf("usupported literal type in print %v", val.Type)
 	}
 	c.builder.WriteString(fmt.Sprintf(
 		"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* %s, i32 0, i32 0), %s)",
@@ -69,7 +64,7 @@ func (p *printableVariableExpr) EmitPrint(c *Codegen) error {
 	}
 
 	c.builder.WriteString(fmt.Sprintf(
-		"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* %s, i32 0, i32 0), %s)",
+		"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* %s, i32 0, i32 0), %s %s)",
 		formatName, llvmVarInfo.LLVMType, llvmVarInfo.LLVMName))
 
 	return nil

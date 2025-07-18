@@ -114,6 +114,11 @@ func (c *Codegen) emitExpr(e ast.Expr) (string, string) {
 		}
 
 		return parts[1], parts[0]
+	case *ast.VariableExpr:
+		reg, typ := c.loadVariable(expr.Name.Lexeme)
+		return reg, typ.LLVMType
+	case *ast.StructLiteralExpr:
+		return c.emitStructLiteralExpr(expr)
 	default:
 		panic(fmt.Sprintf("unsupported expr %T", expr))
 	}
@@ -142,10 +147,10 @@ func (c *Codegen) emitVarStmt(s *ast.VarStmt) {
 
 	c.builder.WriteString(fmt.Sprintf(" store %s %s, %s* %s\n", initValType, initValReg, initValType, allocaReg))
 
-	c.symbols[name] = &VariableInfo{
-	  LLVMName: allocaReg,
-	  LLVMType: llvmType,
-	},
+	c.symbols[name] = VariableInfo{
+		LLVMName: allocaReg,
+		LLVMType: llvmType,
+	}
 }
 
 func (c *Codegen) collectStringsStmt(s ast.Stmt) {
@@ -215,6 +220,44 @@ func (c *Codegen) llvmTypeForTypeExpr(typ *ast.TypeExpr) string {
 	}
 }
 
+func (c *Codegen) emitStructLiteralExpr(expr *ast.StructLiteralExpr) (string, string) {
+	structName := expr.TypeName.Name.Lexeme
+	structType := "%" + structName
+
+	ptrReg := c.freshReg()
+	c.builder.WriteString(fmt.Sprintf(" %s = alloca %s\n", ptrReg, structType))
+
+	info, ok := c.structs[structName]
+	if !ok {
+		panic(fmt.Sprintf("unknown struct type %s", structName))
+	}
+
+	for fieldName, fieldExpr := range expr.Fields {
+		fieldIndex, exists := info.FieldIndices[fieldName]
+		if !exists {
+			panic(fmt.Sprintf("unknown field %s in struct %s", fieldName, structName))
+		}
+		// fieldType := info.FieldTypes[fieldIndex]
+
+		valReg, valType := c.emitExpr(fieldExpr)
+
+		gepReg := c.freshReg()
+
+		c.builder.WriteString(fmt.Sprintf(
+			"%s = getelementptr %s, %s* %s i32 0, i32 %d\n",
+			gepReg, structType, structType, ptrReg, fieldIndex,
+		))
+
+		c.builder.WriteString(fmt.Sprintf(
+			"store %s %s, %s* %s\n",
+			valType, valReg, gepReg, valType,
+		))
+
+	}
+
+	return ptrReg, structType + "*"
+}
+
 func (c *Codegen) emitStructStmt(s *ast.StructStmt) {
 	if _, exists := c.structs[s.Name.Lexeme]; exists {
 		return
@@ -267,6 +310,8 @@ func (c *Codegen) emitStmt(s ast.Stmt) {
 		c.builder.WriteString("\n")
 	case *ast.StructStmt:
 		c.emitStructStmt(stmt)
+	case *ast.VarStmt:
+		c.emitVarStmt(stmt)
 	default:
 		fmt.Printf("warning: unsupported statement type: %T\n", stmt)
 	}
@@ -278,31 +323,18 @@ func (c *Codegen) lookupVariable(name string) (VariableInfo, bool) {
 }
 
 func (c *Codegen) emitPrint(s *ast.PrintStmt) {
-	// lit, ok := s.Expr.(*ast.LiteralExpr)
-	// if !ok {
-	// 	fmt.Println("warning: print only supports strings and ints")
-	// 	return
-	// }
-	// val, err := tokentoval.Convert(lit.Value)
-	// if err != nil {
-	// 	fmt.Printf("error converting token to value %v\n", err)
-	// 	return
-	// }
-	// llvmLiteral := c.emitValueLiteral(val)
-	// var formatName string
-	// switch val.Type {
-
-	// case value.ValueInt:
-	// 	formatName = "@print_int_format"
-	// case value.ValueFloat:
-	// 	formatName = "@print_float_format"
-	// case value.ValueString:
-	// 	formatName = "@print_str_format"
-	// default:
-	// 	fmt.Printf("usupported literal type in print %v", lit)
-	// 	return
-	// }
-	// c.builder.WriteString(fmt.Sprintf(
-	// 	"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* %s, i32 0, i32 0), %s)",
-	// 	formatName, llvmLiteral))
+	switch expr := s.Expr.(type) {
+	case *ast.LiteralExpr:
+		pl := &printableLiteralExp{lit: expr}
+		if err := pl.EmitPrint(c); err != nil {
+			fmt.Printf("error emitting print: %v", err)
+		}
+	case *ast.VariableExpr:
+		pv := &printableVariableExpr{varExpr: expr}
+		if err := pv.EmitPrint(c); err != nil {
+			fmt.Printf("error emitting print: %v\n", err)
+		}
+	default:
+		fmt.Printf("unsupported print expression type: %T\n", expr)
+	}
 }

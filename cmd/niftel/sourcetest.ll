@@ -5,5 +5,12 @@ declare i32 @printf(i8*,...)
 	%Person = type { i8*, i64 }
 define i32 @main(){
 entry:
+ %t0 = alloca %Person
+ %t1 = alloca %Person
+%t2 = getelementptr %Person, %Person* %t1 i32 0, i32 0
+store i8* getelementptr ([5 x i8], [5 x i8]* @.str0, i32 0, i32 0), %t2* i8*
+%t3 = getelementptr %Person, %Person* %t1 i32 0, i32 1
+store i64 2, %t3* i64
+ store %Person* %t1, %Person** %t0
  ret i32 0
 }
