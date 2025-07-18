@@ -250,7 +250,7 @@ func (c *Codegen) emitStructLiteralExpr(expr *ast.StructLiteralExpr) (string, st
 
 		c.builder.WriteString(fmt.Sprintf(
 			"store %s %s, %s* %s\n",
-			valType, valReg, gepReg, valType,
+			valType, valReg, valType, gepReg,
 		))
 
 	}
