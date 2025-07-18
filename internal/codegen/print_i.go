@@ -91,7 +91,7 @@ func (p *printableVariableExpr) EmitPrint(c *Codegen) error {
 
 			}
 			if i < len(structInfo.FieldNames)-1 {
-				c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @print_str_comma, i32 0, i32 0))` + "\n")
+				c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([2 x i8], [2 x i8]* @print_str_comma, i32 0, i32 0))` + "\n")
 			}
 		}
 		c.builder.WriteString(`call i32 (i8*,...) @printf(i8* getelementptr ([2 x i8], [2 x i8]* @print_str_close_brace, i32 0, i32 0))` + "\n")

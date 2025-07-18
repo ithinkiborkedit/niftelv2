@@ -145,7 +145,35 @@ func (c *Codegen) emitVarStmt(s *ast.VarStmt) {
 
 	initValReg, initValType := c.emitExpr(s.Init)
 
-	c.builder.WriteString(fmt.Sprintf(" store %s %s, %s* %s\n", initValType, initValReg, initValType, allocaReg))
+	if len(llvmType) > 0 && llvmType[0] == '%' {
+		structName := llvmType[1:]
+		structInfo, ok := c.structs[structName]
+		if !ok {
+			fmt.Printf("unkown struct type %s for print", structName)
+		}
+
+		for i := range structInfo.FieldNames {
+			fieldType := structInfo.FieldTypes[i]
+			fieldPtrReg := c.freshReg()
+			c.builder.WriteString(fmt.Sprintf(
+				" %s = getelementptr %s, %s* %s, i32 0, i32 0 %d\n",
+				fieldPtrReg, llvmType, llvmType, allocaReg, i))
+
+			initFieldPtrReg := c.freshReg()
+			c.builder.WriteString(fmt.Sprintf(
+				" %s = getelementptr %s, %s* %s, i32 0, i32 %d\n",
+				initFieldPtrReg, llvmType, llvmType, initValReg, i))
+
+			loadReg := c.freshReg()
+			c.builder.WriteString(fmt.Sprintf(
+				" %s = load %s, %s* %s\n",
+				loadReg, fieldType, fieldType, initFieldPtrReg))
+
+			c.builder.WriteString(fmt.Sprintf(
+				" store %s %s, %s* %s\n",
+				initValType, initValReg, initValType, allocaReg))
+		}
+	}
 
 	c.symbols[name] = VariableInfo{
 		LLVMName: allocaReg,
@@ -198,7 +226,7 @@ func (c *Codegen) emitPreamble() {
 	@print_float_format = constant [4 x i8] c"%f\0A\00"
 	@print_str_open_brace = private constant [2 x i8] c"{\00"
 	@print_str_close_brace = private constant [2 x i8] c"}\00"
-	@print_str_comma = private constant [2 x i8] c", \00"
+	@print_str_comma = private constant [3 x i8] c", \00"
 	`)
 }
 
