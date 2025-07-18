@@ -11,19 +11,19 @@ define i32 @main(){
 entry:
  %t0 = alloca %Person
  %t1 = alloca %Person
-%t2 = getelementptr %Person, %Person* %t1, i32 0, i32 0
-store i8* getelementptr ([5 x i8], [5 x i8]* @.str0, i32 0, i32 0), i8** %t2
-%t3 = getelementptr %Person, %Person* %t1, i32 0, i32 1
-store i64 2, i64* %t3
+%t2 = getelementptr %Person, %Person* %t1, i32 0, i32 1
+store i64 2, i64* %t2
+%t3 = getelementptr %Person, %Person* %t1, i32 0, i32 0
+store i8* getelementptr ([5 x i8], [5 x i8]* @.str0, i32 0, i32 0), i8** %t3
  store %Person* %t1, %Person** %t0
 call i32 (i8*,...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @print_str_open_brace, i32 0, i32 0))
  %t4 = getelementptr %Person, %Person* %t0, i32 0, i32 0
 %t5 = load i8*, i8** %t4
- call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0), i8* %t5)
+call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0), i8* %t5)
 call i32 (i8*,...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @print_str_comma, i32 0, i32 0))
  %t6 = getelementptr %Person, %Person* %t0, i32 0, i32 1
 %t7 = load i64, i64* %t6
- call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_int_format, i32 0, i32 0), i64 %t7)
+call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_int_format, i32 0, i32 0), i64 %t7)
 call i32 (i8*,...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @print_str_close_brace, i32 0, i32 0))
 
  ret i32 0

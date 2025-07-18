@@ -76,15 +76,15 @@ func (p *printableVariableExpr) EmitPrint(c *Codegen) error {
 			switch fieldType {
 			case "i64":
 				c.builder.WriteString(fmt.Sprintf(
-					" call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_int_format, i32 0, i32 0), i64 %s)\n",
+					"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_int_format, i32 0, i32 0), i64 %s)\n",
 					loadReg))
 			case "double":
 				c.builder.WriteString(fmt.Sprintf(
-					" call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_float_format, i32 0, i32 0), double %s)\n",
+					"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_float_format, i32 0, i32 0), double %s)\n",
 					loadReg))
 			case "i8*":
 				c.builder.WriteString(fmt.Sprintf(
-					" call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0), i8* %s)\n",
+					"call i32 (i8*,...) @printf(i8* getelementptr ([4 x i8], [4 x i8]* @print_str_format, i32 0, i32 0), i8* %s)\n",
 					loadReg))
 			default:
 				return fmt.Errorf("unsupported struct field type %s for print", fieldType)
