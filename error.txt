@@ -1,3 +1,65 @@
-{k?�
-, 83172304
-}%  
+DEBUG ENV TYPES after registration:[
+"list" "float" "bool" "func" "null" "tuple" "int" "struct" "string" ]
+Raw source string: "struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken advanced: l.current=1 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: struct (type=struct, line=1, lexeme="struct")[STATMENT] At: <nil> Current: struct (type=struct, line=1, lexeme="struct")scanToken advanced: l.current=8 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="Person")[AFTER SKIP NEW LINES] struct body: token IDENTIFIER lexem='Person' line='1'
+scanToken advanced: l.current=15 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: { (type={, line=1, lexeme="{")scanToken advanced: l.current=16 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken advanced: l.current=17 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken advanced: l.current=21 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=2, lexeme="name")[AFTER OPENING '{' ] struct body: token IDENTIFIER lexem='name' line='2'
+[Trying to check for 
+ after '{' ] struct body: token IDENTIFIER lexem='name' line='2'
+[PARSERLOOP] struct body: type=1  lexem='name' line='2'
+scanToken advanced: l.current=25 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: : (type=:, line=2, lexeme=":")scanToken advanced: l.current=27 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=2, lexeme="string")parseTypeExpr: current token = {IDENTIFIER string <nil> 2 16}
+scanToken advanced: l.current=33 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken advanced: l.current=34 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken advanced: l.current=38 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=3, lexeme="age")[PARSERLOOP] struct body: type=1  lexem='age' line='3'
+scanToken advanced: l.current=41 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: : (type=:, line=3, lexeme=":")scanToken advanced: l.current=43 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=3, lexeme="int")parseTypeExpr: current token = {IDENTIFIER int <nil> 3 12}
+scanToken advanced: l.current=46 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken advanced: l.current=47 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: } (type=}, line=4, lexeme="\n}")scanToken advanced: l.current=48 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken advanced: l.current=49 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken advanced: l.current=50 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: var (type=var, line=6, lexeme="var")[STATMENT] At: <nil> Current: var (type=var, line=6, lexeme="var")scanToken advanced: l.current=54 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=6, lexeme="testPerson")scanToken advanced: l.current=64 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: : (type=:, line=6, lexeme=":")scanToken advanced: l.current=66 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=6, lexeme="Person")parseTypeExpr: current token = {IDENTIFIER Person <nil> 6 22}
+scanToken advanced: l.current=73 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: = (type==, line=6, lexeme="=")scanToken advanced: l.current=75 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=6, lexeme="Person")scanToken advanced: l.current=81 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: { (type={, line=6, lexeme="{")scanToken advanced: l.current=82 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=6, lexeme="name")scanToken advanced: l.current=86 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: : (type=:, line=6, lexeme=":")scanToken advanced: l.current=88 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken start string literal: l.current=88 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken string literal: l.current=88 char='X'
+string loop: l.current=88 remaining source="test\", age: 2}\n\nprint(testPerson)"
+char at l.current=88 char='t'
+string loop: l.current=89 remaining source="est\", age: 2}\n\nprint(testPerson)"
+char at l.current=89 char='e'
+string loop: l.current=90 remaining source="st\", age: 2}\n\nprint(testPerson)"
+char at l.current=90 char='s'
+string loop: l.current=91 remaining source="t\", age: 2}\n\nprint(testPerson)"
+char at l.current=91 char='t'
+string loop: l.current=92 remaining source="\", age: 2}\n\nprint(testPerson)"
+char at l.current=92 char='"'
+after advancing l.current=93
+[ADVANCE] Current: STRING (type=STRING, line=6, lexeme="test")scanToken advanced: l.current=94 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: , (type=,, line=6, lexeme=",")scanToken advanced: l.current=96 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=6, lexeme="age")scanToken advanced: l.current=99 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: : (type=:, line=6, lexeme=":")scanToken advanced: l.current=101 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: NUMBER (type=NUMBER, line=6, lexeme="2")scanToken advanced: l.current=102 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: } (type=}, line=6, lexeme="}")scanToken advanced: l.current=103 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken advanced: l.current=104 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+scanToken advanced: l.current=105 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: print (type=print, line=8, lexeme="print")[STATMENT] At: <nil> Current: print (type=print, line=8, lexeme="print")scanToken advanced: l.current=110 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: ( (type=(, line=8, lexeme="(")scanToken advanced: l.current=111 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=8, lexeme="testPerson")scanToken advanced: l.current=121 char="struct Person {\n    name: string\n    age: int\n}\n\nvar testPerson: Person = Person{name: \"test\", age: 2}\n\nprint(testPerson)"
+[ADVANCE] Current: ) (type=), line=8, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=8, lexeme="")llc: error: llc: sourcetest.ll:5:52: error: constant expression type mismatch: got type '[2 x i8]' but expected '[3 x i8]'
+        @print_str_open_brace = private constant [3 x i8] c"{\00"
