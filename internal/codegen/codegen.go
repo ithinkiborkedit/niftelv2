@@ -154,9 +154,10 @@ func (c *Codegen) emitVarStmt(s *ast.VarStmt) {
 
 		for i := range structInfo.FieldNames {
 			fieldType := structInfo.FieldTypes[i]
+
 			fieldPtrReg := c.freshReg()
 			c.builder.WriteString(fmt.Sprintf(
-				" %s = getelementptr %s, %s* %s, i32 0, i32 0 %d\n",
+				" %s = getelementptr %s, %s* %s, i32 0, i32 %d\n",
 				fieldPtrReg, llvmType, llvmType, allocaReg, i))
 
 			initFieldPtrReg := c.freshReg()
