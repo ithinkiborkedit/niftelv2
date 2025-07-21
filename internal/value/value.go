@@ -15,6 +15,8 @@ type ValueType int
 const (
 	ValueNull ValueType = iota
 	ValueInt
+	ValueInt32
+	ValueInt64
 	ValueFloat
 	ValueString
 	ValueBool
@@ -122,6 +124,12 @@ func (v Value) TypeInfo() *symtable.TypeSymbol {
 	switch v.Type {
 	case ValueInt:
 		t, _ := GetType("int")
+		return t
+	case ValueInt32:
+		t, _ := GetType("int32")
+		return t
+	case ValueInt64:
+		t, _ := GetType("int64")
 		return t
 	case ValueFloat:
 		t, _ := GetType("float")

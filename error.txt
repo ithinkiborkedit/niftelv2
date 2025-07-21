@@ -1,2 +1,11 @@
-[ADVANCE] Current: ) (type=), line=8, lexeme=")")[ADVANCE] Current: EOF (type=EOF, line=8, lexeme="")llc: error: llc: sourcetest.ll:5:52: error: constant expression type mismatch: got type '[2 x i8]' but expected '[3 x i8]'
-        @print_str_open_brace = private constant [3 x i8] c"{\00"
+DEBUG ENV TYPES after registration:[
+"null" "list" "int" "tuple" "func" "float" "string" "bool" "struct" ]
+Raw source string: "var y: int32 = 4\n"
+scanToken advanced: l.current=1 char="var y: int32 = 4\n"
+[ADVANCE] Current: var (type=var, line=1, lexeme="var")[STATMENT] At: <nil> Current: var (type=var, line=1, lexeme="var")scanToken advanced: l.current=5 char="var y: int32 = 4\n"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="y")scanToken advanced: l.current=6 char="var y: int32 = 4\n"
+[ADVANCE] Current: : (type=:, line=1, lexeme=":")scanToken advanced: l.current=8 char="var y: int32 = 4\n"
+[ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="int32")parseTypeExpr: current token = {IDENTIFIER int32 <nil> 1 12}
+scanToken advanced: l.current=14 char="var y: int32 = 4\n"
+[ADVANCE] Current: = (type==, line=1, lexeme="=")scanToken advanced: l.current=16 char="var y: int32 = 4\n"
+[ADVANCE] Current: NUMBER (type=NUMBER, line=1, lexeme="4")Parse error: unexpected token '4' as line 1

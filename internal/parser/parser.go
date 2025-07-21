@@ -663,7 +663,14 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 	if ok {
 		return &ast.LiteralExpr{Value: p.prev}, nil
 	}
-	ok, err = p.match(token.TokenNumber)
+	ok, err = p.match(token.TokenINT)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		return &ast.LiteralExpr{Value: p.prev}, nil
+	}
+	ok, err = p.match(token.TokenINT32)
 	if err != nil {
 		return nil, err
 	}

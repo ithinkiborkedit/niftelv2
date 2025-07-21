@@ -10,6 +10,10 @@ func (c *Codegen) llvmTypeForValueType(vt value.ValueType) string {
 	switch vt {
 	case value.ValueInt:
 		return "i64"
+	case value.ValueInt32:
+		return "i32"
+	case value.ValueInt64:
+		return "i64"
 	case value.ValueFloat:
 		return "double"
 	case value.ValueBool:

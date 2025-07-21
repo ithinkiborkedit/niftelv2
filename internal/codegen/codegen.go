@@ -172,8 +172,12 @@ func (c *Codegen) emitVarStmt(s *ast.VarStmt) {
 
 			c.builder.WriteString(fmt.Sprintf(
 				" store %s %s, %s* %s\n",
-				initValType, initValReg, initValType, allocaReg))
+				fieldType, loadReg, fieldType, fieldPtrReg))
 		}
+	} else {
+		c.builder.WriteString(fmt.Sprintf(
+			" store %s %s, %s* %s\n",
+			initValType, initValReg, initValType, allocaReg))
 	}
 
 	c.symbols[name] = VariableInfo{
@@ -221,10 +225,11 @@ func escapeStringForLLVM(s string) string {
 }
 
 func (c *Codegen) emitPreamble() {
-	c.builder.WriteString(`declare i32 @printf(i8*,...)
-	@print_str_format = constant [4 x i8] c"%s\0A\00"
-	@print_int_format = constant [4 x i8] c"%d\0A\00"
-	@print_float_format = constant [4 x i8] c"%f\0A\00"
+	c.builder.WriteString(`
+	declare i32 @printf(i8*,...)
+	@print_str_format = constant [3 x i8] c"%s\00"
+	@print_int_format = constant [3 x i8] c"%d\00"
+	@print_float_format = constant [3 x i8] c"%f\00"
 	@print_str_open_brace = private constant [2 x i8] c"{\00"
 	@print_str_close_brace = private constant [2 x i8] c"}\00"
 	@print_str_comma = private constant [3 x i8] c", \00"
