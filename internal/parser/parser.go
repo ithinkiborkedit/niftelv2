@@ -697,7 +697,7 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 		return nil, err
 	}
 	if ok {
-		typeExpr, err := p.parseTypeExprFromToken(p.prev)
+		typeExpr, err := p.parseTypeExprFromToken()
 		if err != nil {
 			return nil, err
 		}
@@ -742,9 +742,26 @@ func (p *Parser) primaryExpr() (ast.Expr, error) {
 	return nil, fmt.Errorf("unexpected token '%s' as line %d", p.curr.Lexeme, p.curr.Line)
 }
 
-func (p *Parser) parseTypeExprFromToken(tok token.Token) (*ast.TypeExpr, error) {
+func (p *Parser) parseTypeExprFromToken() (*ast.TypeExpr, error) {
+	var name token.Token
+	switch p.curr.Type {
+	case token.TokenIdentifier,
+		token.TokenINT32,
+		token.TokenINT64,
+		token.TokenINT,
+		token.TokenFloat,
+		token.TokenBool,
+		token.TokenString:
+
+		name = p.curr
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+	default:
+		return nil, fmt.Errorf("expected type name got %s at line %d", p.curr.Lexeme, p.curr.Line)
+	}
 	typeExpr := &ast.TypeExpr{
-		Name:     tok,
+		Name:     name,
 		TypeArgs: nil,
 	}
 

@@ -19,6 +19,8 @@ const (
 	TypeKindTuple
 	TypeKindList
 	TypeKindInt
+	TypeKindInt32
+	TypeKindInt64
 	TypeKindFloat
 	TypeKindString
 	TypeKindBool
@@ -176,6 +178,8 @@ var BuiltInTypes = map[string]*symtable.TypeSymbol{}
 
 func BuiltinTypesInit() {
 	BuiltInTypes["int"] = &symtable.TypeSymbol{SymName: "int", SymKind: symtable.SymbolTypes}
+	BuiltInTypes["int32"] = &symtable.TypeSymbol{SymName: "int32", SymKind: symtable.SymbolTypes}
+	BuiltInTypes["int64"] = &symtable.TypeSymbol{SymName: "int64", SymKind: symtable.SymbolTypes}
 	BuiltInTypes["float"] = &symtable.TypeSymbol{SymName: "float", SymKind: symtable.SymbolTypes}
 	BuiltInTypes["string"] = &symtable.TypeSymbol{SymName: "string", SymKind: symtable.SymbolTypes}
 	BuiltInTypes["bool"] = &symtable.TypeSymbol{SymName: "bool", SymKind: symtable.SymbolTypes}

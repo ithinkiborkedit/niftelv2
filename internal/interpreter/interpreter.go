@@ -205,13 +205,23 @@ func (i *Interpreter) VisitStructLiteralExpr(expr *ast.StructLiteralExpr) contro
 func (i *Interpreter) VisitLiteralExpr(expr *ast.LiteralExpr) controlflow.ExecResult {
 	tok := expr.Value
 	switch tok.Type {
-	case token.TokenNumber:
+	case token.TokenINT:
 		val, ok := tok.Data.(int64)
 		if !ok {
 			return controlflow.ExecResult{Err: errors.New("invalid int literal token data")}
 		}
 		return controlflow.ExecResult{Value: value.Value{
-			Type: value.ValueInt, Data: float64(val),
+			Type: value.ValueInt, Data: int64(val),
+		},
+			Flow: controlflow.FlowNone,
+		}
+	case token.TokenINT32:
+		val, ok := tok.Data.(int32)
+		if !ok {
+			return controlflow.ExecResult{Err: errors.New("invalid int literal token data")}
+		}
+		return controlflow.ExecResult{Value: value.Value{
+			Type: value.ValueInt, Data: int32(val),
 		},
 			Flow: controlflow.FlowNone,
 		}

@@ -11,6 +11,13 @@ import (
 func Convert(tok tokens.Token) (value.Value, error) {
 	switch tok.Type {
 	case tokens.TokenNumber:
+		switch data := tok.Data.(type) {
+		case int32:
+			return value.Value{
+				Type: value.ValueInt32,
+				Data: data,
+			}, nil
+		}
 		fval, err := strconv.ParseFloat(tok.Lexeme, 64)
 		if err != nil {
 			return value.Null(), fmt.Errorf("invalid numbner token: %v", err)

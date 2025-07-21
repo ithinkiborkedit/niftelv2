@@ -70,7 +70,7 @@ func (p *printableVariableExpr) EmitPrint(c *Codegen) error {
 
 			loadReg := c.freshReg()
 			c.builder.WriteString(fmt.Sprintf(
-				"%s = load %s, %s* %s\n",
+				" %s = load %s, %s* %s\n",
 				loadReg, fieldType, fieldType, gepReg))
 
 			switch fieldType {

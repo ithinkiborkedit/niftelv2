@@ -39,6 +39,8 @@ func (v Value) String() string {
 		return "null"
 	case ValueInt, ValueFloat, ValueBool, ValueString:
 		return fmt.Sprintf("%v", v.Data)
+	case ValueInt32:
+		return fmt.Sprintf("%v", v.Data)
 	case ValueList:
 		return formatList(v.Data)
 	case ValueDict:

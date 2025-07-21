@@ -29,7 +29,10 @@ func (c *Codegen) emitValueLiteral(v value.Value) string {
 	llvmType := c.llvmTypeForValueType(v.Type)
 	switch v.Type {
 	case value.ValueInt:
-		intVal := int64(v.Data.(float64))
+		intVal := int64(v.Data.(int64))
+		return fmt.Sprintf("%s %d", llvmType, intVal)
+	case value.ValueInt32:
+		intVal := int32(v.Data.(int32))
 		return fmt.Sprintf("%s %d", llvmType, intVal)
 	case value.ValueFloat:
 		floatVal := v.Data.(float64)
