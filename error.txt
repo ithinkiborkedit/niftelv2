@@ -1,5 +1,5 @@
 DEBUG ENV TYPES after registration:[
-"null" "list" "int" "tuple" "func" "float" "string" "bool" "struct" ]
+"list" "float" "func" "int" "bool" "null" "tuple" "struct" "string" ]
 Raw source string: "var y: int32 = 4\n"
 scanToken advanced: l.current=1 char="var y: int32 = 4\n"
 [ADVANCE] Current: var (type=var, line=1, lexeme="var")[STATMENT] At: <nil> Current: var (type=var, line=1, lexeme="var")scanToken advanced: l.current=5 char="var y: int32 = 4\n"
@@ -8,4 +8,6 @@ scanToken advanced: l.current=1 char="var y: int32 = 4\n"
 [ADVANCE] Current: IDENTIFIER (type=IDENTIFIER, line=1, lexeme="int32")parseTypeExpr: current token = {IDENTIFIER int32 <nil> 1 12}
 scanToken advanced: l.current=14 char="var y: int32 = 4\n"
 [ADVANCE] Current: = (type==, line=1, lexeme="=")scanToken advanced: l.current=16 char="var y: int32 = 4\n"
-[ADVANCE] Current: NUMBER (type=NUMBER, line=1, lexeme="4")Parse error: unexpected token '4' as line 1
+[ADVANCE] Current: NUMBER (type=NUMBER, line=1, lexeme="4")scanToken advanced: l.current=17 char="var y: int32 = 4\n"
+scanToken advanced: l.current=17 char="var y: int32 = 4\n"
+[ADVANCE] Current: EOF (type=EOF, line=2, lexeme="")unkown struct type int32 for printpanic: runtime error: invalid memory address or nil pointer dereference
